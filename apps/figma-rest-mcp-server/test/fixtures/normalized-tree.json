@@ -1,0 +1,387 @@
+{
+  "fileKey": "FILE_GOLDEN",
+  "rootNodeIds": ["root-1"],
+  "roots": [
+    {
+      "id": "root-1",
+      "name": "Root Frame",
+      "uniqueName": "Root Frame",
+      "type": "FRAME",
+      "visible": true,
+      "width": 320,
+      "height": 180,
+      "x": 0,
+      "y": 0,
+      "cumulativeRotation": 0,
+      "relativePositioning": "relative",
+      "layout": {
+        "layoutPositioning": "AUTO",
+        "layoutMode": "NONE",
+        "clipsContent": true
+      },
+      "style": {
+        "fills": [
+          {
+            "type": "SOLID",
+            "color": {
+              "r": 0.94,
+              "g": 0.97,
+              "b": 1,
+              "a": 1
+            }
+          }
+        ],
+        "strokes": [
+          {
+            "type": "SOLID",
+            "color": {
+              "r": 0.62,
+              "g": 0.7,
+              "b": 0.86,
+              "a": 1
+            }
+          }
+        ],
+        "strokeWeight": 1,
+        "cornerRadius": 16,
+        "effects": [
+          {
+            "type": "DROP_SHADOW",
+            "visible": true,
+            "color": {
+              "r": 0.03,
+              "g": 0.06,
+              "b": 0.14,
+              "a": 0.28
+            },
+            "offset": {
+              "x": 0,
+              "y": 8
+            },
+            "radius": 24
+          }
+        ]
+      },
+      "textSegments": [],
+      "variableBindings": [],
+      "imageHints": [],
+      "vectorHints": [],
+      "assetSupportRequirements": {
+        "images": false,
+        "vectors": false,
+        "variables": false
+      },
+      "children": [
+        {
+          "id": "text-1",
+          "name": "Hero Title",
+          "uniqueName": "Hero Title",
+          "type": "TEXT",
+          "visible": true,
+          "width": 200,
+          "height": 32,
+          "x": 12,
+          "y": 16,
+          "cumulativeRotation": 0,
+          "relativePositioning": "relative",
+          "layout": {
+            "layoutPositioning": "AUTO",
+            "layoutMode": "NONE"
+          },
+          "style": {
+            "fontName": {
+              "family": "SF Pro Display",
+              "style": "Bold"
+            },
+            "fontSize": 20,
+            "fontWeight": 700,
+            "lineHeightPx": 28,
+            "letterSpacing": -0.3,
+            "textAlignHorizontal": "LEFT",
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 0.05,
+                  "g": 0.08,
+                  "b": 0.14,
+                  "a": 1
+                }
+              }
+            ]
+          },
+          "text": "Hello MCP",
+          "textSegments": [
+            {
+              "text": "Hello",
+              "start": 0,
+              "end": 5,
+              "style": {
+                "fontName": {
+                  "family": "SF Pro Display",
+                  "style": "Bold"
+                },
+                "fontSize": 20,
+                "fontWeight": 700,
+                "fills": [
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.05,
+                      "g": 0.08,
+                      "b": 0.14,
+                      "a": 1
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "text": " MCP",
+              "start": 5,
+              "end": 9,
+              "style": {
+                "fontName": {
+                  "family": "SF Pro Display",
+                  "style": "Semibold"
+                },
+                "fontSize": 20,
+                "fontWeight": 600,
+                "fills": [
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.08,
+                      "g": 0.32,
+                      "b": 0.78,
+                      "a": 1
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "variableBindings": [],
+          "imageHints": [],
+          "vectorHints": [],
+          "assetSupportRequirements": {
+            "images": false,
+            "vectors": false,
+            "variables": false
+          },
+          "children": [],
+          "rawNodeId": "text-1"
+        },
+        {
+          "id": "image-1",
+          "name": "Hero Image",
+          "uniqueName": "Hero Image",
+          "type": "RECTANGLE",
+          "visible": true,
+          "width": 64,
+          "height": 64,
+          "x": 12,
+          "y": 60,
+          "cumulativeRotation": 0,
+          "relativePositioning": "relative",
+          "layout": {
+            "layoutPositioning": "AUTO",
+            "layoutMode": "NONE"
+          },
+          "style": {
+            "cornerRadius": 12,
+            "strokes": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 1,
+                  "g": 1,
+                  "b": 1,
+                  "a": 1
+                }
+              }
+            ],
+            "strokeWeight": 2
+          },
+          "textSegments": [],
+          "variableBindings": [],
+          "imageHints": [
+            {
+              "imageRef": "image-ref-hero",
+              "path": "image-1"
+            }
+          ],
+          "vectorHints": [],
+          "assetSupportRequirements": {
+            "images": true,
+            "vectors": false,
+            "variables": false
+          },
+          "children": [],
+          "rawNodeId": "image-1"
+        },
+        {
+          "id": "vector-1",
+          "name": "Chevron",
+          "uniqueName": "Chevron",
+          "type": "VECTOR",
+          "visible": true,
+          "width": 24,
+          "height": 24,
+          "x": 96,
+          "y": 80,
+          "cumulativeRotation": 0,
+          "relativePositioning": "relative",
+          "layout": {
+            "layoutPositioning": "AUTO",
+            "layoutMode": "NONE"
+          },
+          "style": {},
+          "textSegments": [],
+          "variableBindings": [],
+          "imageHints": [],
+          "vectorHints": [
+            {
+              "nodeId": "vector-1",
+              "preferredFormat": "svg",
+              "required": true
+            }
+          ],
+          "assetSupportRequirements": {
+            "images": false,
+            "vectors": true,
+            "variables": false
+          },
+          "children": [],
+          "rawNodeId": "vector-1"
+        },
+        {
+          "id": "badge-1",
+          "name": "CTA Badge",
+          "uniqueName": "CTA Badge",
+          "type": "FRAME",
+          "visible": true,
+          "width": 160,
+          "height": 44,
+          "x": 140,
+          "y": 60,
+          "cumulativeRotation": 0,
+          "relativePositioning": "relative",
+          "layout": {
+            "layoutPositioning": "AUTO",
+            "layoutMode": "HORIZONTAL",
+            "itemSpacing": 8,
+            "paddingLeft": 14,
+            "paddingRight": 14,
+            "paddingTop": 10,
+            "paddingBottom": 10,
+            "primaryAxisAlignItems": "CENTER",
+            "counterAxisAlignItems": "CENTER",
+            "clipsContent": true
+          },
+          "style": {
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 1,
+                  "g": 0.86,
+                  "b": 0.35,
+                  "a": 1
+                }
+              }
+            ],
+            "cornerRadius": 22
+          },
+          "textSegments": [],
+          "variableBindings": [],
+          "imageHints": [],
+          "vectorHints": [],
+          "assetSupportRequirements": {
+            "images": false,
+            "vectors": false,
+            "variables": false
+          },
+          "children": [
+            {
+              "id": "badge-text-1",
+              "name": "Badge Label",
+              "uniqueName": "Badge Label",
+              "type": "TEXT",
+              "visible": true,
+              "width": 120,
+              "height": 20,
+              "x": 0,
+              "y": 0,
+              "cumulativeRotation": 0,
+              "relativePositioning": "relative",
+              "layout": {
+                "layoutPositioning": "AUTO",
+                "layoutMode": "NONE"
+              },
+              "style": {
+                "fontName": {
+                  "family": "SF Pro Text",
+                  "style": "Semibold"
+                },
+                "fontSize": 14,
+                "fontWeight": 600,
+                "lineHeightPx": 20,
+                "fills": [
+                  {
+                    "type": "SOLID",
+                    "color": {
+                      "r": 0.18,
+                      "g": 0.12,
+                      "b": 0.02,
+                      "a": 1
+                    }
+                  }
+                ]
+              },
+              "text": "Auto layout",
+              "textSegments": [
+                {
+                  "text": "Auto layout",
+                  "start": 0,
+                  "end": 11,
+                  "style": {
+                    "fontName": {
+                      "family": "SF Pro Text",
+                      "style": "Semibold"
+                    },
+                    "fontSize": 14,
+                    "fontWeight": 600,
+                    "fills": [
+                      {
+                        "type": "SOLID",
+                        "color": {
+                          "r": 0.18,
+                          "g": 0.12,
+                          "b": 0.02,
+                          "a": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "variableBindings": [],
+              "imageHints": [],
+              "vectorHints": [],
+              "assetSupportRequirements": {
+                "images": false,
+                "vectors": false,
+                "variables": false
+              },
+              "children": [],
+              "rawNodeId": "badge-text-1"
+            }
+          ],
+          "rawNodeId": "badge-1"
+        }
+      ],
+      "rawNodeId": "root-1"
+    }
+  ]
+}

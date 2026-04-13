@@ -1,0 +1,156 @@
+<div className="w-96 h-[844px] relative bg-black overflow-hidden">
+  <div className="w-96 h-[736px] left-0 top-[108px] absolute bg-white" />
+  <div data-dark-mode="False" className="w-96 h-8 left-0 top-[810px] absolute" />
+  <div data-dark-mode="True" data-type="Mic Active" className="w-96 h-12 left-0 top-0 absolute" />
+  <div className="w-96 h-14 left-0 top-[47px] absolute bg-white rounded-tl-lg rounded-tr-lg" />
+  <div className="w-20 h-8 px-3 py-1.5 left-[290px] top-[58px] absolute bg-gray-900/5 rounded-[36px] inline-flex justify-center items-center gap-2.5">
+    <div className="justify-start text-gray-900 text-base font-medium font-['PingFang_SC'] leading-4">取消多选</div>
+  </div>
+  <div className="w-6 h-6 left-[16px] top-[62px] absolute">
+    <div className="w-6 h-6 left-0 top-0 absolute bg-white/0" />
+    <div className="w-3 h-2 left-[10.59px] top-[4.93px] absolute bg-gray-900 rounded-[1px]" />
+    <div className="w-3 h-2 left-[19.07px] top-[10.59px] absolute origin-top-left rotate-90 bg-gray-900 rounded-[1px]" />
+  </div>
+  <div className="w-16 h-6 left-[150px] top-[62px] absolute justify-start text-gray-900 text-base font-medium font-['PingFang_SC'] leading-4">所有照片</div>
+  <div className="w-4 h-4 left-[223.11px] top-[65.37px] absolute">
+    <div className="w-3 h-1.5 left-[13.92px] top-[11.20px] absolute origin-top-left -rotate-180 bg-gray-900 rounded-[1px]" />
+  </div>
+  <div className="w-96 h-10 left-0 top-[101px] absolute bg-white" />
+  <div className="w-28 h-0.5 left-[16px] top-[139px] absolute bg-gray-900" />
+  <div className="w-28 left-[16px] top-[110px] absolute text-center justify-start text-gray-900 text-base font-medium font-['PingFang_SC'] leading-4">全部</div>
+  <div className="w-28 left-[254px] top-[110px] absolute opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">图片</div>
+  <div className="w-28 left-[135px] top-[110px] absolute opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">视频</div>
+  <div className="w-96 h-10 left-0 top-[101px] absolute bg-white" />
+  <div className="w-16 h-0.5 left-[93px] top-[138px] absolute bg-gray-900" />
+  <div className="left-[25px] top-[110px] absolute inline-flex justify-center items-center">
+    <div className="w-16 opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">收藏</div>
+    <div className="w-16 text-center justify-start text-gray-900 text-base font-medium font-['PingFang_SC'] leading-4">全部</div>
+    <div className="w-16 opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">视频</div>
+    <div className="w-16 opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">图片</div>
+    <div className="w-16 opacity-60 text-center justify-start text-gray-900/75 text-base font-normal font-['PingFang_SC'] leading-4">动图</div>
+  </div>
+  <div data-search="true" className="w-96 left-0 top-[141px] absolute bg-white inline-flex flex-col justify-start items-start gap-0.5">
+    <div className="self-stretch inline-flex justify-between items-start">
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+    </div>
+    <div className="self-stretch inline-flex justify-between items-start">
+      <div data-selected="False" className="w-32 h-32 relative">
+        <img className="w-32 h-32 left-0 top-0 absolute" src="https://placehold.co/129x129" />
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+    </div>
+    <div className="self-stretch inline-flex justify-between items-start">
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+      <div data-selected="True" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[99px] top-[6px] absolute bg-black/10 border-2 border-white" />
+          <div className="w-32 h-7 px-2 py-1.5 left-0 top-[101px] absolute bg-gradient-to-b from-black/0 to-black/40 inline-flex justify-center items-center gap-16">
+            <div className="w-4 h-4 left-[6px] top-[6px] absolute overflow-hidden">
+              <div className="w-3 h-3 left-[1.80px] top-[2.31px] absolute bg-white" />
+            </div>
+            <div className="text-right justify-center text-white text-xs font-medium font-['SF_Pro_Text'] leading-3 [text-shadow:_0px_0px_4px_rgb(0_0_0_/_0.25)]">0:30</div>
+          </div>
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+    </div>
+    <div className="self-stretch inline-flex justify-between items-start">
+      <div data-selected="True" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[99px] top-[6px] absolute bg-black/10 border-2 border-white" />
+          <div className="w-32 h-7 px-2 py-1.5 left-0 top-[101px] absolute bg-gradient-to-b from-black/0 to-black/40 inline-flex justify-center items-center gap-16">
+            <div className="w-4 h-4 left-[6px] top-[6px] absolute overflow-hidden">
+              <div className="w-3 h-3 left-[1.80px] top-[2.31px] absolute bg-white" />
+            </div>
+            <div className="text-right justify-center text-white text-xs font-medium font-['SF_Pro_Text'] leading-3 [text-shadow:_0px_0px_4px_rgb(0_0_0_/_0.25)]">0:30</div>
+          </div>
+        </div>
+      </div>
+      <div data-selected="True" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[99px] top-[6px] absolute bg-black/10 border-2 border-white" />
+          <div className="w-32 h-7 px-2 py-1.5 left-0 top-[101px] absolute bg-gradient-to-b from-black/0 to-black/40 inline-flex justify-center items-center gap-16">
+            <div className="w-4 h-4 left-[6px] top-[6px] absolute overflow-hidden">
+              <div className="w-3 h-3 left-[1.80px] top-[2.31px] absolute bg-white" />
+            </div>
+            <div className="text-right justify-center text-white text-xs font-medium font-['SF_Pro_Text'] leading-3 [text-shadow:_0px_0px_4px_rgb(0_0_0_/_0.25)]">0:30</div>
+          </div>
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+    </div>
+    <div className="self-stretch inline-flex justify-start items-start gap-0.5">
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+      <div data-selected="False" className="w-32 h-32 relative">
+        <div className="w-32 h-32 left-0 top-0 absolute overflow-hidden">
+          <img className="w-full h-full left-0 top-0 absolute" src="https://placehold.co/129x129" />
+          <div className="w-6 h-6 left-[97px] top-[6px] absolute bg-black/10 border-2 border-white" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div className="w-5 h-5 left-[231.50px] top-[639px] absolute overflow-hidden">
+    <div className="w-5 h-5 left-0 top-0 absolute overflow-hidden">
+      <div className="w-5 h-5 left-[-1px] top-[-1px] absolute overflow-hidden">
+        <div className="w-4 h-4 left-[2.06px] top-[2.06px] absolute bg-white" />
+      </div>
+    </div>
+  </div>
+  <div className="w-96 h-12 left-0 top-[141px] absolute bg-gray-900/5" />
+  <div className="left-[48px] top-[156px] absolute justify-start text-gray-900 text-xs font-medium font-['PingFang_SC'] leading-3">往年今日 2018 年 7 月 25 日</div>
+  <div data-尺寸="16" data-形状="outlined" className="w-4 h-4 left-[366px] top-[157px] absolute overflow-hidden">
+    <div className="w-2 h-3.5 left-[4.33px] top-[1.33px] absolute bg-gray-900" />
+  </div>
+  <img className="w-8 h-8 left-[8px] top-[149px] absolute rounded" src="https://placehold.co/32x32" />
+</div>

@@ -1,0 +1,15 @@
+// Drop shadow approximated.
+Box(modifier = Modifier.width(320.dp).height(180.dp).background(Color(0xFFF0F7FF)).clip(RoundedCornerShape(16.dp))) {
+  Text(text = buildAnnotatedString { withStyle(SpanStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0D1424))) { append("Hello") } withStyle(SpanStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1452C7))) { append(" MCP") } }, modifier = Modifier.width(200.dp).height(32.dp).offset(x = 12.dp, y = 16.dp))
+  Box(modifier = Modifier.width(64.dp).height(64.dp).clip(RoundedCornerShape(12.dp)).offset(x = 12.dp, y = 60.dp)) {
+    AsyncImage(model = "https://cdn.example.com/hero.png", contentDescription = "Hero Image")
+  }
+  Box(modifier = Modifier.width(24.dp).height(24.dp).offset(x = 96.dp, y = 80.dp)) {
+    AndroidSvg(svg = """
+    <svg data-node="vector-1"></svg>
+    """, contentDescription = "Chevron")
+  }
+  Row(modifier = Modifier.width(160.dp).height(44.dp).padding(start = 14.dp, top = 10.dp, end = 14.dp, bottom = 10.dp).background(Color(0xFFFFDB59)).clip(RoundedCornerShape(22.dp)).offset(x = 140.dp, y = 60.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(text = "Auto layout", modifier = Modifier.width(120.dp).height(20.dp), style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2E1F05)))
+  }
+}

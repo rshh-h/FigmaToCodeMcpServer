@@ -1,0 +1,14 @@
+<div data-figma-file="FILE_GOLDEN" style="position: relative;">
+  <div style="position: relative; width: 320px; height: 180px; background: #F0F7FF; border-radius: 16px; border: 1px solid #9EB3DB; box-shadow: 0px 8px 24px rgba(8, 15, 36, 0.28); overflow: hidden">
+    <p style="position: absolute; left: 12px; top: 16px; width: 200px; height: 32px; color: #0D1424; font-size: 20px; font-family: SF Pro Display; font-weight: 700; line-height: 28px; letter-spacing: -0.3px; text-align: left; margin: 0"><span style="color: #0D1424; font-size: 20px; font-family: SF Pro Display; font-weight: 700">Hello</span><span style="color: #1452C7; font-size: 20px; font-family: SF Pro Display; font-weight: 600"> MCP</span></p>
+    <div style="position: absolute; left: 12px; top: 60px; width: 64px; height: 64px; border-radius: 12px; border: 2px solid #FFFFFF">
+      <img src="https://cdn.example.com/hero.png" alt="Hero Image" style="width: 100%; height: 100%; object-fit: cover;" />
+    </div>
+    <div style="position: absolute; left: 96px; top: 80px; width: 24px; height: 24px">
+      <svg data-node="vector-1"></svg>
+    </div>
+    <div style="position: absolute; left: 140px; top: 60px; width: 160px; height: 44px; display: flex; flex-direction: row; gap: 8px; padding: 10px 14px 10px 14px; background: #FFDB59; border-radius: 22px; overflow: hidden">
+      <p style="position: relative; width: 120px; height: 20px; color: #2E1F05; font-size: 14px; font-family: SF Pro Text; font-weight: 600; line-height: 20px; margin: 0">Auto layout</p>
+    </div>
+  </div>
+</div>

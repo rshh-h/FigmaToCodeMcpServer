@@ -1,0 +1,31 @@
+// Drop shadow approximated.
+ZStack(alignment: .topLeading) {
+  (Text("Hello").font(.system(size: 20)).foregroundStyle(Color(red: 0.05, green: 0.08, blue: 0.14)) + Text(" MCP").font(.system(size: 20)).foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.78)))
+  .frame(width: 200, height: 32)
+  .offset(x: 12, y: 16)
+  ZStack(alignment: .topLeading) {
+    AsyncImage(url: URL(string: "https://cdn.example.com/hero.png")) { image in image.resizable().scaledToFill() } placeholder: { Color.clear }
+  }
+  .frame(width: 64, height: 64)
+  .cornerRadius(12)
+  .offset(x: 12, y: 60)
+  ZStack(alignment: .topLeading) {
+    SvgWebView(svg: #"""
+    <svg data-node="vector-1"></svg>
+    """#)
+  }
+  .frame(width: 24, height: 24)
+  .offset(x: 96, y: 80)
+  HStack(spacing: 8) {
+    Text("Auto layout").font(.system(size: 14)).foregroundStyle(Color(red: 0.18, green: 0.12, blue: 0.02))
+    .frame(width: 120, height: 20)
+  }
+  .frame(width: 160, height: 44)
+  .padding(EdgeInsets(top: 10, leading: 14, bottom: 10, trailing: 14))
+  .background(Color(red: 1, green: 0.86, blue: 0.35, opacity: 1))
+  .cornerRadius(22)
+  .offset(x: 140, y: 60)
+}
+.frame(width: 320, height: 180)
+.background(Color(red: 0.94, green: 0.97, blue: 1, opacity: 1))
+.cornerRadius(16)

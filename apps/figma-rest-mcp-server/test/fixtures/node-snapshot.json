@@ -1,0 +1,72 @@
+{
+  "nodes": {
+    "1:2": {
+      "document": {
+        "id": "1:2",
+        "name": "Card",
+        "type": "FRAME",
+        "visible": true,
+        "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 200
+        },
+        "children": [
+          {
+            "id": "1:3",
+            "name": "Title",
+            "type": "TEXT",
+            "visible": true,
+            "absoluteBoundingBox": {
+              "x": 8,
+              "y": 8,
+              "width": 100,
+              "height": 24
+            },
+            "characters": "Hello world",
+            "style": {
+              "fontSize": 16
+            },
+            "characterStyleOverrides": [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+            "styleOverrideTable": {
+              "0": {
+                "fontWeight": 400
+              },
+              "1": {
+                "fontWeight": 700
+              }
+            }
+          },
+          {
+            "id": "1:4",
+            "name": "Hero Image",
+            "type": "RECTANGLE",
+            "visible": true,
+            "absoluteBoundingBox": {
+              "x": 0,
+              "y": 40,
+              "width": 320,
+              "height": 160
+            },
+            "fills": [
+              {
+                "type": "IMAGE",
+                "imageRef": "image-ref-1"
+              }
+            ],
+            "boundVariables": {
+              "fills": [
+                {
+                  "id": "VariableID:1",
+                  "name": "color/hero"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+

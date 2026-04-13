@@ -1,0 +1,9 @@
+{
+  "case007": {
+    "fileKey": "ANONFILEKEY1234567890AB",
+    "nodeId": "104:27349",
+    "nodeJsonPath": "./real/case-007/node.json",
+    "imageAssetsPath": "./real/case-007/image-assets.json",
+    "vectorAssetsPath": "./real/case-007/vector-assets.json"
+  }
+}

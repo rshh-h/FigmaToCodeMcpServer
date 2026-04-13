@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Generated caches and temp files
+tmp/
+.history/
+.figma-to-code/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
