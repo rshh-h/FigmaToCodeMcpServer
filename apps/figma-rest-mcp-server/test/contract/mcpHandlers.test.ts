@@ -235,4 +235,36 @@ describe("MCP tool handlers", () => {
     expect((result.structuredContent as any).features.preview).toBe("full");
     expect(result.content[0].text).toContain("Capabilities loaded");
   });
+
+  it("returns convert help output", async () => {
+    const handlers = createToolHandlers(
+      {
+        async execute() {
+          throw new Error("unused");
+        },
+      },
+      {
+        async execute() {
+          return {
+            frameworks: [],
+            features: {
+              colorVariables: "partial",
+              textSegmentation: "partial",
+              preview: "full",
+              images: "partial",
+              vectors: "partial",
+              diagnostics: "full",
+            },
+            limits: [],
+          };
+        },
+      },
+    );
+
+    const result = await handlers.convertHelp();
+
+    expect((result.structuredContent as any).example.framework).toBe("Tailwind");
+    expect((result.structuredContent as any).fields[0].name).toBe("source.url");
+    expect(result.content[0].text).toContain("request template");
+  });
 });

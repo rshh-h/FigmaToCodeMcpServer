@@ -301,18 +301,6 @@ export interface ConvertRequest {
   useCache?: boolean;
   framework: Framework;
   generationMode?: GenerationMode;
-  options?: Omit<
-    ConversionOptions,
-    | "framework"
-    | "htmlGenerationMode"
-    | "tailwindGenerationMode"
-    | "flutterGenerationMode"
-    | "swiftUIGenerationMode"
-    | "composeGenerationMode"
-    | "returnPreview"
-    | "includeDiagnostics"
-  >;
-  returnPreview?: boolean;
   includeDiagnostics?: boolean;
 }
 

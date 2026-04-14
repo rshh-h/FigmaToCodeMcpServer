@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createRequestContext } from "../../src/application/requestContext.js";
 import { LocalAssetMaterializer } from "../../src/adapters/localAssets/localAssetMaterializer.js";
 import type { SourceSnapshot } from "../../src/core/contracts.js";
+import { readConfig } from "../../src/infrastructure/config.js";
 
 function createSnapshot(): SourceSnapshot {
   return {
@@ -72,28 +73,30 @@ function createSnapshot(): SourceSnapshot {
   };
 }
 
+function createConfig(overrides: NodeJS.ProcessEnv = {}) {
+  return readConfig({
+    FIGMA_ACCESS_TOKEN: "token",
+    FIGMA_API_BASE_URL: "https://api.figma.com",
+    HTTP_TIMEOUT_MS: "10000",
+    HTTP_RETRY_MAX: "0",
+    HTTP_MAX_CONCURRENCY: "1",
+    CACHE_TTL_MS: "1000",
+    CACHE_MAX_ENTRIES: "10",
+    ENABLE_VARIABLES: "true",
+    ENABLE_IMAGE_EMBED: "true",
+    ENABLE_VECTOR_EMBED: "true",
+    ENABLE_METRICS_LOGGING: "false",
+    ...overrides,
+  });
+}
+
 describe("LocalAssetMaterializer", () => {
   it("downloads image assets and merged vector roots to local files", async () => {
     const workspaceRoot = `/tmp/figma-local-assets-${Date.now()}`;
     const materializer = new LocalAssetMaterializer(
+      createConfig(),
       {
-        FIGMA_ACCESS_TOKEN: "token",
-        FIGMA_API_BASE_URL: "https://api.figma.com",
-        HTTP_TIMEOUT_MS: 10_000,
-        HTTP_RETRY_MAX: 0,
-        HTTP_MAX_CONCURRENCY: 1,
-        CACHE_TTL_MS: 1_000,
-        CACHE_MAX_ENTRIES: 10,
-        ENABLE_VARIABLES: true,
-        ENABLE_IMAGE_EMBED: true,
-        ENABLE_VECTOR_EMBED: true,
-        ENABLE_PREVIEW: true,
-        ENABLE_METRICS_LOGGING: false,
-        LOCAL_ASSET_OUTPUT_DIR: "ignored-by-cache-layout",
-        GENERATED_CODE_OUTPUT_DIR: "tmp/generated",
-      },
-      {
-        async getJson(request: { path?: string }) {
+        async getJson(request: { path?: string; query?: { ids?: string } }) {
           if (request.path === "/v1/files/FILE/variables/local") {
             return {
               meta: {
@@ -253,22 +256,7 @@ describe("LocalAssetMaterializer", () => {
   it("clears snapshot fetch warnings after local image and svg recovery succeeds", async () => {
     const workspaceRoot = `/tmp/figma-local-assets-recover-${Date.now()}`;
     const materializer = new LocalAssetMaterializer(
-      {
-        FIGMA_ACCESS_TOKEN: "token",
-        FIGMA_API_BASE_URL: "https://api.figma.com",
-        HTTP_TIMEOUT_MS: 10_000,
-        HTTP_RETRY_MAX: 0,
-        HTTP_MAX_CONCURRENCY: 1,
-        CACHE_TTL_MS: 1_000,
-        CACHE_MAX_ENTRIES: 10,
-        ENABLE_VARIABLES: true,
-        ENABLE_IMAGE_EMBED: true,
-        ENABLE_VECTOR_EMBED: true,
-        ENABLE_PREVIEW: true,
-        ENABLE_METRICS_LOGGING: false,
-        LOCAL_ASSET_OUTPUT_DIR: "ignored-by-cache-layout",
-        GENERATED_CODE_OUTPUT_DIR: "tmp/generated",
-      },
+      createConfig(),
       {
         async getJson(request: { path?: string; query?: { ids?: string } }) {
           if (request.path === "/v1/files/FILE/variables/local") {
@@ -423,27 +411,12 @@ describe("LocalAssetMaterializer", () => {
   it("reuses cached local asset intermediates from the workspace root", async () => {
     const workspaceRoot = `/tmp/figma-local-assets-cache-${Date.now()}`;
     const snapshot = createSnapshot();
-    const baseConfig = {
-      FIGMA_ACCESS_TOKEN: "token",
-      FIGMA_API_BASE_URL: "https://api.figma.com",
-      HTTP_TIMEOUT_MS: 10_000,
-      HTTP_RETRY_MAX: 0,
-      HTTP_MAX_CONCURRENCY: 1,
-      CACHE_TTL_MS: 1_000,
-      CACHE_MAX_ENTRIES: 10,
-      ENABLE_VARIABLES: true,
-      ENABLE_IMAGE_EMBED: true,
-      ENABLE_VECTOR_EMBED: true,
-      ENABLE_PREVIEW: true,
-      ENABLE_METRICS_LOGGING: false,
-      LOCAL_ASSET_OUTPUT_DIR: "ignored-by-cache-layout",
-      GENERATED_CODE_OUTPUT_DIR: "tmp/generated",
-    } as const;
+    const baseConfig = createConfig();
 
     const firstMaterializer = new LocalAssetMaterializer(
       baseConfig,
       {
-        async getJson(request: { path?: string }) {
+        async getJson(request: { path?: string; query?: { ids?: string } }) {
           if (request.path === "/v1/files/FILE/variables/local") {
             return {
               meta: {
@@ -665,22 +638,7 @@ describe("LocalAssetMaterializer", () => {
       },
     };
     const materializer = new LocalAssetMaterializer(
-      {
-        FIGMA_ACCESS_TOKEN: "token",
-        FIGMA_API_BASE_URL: "https://api.figma.com",
-        HTTP_TIMEOUT_MS: 10_000,
-        HTTP_RETRY_MAX: 0,
-        HTTP_MAX_CONCURRENCY: 1,
-        CACHE_TTL_MS: 1_000,
-        CACHE_MAX_ENTRIES: 10,
-        ENABLE_VARIABLES: true,
-        ENABLE_IMAGE_EMBED: true,
-        ENABLE_VECTOR_EMBED: true,
-        ENABLE_PREVIEW: true,
-        ENABLE_METRICS_LOGGING: false,
-        LOCAL_ASSET_OUTPUT_DIR: "ignored-by-cache-layout",
-        GENERATED_CODE_OUTPUT_DIR: "tmp/generated",
-      },
+      createConfig(),
       {
         async getJson(request: { path?: string }) {
           if (request.path === "/v1/files/FILE/variables/local") {

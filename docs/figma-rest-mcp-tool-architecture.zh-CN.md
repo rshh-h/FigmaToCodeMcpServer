@@ -104,7 +104,7 @@ flowchart LR
 服务只暴露两个 MCP 工具：
 
 - `figma_to_code_convert`
-- `figma_to_code_capabilities`
+- `figma_to_code_convert_help`
 
 这样的设计可以保持接口稳定，并把解析、抓取、标准化、生成等内部步骤收敛在服务内部。
 
@@ -141,4 +141,4 @@ flowchart LR
 - `SwiftUI`
 - `Compose`
 
-不同 framework 在 preview、vector、image、variables 等能力上的支持程度可能不同，建议结合 `figma_to_code_capabilities` 一起使用。
+调用 `figma_to_code_convert` 前，建议先通过 `figma_to_code_convert_help` 获取请求模板和字段说明。

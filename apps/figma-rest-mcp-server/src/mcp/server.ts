@@ -5,11 +5,12 @@ import { ServiceError, toServiceError } from "../core/errors.js";
 import type { ConvertExecutionHooks, ConvertProgressUpdate } from "../core/interfaces.js";
 import type { ConvertFigmaNodeUseCase, GetCapabilitiesUseCase } from "../application/useCases.js";
 import {
-  capabilitiesRequestSchema,
-  capabilitiesResponseSchema,
+  convertHelpRequestSchema,
+  convertHelpResponseSchema,
   convertRequestSchema,
   convertResponseSchema,
 } from "./schemas.js";
+import { createConvertHelpResponse } from "./convertToolMetadata.js";
 
 const readOnlyAnnotations: ToolAnnotations = {
   readOnlyHint: true,
@@ -48,16 +49,8 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
     "figma_to_code_convert",
     {
       title: "Figma To Code Convert",
-      description: `Convert a single Figma node addressed by source.url into HTML, Tailwind, Flutter, SwiftUI, or Compose code. Pass workspaceRoot to control where caches and intermediate artifacts are stored. The URL must include node-id. This tool may take a long time when the network is slow or Figma asset downloads are delayed, so wait for the result instead of retrying while a request is still running. Example request:
-{
-  "source": {
-    "url": "https://www.figma.com/design/FILE_KEY/Example-File?node-id=1-1427&t=EXAMPLE-1"
-  },
-  "workspaceRoot": "/absolute/path/to/your/project",
-  "useCache": true,
-  "framework": "Tailwind",
-  "generationMode": "jsx"
-}`,
+      description:
+        "Convert a single Figma node into HTML, Tailwind, Flutter, SwiftUI, or Compose code. Call figma_to_code_convert_help to get a valid request template and field notes before invoking this tool.",
       inputSchema: convertRequestSchema,
       outputSchema: convertResponseSchema,
       annotations: readOnlyAnnotations,
@@ -66,16 +59,16 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
   );
 
   server.registerTool(
-    "figma_to_code_capabilities",
+    "figma_to_code_convert_help",
     {
-      title: "Figma To Code Capabilities",
+      title: "Figma To Code Convert Help",
       description:
-        "Return the service capability snapshot for supported frameworks and conversion features.",
-      inputSchema: capabilitiesRequestSchema,
-      outputSchema: capabilitiesResponseSchema,
+        "Return a figma_to_code_convert request template, field descriptions, and valid generation modes.",
+      inputSchema: convertHelpRequestSchema,
+      outputSchema: convertHelpResponseSchema,
       annotations: readOnlyAnnotations,
     },
-    handlers.capabilities,
+    handlers.convertHelp,
   );
 
   return { app, server, startup: app.startup };
@@ -141,6 +134,18 @@ export function createToolHandlers(
         });
         return toToolErrorResult(serviceError);
       }
+    },
+    convertHelp: async () => {
+      const response = createConvertHelpResponse();
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: "Loaded figma_to_code_convert request template and field notes.",
+          },
+        ],
+        structuredContent: response,
+      };
     },
   };
 }

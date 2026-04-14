@@ -17,9 +17,11 @@ describe("infrastructure", () => {
     expect(config.HTTP_RETRY_MAX).toBe(2);
     expect(config.HTTP_MAX_CONCURRENCY).toBe(6);
     expect(config.CACHE_MAX_ENTRIES).toBe(500);
-    expect(config.ENABLE_PREVIEW).toBe(true);
     expect(config.ENABLE_METRICS_LOGGING).toBe(false);
-    expect(config.GENERATED_CODE_OUTPUT_DIR).toBe("tmp/generated");
+    expect(config.SHOW_LAYER_NAMES).toBe(false);
+    expect(config.USE_TAILWIND4).toBe(false);
+    expect(config.DOWNLOAD_IMAGES_TO_LOCAL).toBe(true);
+    expect(config.DOWNLOAD_VECTORS_TO_LOCAL).toBe(true);
   });
 
   it("retries retryable http failures", async () => {

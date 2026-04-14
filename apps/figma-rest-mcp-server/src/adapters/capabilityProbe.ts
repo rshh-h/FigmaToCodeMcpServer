@@ -47,7 +47,7 @@ export class CapabilityProbeAdapter implements CapabilityProbe {
       features: {
         colorVariables,
         textSegmentation: "partial",
-        preview: this.config.ENABLE_PREVIEW ? "partial" : "none",
+        preview: "none",
         images: this.config.ENABLE_IMAGE_EMBED ? "partial" : "none",
         vectors: this.config.ENABLE_VECTOR_EMBED ? "partial" : "none",
         diagnostics: "full",
@@ -60,18 +60,12 @@ export class CapabilityProbeAdapter implements CapabilityProbe {
 
   scopeForFramework(
     snapshot: CapabilitySnapshot,
-    framework: Framework,
+    _framework: Framework,
   ): CapabilitySnapshot {
-    const preview =
-      !this.config.ENABLE_PREVIEW
-        ? "none"
-        : framework === "HTML" || framework === "Tailwind"
-          ? "full"
-          : "partial";
     const vectors =
       !this.config.ENABLE_VECTOR_EMBED
         ? "none"
-        : framework === "HTML" || framework === "Tailwind"
+        : _framework === "HTML" || _framework === "Tailwind"
           ? "full"
           : "partial";
 
@@ -79,7 +73,7 @@ export class CapabilityProbeAdapter implements CapabilityProbe {
       ...snapshot,
       features: {
         ...snapshot.features,
-        preview,
+        preview: "none",
         vectors,
       },
     };

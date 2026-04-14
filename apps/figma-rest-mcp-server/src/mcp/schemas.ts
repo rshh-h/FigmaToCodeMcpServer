@@ -1,26 +1,12 @@
 import { z } from "zod";
+import {
+  allGenerationModes,
+  generationModesByFramework,
+  supportedFrameworks,
+} from "./convertToolMetadata.js";
 
-const frameworkSchema = z.enum([
-  "HTML",
-  "Tailwind",
-  "Flutter",
-  "SwiftUI",
-  "Compose",
-]);
-const generationModeSchema = z.enum([
-  "html",
-  "jsx",
-  "styled-components",
-  "svelte",
-  "twig",
-  "fullApp",
-  "stateless",
-  "snippet",
-  "preview",
-  "struct",
-  "composable",
-  "screen",
-]);
+const frameworkSchema = z.enum(supportedFrameworks);
+const generationModeSchema = z.enum(allGenerationModes);
 
 const sourceUrlDescription =
   "A Figma design/file URL for a single node. The URL must include the node-id query parameter, for example: https://www.figma.com/design/FILE_KEY/Example-File?node-id=1-1427&t=EXAMPLE-1";
@@ -70,44 +56,19 @@ export const convertRequestSchema = z
       ),
     useCache: z
       .boolean()
-      .default(true)
+      .default(false)
       .describe(
-        "Whether to reuse cached Figma REST data and previously materialized workspace intermediates. Defaults to true.",
+        "Whether to reuse cached Figma REST data and previously materialized workspace intermediates. Defaults to false.",
       ),
     framework: frameworkSchema,
     generationMode: generationModeSchema.optional(),
-    options: z
-      .object({
-        showLayerNames: z.boolean().optional(),
-        useColorVariables: z.boolean().optional(),
-        embedImages: z.boolean().optional(),
-        embedVectors: z.boolean().optional(),
-        roundTailwindValues: z.boolean().optional(),
-        roundTailwindColors: z.boolean().optional(),
-        customTailwindPrefix: z.string().optional(),
-        useTailwind4: z.boolean().optional(),
-        baseFontSize: z.number().min(1).max(96).optional(),
-        thresholdPercent: z.number().min(0).max(1).optional(),
-        baseFontFamily: z.string().optional(),
-        fontFamilyCustomConfig: z.record(z.array(z.string())).optional(),
-        downloadImagesToLocal: z
-          .boolean()
-          .default(true)
-          .describe("Whether to download image resources into the workspace. Defaults to true."),
-        downloadVectorsToLocal: z
-          .boolean()
-          .default(true)
-          .describe("Whether to download SVG/vector resources into the workspace. Defaults to true."),
-      })
-      .default({}),
-    returnPreview: z.boolean().default(false),
     includeDiagnostics: z.boolean().default(true),
   })
   .superRefine((value, ctx) => {
     if (
       value.generationMode &&
       value.framework === "HTML" &&
-      !["html", "jsx", "styled-components", "svelte"].includes(value.generationMode)
+      !(generationModesByFramework.HTML as readonly string[]).includes(value.generationMode)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -118,7 +79,7 @@ export const convertRequestSchema = z
     if (
       value.generationMode &&
       value.framework === "Tailwind" &&
-      !["html", "jsx", "twig"].includes(value.generationMode)
+      !(generationModesByFramework.Tailwind as readonly string[]).includes(value.generationMode)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -129,7 +90,7 @@ export const convertRequestSchema = z
     if (
       value.generationMode &&
       value.framework === "Flutter" &&
-      !["fullApp", "stateless", "snippet"].includes(value.generationMode)
+      !(generationModesByFramework.Flutter as readonly string[]).includes(value.generationMode)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -140,7 +101,7 @@ export const convertRequestSchema = z
     if (
       value.generationMode &&
       value.framework === "SwiftUI" &&
-      !["preview", "struct", "snippet"].includes(value.generationMode)
+      !(generationModesByFramework.SwiftUI as readonly string[]).includes(value.generationMode)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -151,7 +112,7 @@ export const convertRequestSchema = z
     if (
       value.generationMode &&
       value.framework === "Compose" &&
-      !["snippet", "composable", "screen"].includes(value.generationMode)
+      !(generationModesByFramework.Compose as readonly string[]).includes(value.generationMode)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -230,6 +191,39 @@ export const capabilitiesResponseSchema = z.object({
     diagnostics: z.enum(["full", "partial", "none"]),
   }),
   limits: z.array(z.string()),
+});
+
+export const convertHelpRequestSchema = z.object({});
+
+export const convertHelpResponseSchema = z.object({
+  example: z.object({
+    source: z.object({
+      url: z.string().url(),
+    }),
+    workspaceRoot: z.string(),
+    useCache: z.boolean(),
+    framework: frameworkSchema,
+    generationMode: generationModeSchema.optional(),
+    includeDiagnostics: z.boolean(),
+  }),
+  fields: z.array(
+    z.object({
+      name: z.string(),
+      type: z.enum(["string", "boolean", "enum"]),
+      required: z.boolean(),
+      default: z.union([z.string(), z.boolean()]).optional(),
+      enum: z.array(z.string()).optional(),
+      description: z.string(),
+    }),
+  ),
+  generationModesByFramework: z.object({
+    HTML: z.array(z.string()),
+    Tailwind: z.array(z.string()),
+    Flutter: z.array(z.string()),
+    SwiftUI: z.array(z.string()),
+    Compose: z.array(z.string()),
+  }),
+  notes: z.array(z.string()),
 });
 
 export type ConvertRequestInput = z.infer<typeof convertRequestSchema>;

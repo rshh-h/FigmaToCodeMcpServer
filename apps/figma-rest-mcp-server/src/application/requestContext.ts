@@ -35,7 +35,7 @@ export function createRequestContext(input: {
     options: input.options,
     workspace: {
       workspaceRoot: resolveWorkspaceRoot(input.workspace?.workspaceRoot ?? process.cwd()),
-      useCache: input.workspace?.useCache ?? true,
+      useCache: input.workspace?.useCache ?? false,
     },
     warningCollector: new WarningCollector(),
     stageTimer: new StageTimer(),

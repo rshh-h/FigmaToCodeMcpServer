@@ -37,37 +37,38 @@
 当前对外提供两个 MCP 工具：
 
 - `figma_to_code_convert`
-- `figma_to_code_capabilities`
+- `figma_to_code_convert_help`
 
 ## `figma_to_code_convert`
 
-示例输入：
+调用前建议先使用 `figma_to_code_convert_help` 获取请求模板和字段说明。
 
-```json
-{
-  "source": {
-    "url": "https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427"
-  },
-  "workspaceRoot": "/absolute/path/to/your/project",
-  "useCache": true,
-  "framework": "HTML",
-  "generationMode": "jsx",
-  "options": {
-    "embedImages": true,
-    "embedVectors": true,
-    "downloadImagesToLocal": true,
-    "downloadVectorsToLocal": true
-  }
-}
-```
+入参表：
+
+| 字段 | 类型 | 必填 | 默认值 | 说明 |
+|---|---|---|---|---|
+| `source.url` | `string` | 是 | 无 | 单节点 Figma URL，必须包含 `node-id` |
+| `workspaceRoot` | `string` | 是 | 无 | 工作区根目录，用于保存缓存、中间产物与生成结果 |
+| `useCache` | `boolean` | 否 | `false` | 是否复用当前工作区下的 REST 缓存和本地资产中间产物 |
+| `framework` | `"HTML" \| "Tailwind" \| "Flutter" \| "SwiftUI" \| "Compose"` | 是 | 无 | 目标代码框架 |
+| `generationMode` | `string` | 否 | 无 | 对应框架的生成模式，取值受 `framework` 限制 |
+| `includeDiagnostics` | `boolean` | 否 | `true` | 是否在响应中返回 diagnostics |
+
+`generationMode` 可选值：
+
+| `framework` | 合法 `generationMode` |
+|---|---|
+| `HTML` | `html`, `jsx`, `styled-components`, `svelte` |
+| `Tailwind` | `html`, `jsx`, `twig` |
+| `Flutter` | `fullApp`, `stateless`, `snippet` |
+| `SwiftUI` | `preview`, `struct`, `snippet` |
+| `Compose` | `snippet`, `composable`, `screen` |
 
 说明：
 
-- `source.url` 必须是单节点 Figma URL，且包含 `node-id`
-- `workspaceRoot` 用于保存缓存、中间产物与生成结果
-- `useCache` 默认为 `true`
-- `generationMode` 放在顶层，避免与 `options` 混用
-- `options.downloadImagesToLocal` 和 `options.downloadVectorsToLocal` 仅在需要输出本地资源路径时启用
+- 本地图片和向量资源默认写入 `<workspaceRoot>/.figma-to-code/cache/assets/`
+- 原 `options` 字段已移除，生成相关默认值统一由环境变量控制
+- `preview` 当前未对外开放，请求侧固定不生成
 
 缓存默认写入：
 
@@ -75,51 +76,57 @@
 - `<workspaceRoot>/.figma-to-code/cache/generated/`
 - `<workspaceRoot>/.figma-to-code/cache/assets/`
 
-## `figma_to_code_capabilities`
+## `figma_to_code_convert_help`
 
-示例输入：
+返回 `figma_to_code_convert` 的：
 
-```json
-{
-  "framework": "Tailwind"
-}
-```
-
-输出包含：
-
-- `frameworks[]`
-- `features`
-- `limits[]`
+- 请求样例
+- 字段说明
+- framework 对应的合法 `generationMode`
+- 调用注意事项
 
 ## 环境变量
 
 核心配置位于 `apps/figma-rest-mcp-server/src/infrastructure/config.ts`。
 
-常用环境变量：
+环境变量表：
 
-- `FIGMA_ACCESS_TOKEN`
-- `FIGMA_API_BASE_URL`
-- `HTTP_TIMEOUT_MS`
-- `HTTP_RETRY_MAX`
-- `HTTP_MAX_CONCURRENCY`
-- `CACHE_TTL_MS`
-- `IMAGE_CACHE_TTL_MS`
-- `VECTOR_CACHE_TTL_MS`
-- `VARIABLE_CACHE_TTL_MS`
-- `AUTH_CACHE_TTL_MS`
-- `CACHE_MAX_ENTRIES`
-- `ENABLE_METRICS_LOGGING`
-- `ENABLE_VARIABLES`
-- `ENABLE_IMAGE_EMBED`
-- `ENABLE_VECTOR_EMBED`
-- `ENABLE_PREVIEW`
+| 变量名 | 类型 | 必填 | 默认值 | 说明 |
+|---|---|---|---|---|
+| `FIGMA_ACCESS_TOKEN` | `string` | 是 | 无 | Figma API token，服务启动必需 |
+| `FIGMA_API_BASE_URL` | `string` | 否 | `https://api.figma.com` | Figma API 基地址 |
+| `HTTP_TIMEOUT_MS` | `number` | 否 | `15000` | HTTP 请求超时毫秒数 |
+| `HTTP_RETRY_MAX` | `number` | 否 | `2` | HTTP 最大重试次数 |
+| `HTTP_MAX_CONCURRENCY` | `number` | 否 | `6` | HTTP 并发上限 |
+| `CACHE_TTL_MS` | `number` | 否 | `300000` | 通用缓存 TTL |
+| `IMAGE_CACHE_TTL_MS` | `number` | 否 | 无 | 图片缓存 TTL，未设置时沿用 `CACHE_TTL_MS` |
+| `VECTOR_CACHE_TTL_MS` | `number` | 否 | 无 | 向量缓存 TTL，未设置时沿用 `CACHE_TTL_MS` |
+| `VARIABLE_CACHE_TTL_MS` | `number` | 否 | 无 | 变量缓存 TTL，未设置时沿用 `CACHE_TTL_MS` |
+| `AUTH_CACHE_TTL_MS` | `number` | 否 | 无 | 认证缓存 TTL，未设置时沿用 `CACHE_TTL_MS` |
+| `CACHE_MAX_ENTRIES` | `number` | 否 | `500` | 进程内缓存最大条目数 |
+| `ENABLE_VARIABLES` | `boolean` | 否 | `false` | 是否启用变量能力，同时也是颜色变量输出的默认来源 |
+| `ENABLE_IMAGE_EMBED` | `boolean` | 否 | `true` | 是否启用图片嵌入能力，同时也是图片嵌入输出的默认来源 |
+| `ENABLE_VECTOR_EMBED` | `boolean` | 否 | `true` | 是否启用向量嵌入能力，同时也是向量嵌入输出的默认来源 |
+| `ENABLE_METRICS_LOGGING` | `boolean` | 否 | `false` | 是否输出 metrics 日志 |
+| `SHOW_LAYER_NAMES` | `boolean` | 否 | `false` | 是否在输出中显示 layer 名称 |
+| `ROUND_TAILWIND_VALUES` | `boolean` | 否 | `true` | Tailwind 数值是否按阈值近似映射 |
+| `ROUND_TAILWIND_COLORS` | `boolean` | 否 | `true` | Tailwind 颜色是否按阈值近似映射 |
+| `USE_TAILWIND4` | `boolean` | 否 | `false` | 是否启用 Tailwind 4 相关生成逻辑 |
+| `CUSTOM_TAILWIND_PREFIX` | `string` | 否 | `""` | Tailwind 类名前缀 |
+| `BASE_FONT_SIZE` | `number` | 否 | `16` | 基础字体大小，用于部分 Tailwind/排版换算 |
+| `THRESHOLD_PERCENT` | `number` | 否 | `15` | Tailwind 数值近似匹配阈值百分比 |
+| `BASE_FONT_FAMILY` | `string` | 否 | `""` | 默认字体族 |
+| `FONT_FAMILY_CUSTOM_CONFIG` | `JSON string` | 否 | `{}` | 自定义字体映射，环境变量中需传 JSON 字符串 |
+| `DOWNLOAD_IMAGES_TO_LOCAL` | `boolean` | 否 | `true` | 是否默认下载图片到工作区本地 |
+| `DOWNLOAD_VECTORS_TO_LOCAL` | `boolean` | 否 | `true` | 是否默认下载向量到工作区本地 |
 
 示例：
 
 ```bash
 export FIGMA_ACCESS_TOKEN=xxxxx
-export ENABLE_PREVIEW=true
-export ENABLE_VARIABLES=true
+export ENABLE_VARIABLES=false
+export ENABLE_IMAGE_EMBED=true
+export ENABLE_VECTOR_EMBED=true
 ```
 
 ## 本地运行
@@ -138,6 +145,8 @@ pnpm --filter figma-to-code-mcp-server dev
 
 mcp 本地配置：
 
+如果需要像素级一致，需要关闭ROUND_TAILWIND_VALUES和ROUND_TAILWIND_COLORS
+
 ```
 [mcp_servers.figma_to_code]
 type = "stdio"
@@ -146,10 +155,12 @@ args = ["--dir", "path to FigmaToCodeMCPServer/apps/figma-rest-mcp-server", "exe
 
 [mcp_servers.figma_to_code.env]
 FIGMA_ACCESS_TOKEN = "your figma token"
-ENABLE_PREVIEW = "false"
-ENABLE_VARIABLES = "true"
+ENABLE_VARIABLES = "false"
 ENABLE_IMAGE_EMBED = "true"
 ENABLE_VECTOR_EMBED = "true"
+ROUND_TAILWIND_VALUES = "false"
+ROUND_TAILWIND_COLORS = "false"
+SHOW_LAYER_NAMES = "false"
 ```
 
 构建并启动 HTTP 模式：

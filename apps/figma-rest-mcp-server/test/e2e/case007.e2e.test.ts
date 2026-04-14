@@ -72,7 +72,6 @@ describe("case-007 mocked e2e", () => {
     const capabilityProbe = new CapabilityProbeAdapter(
       readConfig({
         FIGMA_ACCESS_TOKEN: "token",
-        ENABLE_PREVIEW: "true",
         ENABLE_IMAGE_EMBED: "true",
         ENABLE_VECTOR_EMBED: "true",
         ENABLE_VARIABLES: "true",
@@ -92,6 +91,7 @@ describe("case-007 mocked e2e", () => {
       new NoopCodeArtifactWriter(),
       new PreviewAdapter(),
       new DefaultDiagnosticsBuilder(),
+      {},
     );
 
     const response = await useCase.execute({
@@ -101,26 +101,15 @@ describe("case-007 mocked e2e", () => {
       workspaceRoot: process.cwd(),
       framework: "Compose",
       generationMode: "screen",
-      returnPreview: true,
       includeDiagnostics: true,
     });
 
     expect(response.framework).toBe("Compose");
     expect(response.code).toContain("@Composable");
     expect(response.code.length).toBeGreaterThan(100);
-    expect(response.preview?.html).toContain("<div");
-    expect(response.preview?.html.length).toBeGreaterThan(100);
-    expect(response.warnings).toContain("preview_partial");
+    expect(response.preview).toBeUndefined();
     expect(response.diagnostics?.traceId).toBe("trace-case-007");
     expect(response.diagnostics?.sourceNodeIds).toEqual([fixture.nodeId]);
-    expect(response.diagnostics?.decisions).toContainEqual({
-      feature: "preview",
-      stage: "generate_preview",
-      requested: true,
-      effective: true,
-      supportLevel: "partial",
-      reason: "Preview is rendered as HTML for non-HTML frameworks.",
-    });
     expect(response.diagnostics?.timing.fetch_snapshot).toBeGreaterThanOrEqual(0);
   });
 });

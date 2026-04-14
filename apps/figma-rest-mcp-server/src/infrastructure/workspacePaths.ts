@@ -1,5 +1,4 @@
 import { relative, resolve, sep } from "node:path";
-import type { AppConfig } from "./config.js";
 
 const WORKSPACE_METADATA_DIR = ".figma-to-code";
 
@@ -29,18 +28,10 @@ export function toWorkspaceRelativePath(
   return relativePath;
 }
 
-export function resolveGeneratedCodeOutputDir(
-  config: AppConfig,
-  workspaceRoot: string,
-): string {
-  return resolveWorkspacePath(workspaceRoot, config.GENERATED_CODE_OUTPUT_DIR);
-}
-
 export function resolveLocalAssetOutputDir(
-  _config: AppConfig,
   workspaceRoot: string,
 ): string {
-  return resolveWorkspacePath(workspaceRoot, WORKSPACE_METADATA_DIR, "cache", "assets");
+  return resolveWorkspacePath(workspaceRoot, `${WORKSPACE_METADATA_DIR}/cache/assets`);
 }
 
 export function resolveGeneratedCodeCacheDir(workspaceRoot: string): string {

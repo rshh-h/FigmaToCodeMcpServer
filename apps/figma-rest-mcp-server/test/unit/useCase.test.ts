@@ -142,6 +142,7 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
+      {},
       metrics,
     );
 
@@ -152,11 +153,10 @@ describe("ConvertFigmaNodeUseCase", () => {
       workspaceRoot: process.cwd(),
       framework: "HTML",
       includeDiagnostics: true,
-      returnPreview: true,
     });
 
     expect(result.code).toBe("tmp/generated/trace-1/html.html");
-    expect(result.preview?.html).toBe("<div />");
+    expect(result.preview).toBeUndefined();
     expect(result.diagnostics?.traceId).toBe("trace-1");
     expect(metrics.increments).toContainEqual({
       name: "figma_convert_request_total",
@@ -311,6 +311,7 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
+      {},
     );
 
     await useCase.execute(
@@ -321,7 +322,6 @@ describe("ConvertFigmaNodeUseCase", () => {
         workspaceRoot: process.cwd(),
         framework: "HTML",
         includeDiagnostics: true,
-        returnPreview: false,
       },
       {
         onProgress(update) {
@@ -490,6 +490,7 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
+      {},
     );
 
     const result = await useCase.execute({
@@ -499,7 +500,6 @@ describe("ConvertFigmaNodeUseCase", () => {
       workspaceRoot: process.cwd(),
       framework: "HTML",
       includeDiagnostics: true,
-      returnPreview: false,
     });
 
     expect(result.code).toBe("tmp/generated/trace-assets/html.html");

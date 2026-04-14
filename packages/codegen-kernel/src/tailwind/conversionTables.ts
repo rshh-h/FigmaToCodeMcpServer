@@ -162,11 +162,12 @@ export const nearestColorFromRgb = (color: RGB) => {
 };
 
 export const variableToColorName = async (id: string) => {
-  return (
-    (await figma.variables.getVariableByIdAsync(id))?.name
-      .replaceAll("/", "-")
-      .replaceAll(" ", "-") || id.toLowerCase().replaceAll(":", "-")
-  );
+  const variable = await figma.variables.getVariableByIdAsync(id);
+  if (variable?.name) {
+    return variable.name.replaceAll("/", "-").replaceAll(" ", "-");
+  }
+
+  return id;
 };
 
 /**

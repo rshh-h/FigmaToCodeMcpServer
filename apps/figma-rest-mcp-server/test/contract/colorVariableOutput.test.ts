@@ -106,4 +106,31 @@ describe("color variable output", () => {
     const tailwindArtifact = await generator.generate(tailwindTree, tailwindContext);
     expect(tailwindArtifact.code).toContain("bg-color-brand-primary");
   });
+
+  it("keeps the original variable id when REST variable metadata cannot be resolved", async () => {
+    const snapshot = createSnapshot();
+    const missingVariableId = "VariableID:missing/raw";
+    (
+      snapshot.sourceNodes[0].document.fills as Array<{
+        boundVariables: { color: { id: string } };
+      }>
+    )[0].boundVariables.color.id = missingVariableId;
+    snapshot.variablesRaw = {
+      meta: {
+        variableCollections: {},
+        variables: {},
+      },
+    };
+
+    const generator = new GeneratorAdapter();
+    const normalizer = new NormalizationAdapter();
+
+    const tailwindContext = createContext("Tailwind");
+    tailwindContext.sourceSnapshot = snapshot;
+    const tailwindTree = await normalizer.normalize(snapshot, tailwindContext);
+    const tailwindArtifact = await generator.generate(tailwindTree, tailwindContext);
+
+    expect(tailwindArtifact.code).toContain(`bg-${missingVariableId}`);
+    expect(tailwindArtifact.code).not.toContain("bg-variableid-missing/raw");
+  });
 });

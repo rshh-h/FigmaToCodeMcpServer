@@ -21,9 +21,9 @@ describe("FigmaRestGateway", () => {
       meta: { images: { hero: "https://signed.example.com/hero.png" } },
     });
     const gateway = new FigmaRestGateway(
-      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      readConfig({ FIGMA_ACCESS_TOKEN: "token", ENABLE_VARIABLES: "true" }),
       { getJson } as any,
-      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token", ENABLE_VARIABLES: "true" })),
       stderrLogger,
       noopMetrics,
     );
@@ -51,9 +51,9 @@ describe("FigmaRestGateway", () => {
       },
     });
     const gateway = new FigmaRestGateway(
-      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      readConfig({ FIGMA_ACCESS_TOKEN: "token", ENABLE_VARIABLES: "true" }),
       { getJson } as any,
-      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token", ENABLE_VARIABLES: "true" })),
       stderrLogger,
       noopMetrics,
     );

@@ -116,7 +116,7 @@ export class LocalAssetMaterializer implements AssetMaterializer {
 
     const outputSlug = target.nodeIds.map((nodeId) => nodeIdToSlug(nodeId)).join("__");
     const baseDir = resolve(
-      resolveLocalAssetOutputDir(this.config, context.workspace.workspaceRoot),
+      resolveLocalAssetOutputDir(context.workspace.workspaceRoot),
       target.fileKey,
       outputSlug,
     );

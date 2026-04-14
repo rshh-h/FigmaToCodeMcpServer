@@ -10,7 +10,7 @@ export const defaultPluginSettings: PluginSettings = {
   composeGenerationMode: "snippet",
   roundTailwindValues: true,
   roundTailwindColors: true,
-  useColorVariables: true,
+  useColorVariables: false,
   customTailwindPrefix: "",
   embedImages: false,
   embedVectors: false,

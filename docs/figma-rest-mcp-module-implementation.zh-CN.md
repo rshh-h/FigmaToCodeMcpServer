@@ -29,7 +29,7 @@
 - 标准错误映射
 - `structuredContent` 返回格式
 
-当前对外工具集中在 `figma_to_code_convert` 和 `figma_to_code_capabilities`。
+当前对外工具集中在 `figma_to_code_convert` 和 `figma_to_code_convert_help`。
 
 ## `src/application`
 

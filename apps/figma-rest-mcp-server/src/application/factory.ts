@@ -19,6 +19,7 @@ import {
 import { RateLimitGate } from "../infrastructure/rateLimitGate.js";
 import { TokenProvider } from "../infrastructure/tokenProvider.js";
 import { uuidTracer } from "../infrastructure/tracer.js";
+import type { ConversionOptions } from "../core/contracts.js";
 
 function validateStartupConfig(config: ReturnType<typeof readConfig>) {
   if (!config.FIGMA_ACCESS_TOKEN) {
@@ -28,9 +29,32 @@ function validateStartupConfig(config: ReturnType<typeof readConfig>) {
   }
 }
 
+function createDefaultConversionOptions(
+  config: ReturnType<typeof readConfig>,
+): Omit<ConversionOptions, "framework"> {
+  return {
+    showLayerNames: config.SHOW_LAYER_NAMES,
+    useColorVariables: config.ENABLE_VARIABLES,
+    embedImages: config.ENABLE_IMAGE_EMBED,
+    embedVectors: config.ENABLE_VECTOR_EMBED,
+    roundTailwindValues: config.ROUND_TAILWIND_VALUES,
+    roundTailwindColors: config.ROUND_TAILWIND_COLORS,
+    customTailwindPrefix: config.CUSTOM_TAILWIND_PREFIX,
+    useTailwind4: config.USE_TAILWIND4,
+    baseFontSize: config.BASE_FONT_SIZE,
+    thresholdPercent: config.THRESHOLD_PERCENT,
+    baseFontFamily: config.BASE_FONT_FAMILY,
+    fontFamilyCustomConfig: config.FONT_FAMILY_CUSTOM_CONFIG,
+    downloadImagesToLocal: config.DOWNLOAD_IMAGES_TO_LOCAL,
+    downloadVectorsToLocal: config.DOWNLOAD_VECTORS_TO_LOCAL,
+    returnPreview: false,
+  };
+}
+
 export function createApplication(env: NodeJS.ProcessEnv = process.env) {
   const config = readConfig(env);
   validateStartupConfig(config);
+  const defaultConversionOptions = createDefaultConversionOptions(config);
   const metrics = config.ENABLE_METRICS_LOGGING
     ? createLoggingMetrics(stderrLogger)
     : noopMetrics;
@@ -66,6 +90,7 @@ export function createApplication(env: NodeJS.ProcessEnv = process.env) {
     new FileCodeArtifactWriter(),
     new PreviewAdapter(),
     new DefaultDiagnosticsBuilder(),
+    defaultConversionOptions,
     metrics,
   );
 

@@ -31,7 +31,6 @@ if (!process.env.FIGMA_ACCESS_TOKEN) {
       source: { url: fileUrl },
       workspaceRoot: process.cwd(),
       framework,
-      returnPreview: true,
       includeDiagnostics: true,
     },
   ];

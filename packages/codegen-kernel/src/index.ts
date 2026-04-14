@@ -1,26 +1,25 @@
 import type { ConversionPreview } from "codegen-types";
-import { defaultPluginSettings } from "./runtime/defaultPluginSettings";
-import { runWithSourceSnapshot } from "./runtime/runWithSourceSnapshot";
+import { defaultPluginSettings } from "./runtime/defaultPluginSettings.js";
+import { runWithSourceSnapshot } from "./runtime/runWithSourceSnapshot.js";
 import type {
   KernelArtifact,
   KernelSettings,
   KernelSourceSnapshot,
   KernelWarningSink,
-} from "./types";
+} from "./types.js";
 
 export type {
   KernelArtifact,
   KernelSettings,
   KernelSourceSnapshot,
   KernelWarningSink,
-} from "./types";
-export { defaultPluginSettings } from "./runtime/defaultPluginSettings";
-export { runWithSourceSnapshot } from "./runtime/runWithSourceSnapshot";
+} from "./types.js";
+export { defaultPluginSettings } from "./runtime/defaultPluginSettings.js";
+export { runWithSourceSnapshot } from "./runtime/runWithSourceSnapshot.js";
 
 function toEffectiveSettings(settings: KernelSettings): KernelSettings {
   return {
     ...defaultPluginSettings,
-    framework: settings.framework,
     ...settings,
   };
 }

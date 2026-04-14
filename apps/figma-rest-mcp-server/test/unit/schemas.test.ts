@@ -26,7 +26,7 @@ describe("convertRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts local asset download flags", () => {
+  it("accepts useCache when explicitly provided", () => {
     const result = convertRequestSchema.safeParse({
       source: {
         url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
@@ -34,16 +34,13 @@ describe("convertRequestSchema", () => {
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
       generationMode: "jsx",
-      options: {
-        downloadImagesToLocal: true,
-        downloadVectorsToLocal: true,
-      },
+      useCache: true,
     });
 
     expect(result.success).toBe(true);
   });
 
-  it("defaults local asset download flags to true", () => {
+  it("defaults useCache to false", () => {
     const result = convertRequestSchema.safeParse({
       source: {
         url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
@@ -53,8 +50,7 @@ describe("convertRequestSchema", () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.data?.options?.downloadImagesToLocal).toBe(true);
-    expect(result.data?.options?.downloadVectorsToLocal).toBe(true);
+    expect(result.data?.useCache).toBe(false);
   });
 
   it("rejects a generationMode that does not match framework", () => {

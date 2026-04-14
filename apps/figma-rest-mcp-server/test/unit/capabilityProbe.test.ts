@@ -7,7 +7,6 @@ describe("CapabilityProbeAdapter", () => {
     const probe = new CapabilityProbeAdapter(
       readConfig({
         ENABLE_VARIABLES: "false",
-        ENABLE_PREVIEW: "true",
       }),
       {
         async fetchNodes() {
@@ -30,10 +29,10 @@ describe("CapabilityProbeAdapter", () => {
 
     const snapshot = await probe.getServiceSnapshot();
     expect(snapshot.features.colorVariables).toBe("none");
-    expect(snapshot.features.preview).toBe("partial");
+    expect(snapshot.features.preview).toBe("none");
     expect(snapshot.limits).toEqual([]);
-    expect(probe.scopeForFramework(snapshot, "HTML").features.preview).toBe("full");
-    expect(probe.scopeForFramework(snapshot, "Compose").features.preview).toBe("partial");
+    expect(probe.scopeForFramework(snapshot, "HTML").features.preview).toBe("none");
+    expect(probe.scopeForFramework(snapshot, "Compose").features.preview).toBe("none");
     expect(probe.scopeForFramework(snapshot, "HTML").features.vectors).toBe("full");
     expect(probe.scopeForFramework(snapshot, "Compose").features.vectors).toBe("partial");
   });

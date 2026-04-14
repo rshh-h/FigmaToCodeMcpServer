@@ -30,9 +30,7 @@ import { resolveWorkspaceRoot } from "../infrastructure/workspacePaths.js";
 
 function getConvertProgressTotal(request: ConvertRequest): number {
   return (
-    9 +
-    Number(Boolean(request.returnPreview)) +
-    Number(request.includeDiagnostics !== false)
+    9 + Number(request.includeDiagnostics !== false)
   );
 }
 
@@ -107,6 +105,7 @@ export class ConvertFigmaNodeUseCase {
     private readonly codeArtifactWriter: CodeArtifactWriter,
     private readonly previewGenerator: PreviewGenerator,
     private readonly diagnosticsBuilder: DiagnosticsBuilder,
+    private readonly defaultConversionOptions: Omit<ConversionOptions, "framework">,
     private readonly metrics: Metrics = noopMetrics,
   ) {}
 
@@ -151,15 +150,15 @@ export class ConvertFigmaNodeUseCase {
         );
         const workspace = {
           workspaceRoot: resolveWorkspaceRoot(request.workspaceRoot ?? process.cwd()),
-          useCache: request.useCache ?? true,
+          useCache: request.useCache ?? false,
         };
         const requestContext = createRequestContext({
           traceId: this.tracer.createTraceId(),
           options: {
             framework: request.framework,
+            ...this.defaultConversionOptions,
             ...resolveGenerationModeOptions(request.framework, request.generationMode),
-            ...request.options,
-            returnPreview: request.returnPreview,
+            returnPreview: false,
             includeDiagnostics: request.includeDiagnostics,
           },
           workspace,
@@ -273,13 +272,6 @@ export class ConvertFigmaNodeUseCase {
 
         await advanceProgress("write_artifact", "Writing cached artifacts");
         artifact = await this.codeArtifactWriter.write(artifact, requestContext);
-
-        if (request.returnPreview) {
-          await advanceProgress("generate_preview", "Generating preview");
-          artifact.preview = await requestContext.stageTimer.measure("generate_preview", () =>
-            this.previewGenerator.generate(tree, artifact, requestContext),
-          );
-        }
 
         const diagnostics =
           request.includeDiagnostics === false
