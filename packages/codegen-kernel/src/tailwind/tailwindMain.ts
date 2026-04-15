@@ -12,6 +12,7 @@ import {
   isLocalVectorChildNode,
   renderAndAttachSVG,
 } from "../altNodes/altNodeUtils";
+import { formatWithJSX } from "../common/parseJSX";
 import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes";
 
 export let localTailwindSettings: PluginSettings;
@@ -147,7 +148,7 @@ const tailwindGroup = async (
     .size()
     .position();
 
-  if (builder.attributes || builder.style) {
+  if (builder.attributes.length > 0 || builder.styles.length > 0) {
     const attr = builder.build("");
     const generator = await tailwindWidgetGenerator(node.children, settings);
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
@@ -324,7 +325,12 @@ export const tailwindContainer = (
       tag = "img";
       src = ` src="${imageURL}"`;
     } else {
-      renderedChildren = `\n<img className="w-full h-full left-0 top-0 absolute" src="${imageURL}" />${children}`;
+      builder.addStyles(
+        formatWithJSX("background-image", settings.tailwindGenerationMode === "jsx", `url(\"${imageURL}\")`),
+        formatWithJSX("background-size", settings.tailwindGenerationMode === "jsx", "cover"),
+        formatWithJSX("background-position", settings.tailwindGenerationMode === "jsx", "center"),
+        formatWithJSX("background-repeat", settings.tailwindGenerationMode === "jsx", "no-repeat"),
+      );
     }
   }
 

@@ -51,6 +51,187 @@ type VectorAnalysis = {
   geometricCount: number;
 };
 
+type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+function getVisibleChildren(
+  node: Record<string, unknown>,
+): Record<string, unknown>[] {
+  return Array.isArray(node.children)
+    ? node.children.filter(
+        (child): child is Record<string, unknown> =>
+          Boolean(child) &&
+          typeof child === "object" &&
+          !isIgnoredNode(child as Record<string, unknown>),
+      )
+    : [];
+}
+
+function hasVisiblePaint(
+  paints: unknown,
+): boolean {
+  if (!Array.isArray(paints)) {
+    return false;
+  }
+
+  return paints.some((paint) => {
+    if (!paint || typeof paint !== "object") {
+      return false;
+    }
+
+    const visible =
+      !("visible" in paint) ||
+      (paint as { visible?: unknown }).visible !== false;
+    const opacity = (paint as { opacity?: unknown }).opacity;
+
+    return visible && (typeof opacity !== "number" || opacity > 0);
+  });
+}
+
+function getAbsoluteBoundingBox(
+  node: Record<string, unknown>,
+): BoundingBox | null {
+  const box = node.absoluteBoundingBox;
+  if (!box || typeof box !== "object") {
+    return null;
+  }
+
+  const x = typeof box.x === "number" ? box.x : null;
+  const y = typeof box.y === "number" ? box.y : null;
+  const width = typeof box.width === "number" ? box.width : null;
+  const height = typeof box.height === "number" ? box.height : null;
+
+  if (
+    x === null ||
+    y === null ||
+    width === null ||
+    height === null ||
+    width <= 0 ||
+    height <= 0
+  ) {
+    return null;
+  }
+
+  return { x, y, width, height };
+}
+
+function getArea(box: BoundingBox): number {
+  return box.width * box.height;
+}
+
+function getOverlapRatio(a: BoundingBox, b: BoundingBox): number {
+  const overlapWidth =
+    Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+  const overlapHeight =
+    Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+
+  if (overlapWidth <= 0 || overlapHeight <= 0) {
+    return 0;
+  }
+
+  const overlapArea = overlapWidth * overlapHeight;
+  return overlapArea / Math.min(getArea(a), getArea(b));
+}
+
+function isVisuallyEmptyNode(
+  node: Record<string, unknown>,
+): boolean {
+  if (isBlockedNodeType(node)) {
+    return false;
+  }
+
+  if (hasGeometry(node) || hasVisiblePaint(node.fills) || hasVisiblePaint(node.strokes)) {
+    return false;
+  }
+
+  const children = getVisibleChildren(node);
+  if (children.length > 0) {
+    return false;
+  }
+
+  return true;
+}
+
+function getMeaningfulChildren(
+  node: Record<string, unknown>,
+): Record<string, unknown>[] {
+  return getVisibleChildren(node).filter((child) => !isVisuallyEmptyNode(child));
+}
+
+function shouldKeepChildrenSeparate(
+  node: Record<string, unknown>,
+): boolean {
+  if (
+    typeof node.type !== "string" ||
+    !CONTAINER_NODE_TYPES.has(node.type) ||
+    hasGeometry(node)
+  ) {
+    return false;
+  }
+
+  const parentBox = getAbsoluteBoundingBox(node);
+  if (!parentBox) {
+    return false;
+  }
+
+  const parentArea = getArea(parentBox);
+  if (parentArea <= 0) {
+    return false;
+  }
+
+  const candidateChildren = getVisibleChildren(node)
+    .map((child) => ({
+      child,
+      analysis: analyzeNode(child),
+      box: getAbsoluteBoundingBox(child),
+    }))
+    .filter(
+      (
+        entry,
+      ): entry is {
+        child: Record<string, unknown>;
+        analysis: VectorAnalysis;
+        box: BoundingBox;
+      } =>
+        Boolean(entry.box) &&
+        typeof entry.child.type === "string" &&
+        CONTAINER_NODE_TYPES.has(entry.child.type) &&
+        entry.analysis.containsVectorContent &&
+        getArea(entry.box) / parentArea >= 0.18,
+    );
+
+  if (candidateChildren.length < 2) {
+    return false;
+  }
+
+  let separatedPairs = 0;
+  let totalPairs = 0;
+
+  for (let index = 0; index < candidateChildren.length; index += 1) {
+    for (
+      let nextIndex = index + 1;
+      nextIndex < candidateChildren.length;
+      nextIndex += 1
+    ) {
+      totalPairs += 1;
+      if (
+        getOverlapRatio(
+          candidateChildren[index].box,
+          candidateChildren[nextIndex].box,
+        ) <= 0.2
+      ) {
+        separatedPairs += 1;
+      }
+    }
+  }
+
+  return totalPairs > 0 && separatedPairs === totalPairs;
+}
+
 function analyzeNode(node: Record<string, unknown> | null | undefined): VectorAnalysis {
   if (!node || typeof node !== "object" || isIgnoredNode(node)) {
     return {
@@ -68,14 +249,7 @@ function analyzeNode(node: Record<string, unknown> | null | undefined): VectorAn
     };
   }
 
-  const children = Array.isArray(node.children)
-    ? node.children.filter(
-        (child): child is Record<string, unknown> =>
-          Boolean(child) &&
-          typeof child === "object" &&
-          !isIgnoredNode(child as Record<string, unknown>),
-      )
-    : [];
+  const children = getMeaningfulChildren(node);
   const childAnalyses = children.map((child) => analyzeNode(child));
   const anyChildVectorContent = childAnalyses.some(
     (analysis) => analysis.containsVectorContent,
@@ -135,14 +309,7 @@ function shouldCollapseIntoOnlyExportableChild(
     return false;
   }
 
-  const children = Array.isArray(node.children)
-    ? node.children.filter(
-        (child): child is Record<string, unknown> =>
-          Boolean(child) &&
-          typeof child === "object" &&
-          !isIgnoredNode(child as Record<string, unknown>),
-      )
-    : [];
+  const children = getMeaningfulChildren(node);
   const exportableChildren = children.filter(
     (child) => analyzeNode(child).exportable,
   );
@@ -165,7 +332,8 @@ function collectRoots(
   const analysis = analyzeNode(node);
   if (
     isAssetLikeRoot(node, analysis) &&
-    !shouldCollapseIntoOnlyExportableChild(node)
+    !shouldCollapseIntoOnlyExportableChild(node) &&
+    !shouldKeepChildrenSeparate(node)
   ) {
     roots.push(node);
     return;

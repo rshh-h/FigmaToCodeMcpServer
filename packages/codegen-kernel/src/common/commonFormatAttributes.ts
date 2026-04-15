@@ -17,11 +17,35 @@ export const formatStyleAttribute = (
   return ` style=${isJSX ? `{{${trimmedStyles}}}` : `"${trimmedStyles}"`}`;
 };
 
-export const formatDataAttribute = (label: string, value?: string) =>
-  ` data-${lowercaseFirstLetter(label).replace(" ", "-")}${value === undefined ? `` : `="${value}"`}`;
+export const sanitizeAttributeName = (label: string): string => {
+  const normalized = lowercaseFirstLetter(label)
+    .trim()
+    .replace(/\*/g, "x")
+    .replace(/\s+/g, "-")
+    .replace(/[^\p{L}\p{N}_-]+/gu, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-export const formatTwigAttribute = (label: string, value?: string) =>
-  ['.', '_'].includes(label.charAt(0)) ? '' : (` ${lowercaseFirstLetter(label).replace(" ", "-")}${value === undefined ? `` : `="${value}"`}`);
+  return normalized;
+};
+
+export const formatDataAttribute = (label: string, value?: string) => {
+  const cleanLabel = sanitizeAttributeName(label);
+  if (cleanLabel === "") {
+    return "";
+  }
+
+  return ` data-${cleanLabel}${value === undefined ? `` : `="${value}"`}`;
+};
+
+export const formatTwigAttribute = (label: string, value?: string) => {
+  const cleanLabel = sanitizeAttributeName(label);
+  if (cleanLabel === "" || [".", "_"].includes(cleanLabel.charAt(0))) {
+    return "";
+  }
+
+  return ` ${cleanLabel}${value === undefined ? `` : `="${value}"`}`;
+};
 
 export const formatClassAttribute = (
   classes: string[],

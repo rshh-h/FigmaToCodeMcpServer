@@ -27,8 +27,10 @@ import {
 import { pxToBlur } from "./conversionTables";
 import {
   formatDataAttribute,
+  formatStyleAttribute,
   formatTwigAttribute,
   getClassLabel,
+  sanitizeAttributeName,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "../pluginTypes";
 import { MinimalFillsTrait, MinimalStrokesTrait, Paint } from "../api_types";
@@ -38,9 +40,8 @@ const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
-  style: string;
+  styles: string[];
   data: string[];
-  styleSeparator: string = "";
   node: SceneNode;
   settings: TailwindSettings;
 
@@ -65,8 +66,7 @@ export class TailwindDefaultBuilder {
   constructor(node: SceneNode, settings: TailwindSettings) {
     this.node = node;
     this.settings = settings;
-    this.styleSeparator = this.isJSX ? "," : ";";
-    this.style = "";
+    this.styles = [];
     this.data = [];
   }
 
@@ -266,6 +266,11 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
+  addStyles(...newStyles: string[]): this {
+    this.styles.push(...dropEmptyStrings(newStyles).map((style) => style.trim()));
+    return this;
+  }
+
   build(additionalAttr = ""): string {
     if (additionalAttr) {
       this.addAttributes(additionalAttr);
@@ -283,13 +288,12 @@ export class TailwindDefaultBuilder {
         ?.map((prop) => {
           if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN" || (this.isTwigComponent && prop[1].type === "TEXT")) {
             const cleanName = prop[0]
-              .split("#")[0]
-              .replace(/\s+/g, "-")
-              .toLowerCase();
+              .split("#")[0];
+            const sanitizedName = sanitizeAttributeName(cleanName);
 
             return this.isTwigComponent
-              ? formatTwigAttribute(cleanName, String(prop[1].value))
-              : formatDataAttribute(cleanName, String(prop[1].value));
+              ? formatTwigAttribute(sanitizedName, String(prop[1].value))
+              : formatDataAttribute(sanitizedName, String(prop[1].value));
           }
           return "";
         })
@@ -303,7 +307,7 @@ export class TailwindDefaultBuilder {
       this.attributes.length > 0
         ? ` ${classLabel}="${this.attributes.filter(Boolean).join(" ")}"`
         : "";
-    const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
+    const styles = formatStyleAttribute(this.styles, this.isJSX);
     const dataAttributes = this.data.join("");
 
     return `${dataAttributes}${classNames}${styles}`;
@@ -312,6 +316,6 @@ export class TailwindDefaultBuilder {
   reset(): void {
     this.attributes = [];
     this.data = [];
-    this.style = "";
+    this.styles = [];
   }
 }

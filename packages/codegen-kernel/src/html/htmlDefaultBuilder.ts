@@ -26,6 +26,7 @@ import {
   formatClassAttribute,
   formatDataAttribute,
   formatStyleAttribute,
+  sanitizeAttributeName,
 } from "../common/commonFormatAttributes";
 import { HTMLSettings } from "../pluginTypes";
 import { figma } from "../runtime/figma";
@@ -457,11 +458,10 @@ export class HtmlDefaultBuilder {
         ?.map((prop) => {
           if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN") {
             const cleanName = prop[0]
-              .split("#")[0]
-              .replace(/\s+/g, "-")
-              .toLowerCase();
+              .split("#")[0];
+            const sanitizedName = sanitizeAttributeName(cleanName);
 
-            return formatDataAttribute(cleanName, String(prop[1].value));
+            return formatDataAttribute(sanitizedName, String(prop[1].value));
           }
           return "";
         })
