@@ -146,12 +146,15 @@ pnpm --filter figma-to-code-mcp-server dev
 mcp 本地配置：
 
 如果需要像素级一致，需要关闭ROUND_TAILWIND_VALUES和ROUND_TAILWIND_COLORS
+通过 figma rest api 拉取数据可能受网络影响，所以推荐这里把超时时间设的长一些
 
 ```
 [mcp_servers.figma_to_code]
 type = "stdio"
 command = "pnpm"
 args = ["--dir", "path to FigmaToCodeMCPServer/apps/figma-rest-mcp-server", "exec", "tsx", "src/stdio.ts"]
+startup_timeout_sec = 20   # 启动 20 秒
+tool_timeout_sec    = 300  # 工具 5 分钟
 
 [mcp_servers.figma_to_code.env]
 FIGMA_ACCESS_TOKEN = "your figma token"
