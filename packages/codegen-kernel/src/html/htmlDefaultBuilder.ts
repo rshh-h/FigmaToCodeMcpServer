@@ -355,7 +355,7 @@ export class HtmlDefaultBuilder {
 
   size(): this {
     const { node, settings } = this;
-    const { width, height, constraints } = htmlSizePartial(
+    const { width, height, constraints, flexItem } = htmlSizePartial(
       node,
       settings.htmlGenerationMode === "jsx",
     );
@@ -379,6 +379,10 @@ export class HtmlDefaultBuilder {
     // Add constraints as separate styles
     if (constraints.length > 0) {
       this.addStyles(...constraints);
+    }
+
+    if (flexItem.length > 0) {
+      this.addStyles(...flexItem);
     }
 
     return this;

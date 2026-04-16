@@ -1,6 +1,7 @@
 import { pxToLayoutSize } from "../conversionTables";
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { numberToFixedString } from "../../common/numToAutoFixed";
+import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild";
 import { TailwindSettings } from "../../pluginTypes";
 import { localTailwindSettings } from "../tailwindMain";
 
@@ -32,7 +33,7 @@ const formatTailwindSizeValue = (
 export const tailwindSizePartial = (
   node: SceneNode,
   settings?: TailwindSettings,
-): { width: string; height: string; constraints: string } => {
+): { width: string; height: string; constraints: string; flexItem: string } => {
   const size = nodeSize(node);
   const nodeParent = node.parent;
 
@@ -111,5 +112,6 @@ export const tailwindSizePartial = (
     width: w,
     height: h,
     constraints: constraints.join(" "),
+    flexItem: shouldPreventAutoLayoutFlexShrink(node) ? "shrink-0" : "",
   };
 };

@@ -1,16 +1,18 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
+import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild";
 import { formatWithJSX } from "../../common/parseJSX";
 import { isPreviewGlobal } from "../htmlMain";
 
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
-): { width: string; height: string; constraints: string[] } => {
+): { width: string; height: string; constraints: string[]; flexItem: string[] } => {
   if (isPreviewGlobal && node.parent === undefined) {
     return {
       width: formatWithJSX("width", isJsx, "100%"),
       height: formatWithJSX("height", isJsx, "100%"),
       constraints: [],
+      flexItem: [],
     };
   }
 
@@ -79,5 +81,8 @@ export const htmlSizePartial = (
     width: w,
     height: h,
     constraints: constraints,
+    flexItem: shouldPreventAutoLayoutFlexShrink(node)
+      ? [formatWithJSX("flex-shrink", isJsx, 0)]
+      : [],
   };
 };
