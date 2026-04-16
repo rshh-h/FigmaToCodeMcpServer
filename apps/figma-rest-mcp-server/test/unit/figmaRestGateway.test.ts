@@ -95,6 +95,72 @@ describe("FigmaRestGateway", () => {
     });
   });
 
+  it("drops non-SVG payloads returned by signed vector URLs", async () => {
+    const workspace = createWorkspace();
+    const getJson = vi.fn().mockResolvedValue({
+      images: {
+        "1:2": "https://signed.example.com/not-actually-svg",
+      },
+    });
+    const getText = vi.fn().mockResolvedValue(
+      "<!doctype html><html><head><title>Figma Developer Docs</title></head><body></body></html>",
+    );
+    const gateway = new FigmaRestGateway(
+      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      { getJson, getText } as any,
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      stderrLogger,
+      noopMetrics,
+    );
+
+    const vectors = await withRequestCache(
+      async () => await gateway.fetchVectors("FILE", ["1:2"], workspace),
+    );
+
+    expect(vectors).toEqual({});
+  });
+
+  it("sanitizes polluted vector disk cache entries before reuse", async () => {
+    const workspace = createWorkspace();
+    const firstGateway = new FigmaRestGateway(
+      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      {
+        getJson: vi.fn().mockResolvedValue({
+          images: {
+            "1:2": "https://signed.example.com/not-actually-svg",
+          },
+        }),
+        getText: vi.fn().mockResolvedValue(
+          "<!doctype html><html><head><title>Figma Developer Docs</title></head><body></body></html>",
+        ),
+      } as any,
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      stderrLogger,
+      noopMetrics,
+    );
+
+    await withRequestCache(async () => {
+      await firstGateway.fetchVectors("FILE", ["1:2"], workspace);
+    });
+
+    const secondGateway = new FigmaRestGateway(
+      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      {
+        getJson: vi.fn(),
+        getText: vi.fn(),
+      } as any,
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      stderrLogger,
+      noopMetrics,
+    );
+
+    const vectors = await withRequestCache(async () => {
+      return await secondGateway.fetchVectors("FILE", ["1:2"], workspace);
+    });
+
+    expect(vectors).toEqual({});
+  });
+
   it("reuses workspace disk cache across gateway instances", async () => {
     const workspace = createWorkspace();
     const firstGateway = new FigmaRestGateway(

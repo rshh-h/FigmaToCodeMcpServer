@@ -14,6 +14,15 @@ import { TokenProvider } from "../infrastructure/tokenProvider.js";
 import type { WorkspaceRequestOptions } from "../core/contracts.js";
 import { fetchSvgSignedUrls } from "./vectorSvgExport.js";
 
+function isSvgMarkup(content: string): boolean {
+  const trimmed = content.trimStart();
+  if (/^<!doctype html/i.test(trimmed) || /^<html[\s>]/i.test(trimmed)) {
+    return false;
+  }
+
+  return /<svg[\s>]/i.test(trimmed.slice(0, 1024));
+}
+
 export class FigmaRestGateway implements SourceGateway {
   private readonly nodeCache: MemoryCache<{
     fileKey: string;
@@ -66,6 +75,31 @@ export class FigmaRestGateway implements SourceGateway {
       workspaceRoot: process.cwd(),
       useCache: true,
     };
+  }
+
+  private sanitizeVectorPayload(
+    fileKey: string,
+    vectors: Record<string, string>,
+    source: "memory_cache" | "disk_cache" | "download",
+  ): Record<string, string> {
+    const sanitizedEntries = Object.entries(vectors).flatMap(([nodeId, content]) => {
+      if (isSvgMarkup(content)) {
+        return [[nodeId, content] as const];
+      }
+
+      this.logger.warn("Discarded non-SVG vector payload", {
+        fileKey,
+        nodeId,
+        source,
+        preview: content.trimStart().slice(0, 120),
+      });
+      this.metrics.increment("figma_vector_invalid_svg_total", 1, {
+        source,
+      });
+      return [];
+    });
+
+    return Object.fromEntries(sanitizedEntries);
   }
 
   async fetchNodes(
@@ -215,7 +249,9 @@ export class FigmaRestGateway implements SourceGateway {
       const cached = this.vectorCache.get(cacheKey);
       if (cached) {
         this.metrics.increment("figma_cache_hit_total", 1, { resource: "vectors" });
-        return cached;
+        const sanitized = this.sanitizeVectorPayload(fileKey, cached, "memory_cache");
+        this.vectorCache.set(cacheKey, sanitized);
+        return sanitized;
       }
       const diskHit = effectiveWorkspace.useCache
         ? await this.restCache.readJson<Record<string, string>>(
@@ -226,9 +262,19 @@ export class FigmaRestGateway implements SourceGateway {
           )
         : undefined;
       if (diskHit) {
-        this.vectorCache.set(cacheKey, diskHit);
+        const sanitized = this.sanitizeVectorPayload(fileKey, diskHit, "disk_cache");
+        this.vectorCache.set(cacheKey, sanitized);
+        if (Object.keys(sanitized).length !== Object.keys(diskHit).length) {
+          await this.restCache.writeJson(
+            effectiveWorkspace.workspaceRoot,
+            "vectors",
+            fileKey,
+            cacheKey,
+            sanitized,
+          );
+        }
         this.metrics.increment("figma_cache_hit_total", 1, { resource: "vectors" });
-        return diskHit;
+        return sanitized;
       }
       this.metrics.increment("figma_cache_miss_total", 1, { resource: "vectors" });
 
@@ -250,15 +296,16 @@ export class FigmaRestGateway implements SourceGateway {
           ]),
         ),
       );
-      this.vectorCache.set(cacheKey, vectors);
+      const sanitized = this.sanitizeVectorPayload(fileKey, vectors, "download");
+      this.vectorCache.set(cacheKey, sanitized);
       await this.restCache.writeJson(
         effectiveWorkspace.workspaceRoot,
         "vectors",
         fileKey,
         cacheKey,
-        vectors,
+        sanitized,
       );
-      return vectors;
+      return sanitized;
     });
   }
 

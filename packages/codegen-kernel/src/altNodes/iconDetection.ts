@@ -91,6 +91,30 @@ function hasSvgExportSettings(node: SceneNode): boolean {
   return settingsToCheck.some((setting) => setting.format === "SVG");
 }
 
+function hasVisibleStyle(node: SceneNode): boolean {
+  const hasVisibleFill =
+    "fills" in node &&
+    Array.isArray(node.fills) &&
+    node.fills.some(
+      (fill) =>
+        typeof fill === "object" &&
+        fill !== null &&
+        fill.visible !== false &&
+        ("opacity" in fill ? (fill.opacity ?? 1) : 1) > 0,
+    );
+
+  const hasVisibleStroke =
+    "strokes" in node &&
+    Array.isArray(node.strokes) &&
+    node.strokes.some(
+      (stroke) =>
+        stroke.visible !== false &&
+        ("opacity" in stroke ? (stroke.opacity ?? 1) : 1) > 0,
+    );
+
+  return hasVisibleFill || hasVisibleStroke;
+}
+
 /**
  * Recursively checks the children of a container node.
  * Returns an object indicating if disallowed children were found
@@ -187,8 +211,13 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
     // Check other primitives (ELLIPSE, RECTANGLE, LINE) with size constraint
     else if (ICON_PRIMITIVE_TYPES.has(node.type)) {
       if (isTypicalIconSize(node)) {
-        reason = `Direct ${node.type} with typical size`;
-        result = true;
+        if (hasVisibleStyle(node)) {
+          reason = `Direct ${node.type} with typical size and visible style`;
+          result = true;
+        } else {
+          reason = `Direct ${node.type} with no visible style`;
+          result = false;
+        }
       } else {
         reason = `Direct ${node.type} but too large (${Math.round(node.width)}x${Math.round(node.height)})`;
         result = false;
