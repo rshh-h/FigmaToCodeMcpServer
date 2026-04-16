@@ -243,4 +243,5 @@ FIGMA_VERIFY_FRAMEWORK=Tailwind
 
 - [工具架构概览](docs/figma-rest-mcp-tool-architecture.zh-CN.md)
 - [模块说明](docs/figma-rest-mcp-module-implementation.zh-CN.md)
+- [渲染语义预处理方案](docs/render-semantics-preprocess-plan.zh-CN.md)
 - [本地资源能力说明](docs/local-asset-download-plan.md)

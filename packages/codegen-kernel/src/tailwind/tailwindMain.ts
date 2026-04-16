@@ -18,7 +18,14 @@ import {
   isLocalVectorChildNode,
   renderAndAttachSVG,
 } from "../altNodes/altNodeUtils";
+import { numberToFixedString } from "../common/numToAutoFixed";
 import { formatWithJSX } from "../common/parseJSX";
+import {
+  annotateRenderSemantics,
+  shouldAllowNodeFlatten,
+  shouldAllowNodeMerge,
+  shouldPreserveNodeWrapper,
+} from "../common/renderSemantics";
 import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes";
 
 export let localTailwindSettings: PluginSettings;
@@ -49,6 +56,7 @@ export const tailwindMain = async (
 ): Promise<string> => {
   localTailwindSettings = settings;
   previousExecutionCache = [];
+  annotateRenderSemantics(sceneNode);
 
   let result = await tailwindWidgetGenerator(sceneNode, settings);
 
@@ -137,7 +145,12 @@ const convertNode =
       return tailwindWrapSVG(node as AltNode<SceneNode>, settings, localVectorPath);
     }
 
-    if (settings.embedVectors && (node as any).canBeFlattened) {
+    if (
+      settings.embedVectors &&
+      (node as any).canBeFlattened &&
+      shouldAllowNodeFlatten(node) &&
+      shouldAllowNodeMerge(node)
+    ) {
       const altNode = await renderAndAttachSVG(node);
       if (altNode.svg) {
         return tailwindWrapSVG(altNode, settings);
@@ -204,13 +217,32 @@ const tailwindGroup = async (
     return "";
   }
 
+  const preserveWrapper = shouldPreserveNodeWrapper(node);
   const builder = new TailwindDefaultBuilder(node, settings)
     .blend()
     .size()
     .position();
+  const forceWidth =
+    "layoutSizingHorizontal" in node
+      ? node.layoutSizingHorizontal === "HUG"
+      : false;
+  const forceHeight =
+    "layoutSizingVertical" in node ? node.layoutSizingVertical === "HUG" : false;
+  const structuralAttributes = preserveWrapper
+    ? [
+        forceWidth ? `w-[${numberToFixedString(node.width)}px]` : "",
+        forceHeight ? `h-[${numberToFixedString(node.height)}px]` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "";
 
-  if (builder.attributes.length > 0 || builder.styles.length > 0) {
-    const attr = builder.build("");
+  if (
+    preserveWrapper ||
+    builder.attributes.length > 0 ||
+    builder.styles.length > 0
+  ) {
+    const attr = builder.build(structuralAttributes);
     const generator = await tailwindWidgetGenerator(node.children, settings);
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }

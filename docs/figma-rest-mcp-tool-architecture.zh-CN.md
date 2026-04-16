@@ -141,4 +141,12 @@ flowchart LR
 - `SwiftUI`
 - `Compose`
 
+## 相关设计文档
+
+如果你要继续看实现细节，建议结合以下专题文档：
+
+- [模块说明](figma-rest-mcp-module-implementation.zh-CN.md)
+- [渲染语义预处理方案](render-semantics-preprocess-plan.zh-CN.md)
+- [本地资源能力说明](local-asset-download-plan.md)
+
 调用 `figma_to_code_convert` 前，建议先通过 `figma_to_code_convert_help` 获取请求模板和字段说明。

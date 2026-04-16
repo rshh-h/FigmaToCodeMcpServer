@@ -108,7 +108,8 @@
 
 1. `README.md`
 2. `docs/figma-rest-mcp-tool-architecture.zh-CN.md`
-3. 本文
-4. `docs/local-asset-download-plan.md`
+3. `docs/render-semantics-preprocess-plan.zh-CN.md`
+4. 本文
+5. `docs/local-asset-download-plan.md`
 
 随后再进入 `apps/figma-rest-mcp-server/src` 与 `packages/codegen-kernel/src` 查看实现细节。

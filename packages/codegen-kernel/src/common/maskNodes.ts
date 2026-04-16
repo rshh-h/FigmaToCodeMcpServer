@@ -1,4 +1,5 @@
 import { commonIsAbsolutePosition } from "./commonPosition";
+import { getRenderSemantics } from "./renderSemantics";
 
 type MaskType = "ALPHA" | "VECTOR" | "LUMINANCE";
 
@@ -25,6 +26,26 @@ const getMaskType = (node: SceneNode): MaskType =>
 
 const isMaskNode = (node: SceneNode): boolean =>
   (node as SceneNode & { isMask?: boolean }).isMask === true;
+
+const isMaskBoundaryNode = (node: SceneNode): boolean =>
+  isMaskNode(node) || getRenderSemantics(node).isMaskBoundary;
+
+const collectMaskedNodes = (
+  nodes: readonly SceneNode[],
+  startIndex: number,
+): readonly SceneNode[] => {
+  const maskedNodes: SceneNode[] = [];
+
+  for (let index = startIndex; index < nodes.length; index += 1) {
+    const node = nodes[index];
+    if (isMaskBoundaryNode(node)) {
+      break;
+    }
+    maskedNodes.push(node);
+  }
+
+  return maskedNodes;
+};
 
 const getUnsupportedMaskReason = (
   maskNode: SceneNode,
@@ -55,7 +76,7 @@ export const buildMaskRenderPlan = (
 ): MaskRenderPlanItem[] => {
   const plan: MaskRenderPlanItem[] = [];
 
-  for (let index = 0; index < nodes.length; index += 1) {
+  for (let index = 0; index < nodes.length; ) {
     const node = nodes[index];
 
     if (!isMaskNode(node)) {
@@ -63,10 +84,11 @@ export const buildMaskRenderPlan = (
         kind: "node",
         node,
       });
+      index += 1;
       continue;
     }
 
-    const maskedNodes = nodes.slice(index + 1);
+    const maskedNodes = collectMaskedNodes(nodes, index + 1);
     const unsupportedReason = getUnsupportedMaskReason(node, maskedNodes);
 
     if (unsupportedReason) {
@@ -75,6 +97,7 @@ export const buildMaskRenderPlan = (
         node,
         warning: `${unsupportedReason} Rendering without mask semantics.`,
       });
+      index += 1;
       continue;
     }
 
@@ -83,7 +106,7 @@ export const buildMaskRenderPlan = (
       maskNode: node,
       maskedNodes,
     });
-    break;
+    index += maskedNodes.length + 1;
   }
 
   return plan;

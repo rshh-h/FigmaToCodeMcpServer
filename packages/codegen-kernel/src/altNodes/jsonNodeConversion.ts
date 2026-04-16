@@ -3,6 +3,7 @@ import { PluginSettings } from "../pluginTypes";
 import { variableToColorName } from "../tailwind/conversionTables";
 import { HasGeometryTrait, Node, Paint } from "../api_types";
 import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
+import { analyzeRenderSemantics } from "../common/renderSemantics";
 import { isLikelyIcon } from "./iconDetection";
 import { AltNode } from "../alt_api_types";
 
@@ -327,7 +328,11 @@ const processNodePair = async (
     nodeType === "GROUP" &&
     jsonNode.children &&
     !runtimeNode.localVectorPath &&
-    !hasDirectMaskChild(jsonNode)
+    !hasDirectMaskChild(jsonNode) &&
+    !analyzeRenderSemantics(
+      jsonNode as unknown as SceneNode,
+      (parentNode as unknown as SceneNode | null) ?? null,
+    ).preserveWrapper
   ) {
     const processedChildren = [];
 

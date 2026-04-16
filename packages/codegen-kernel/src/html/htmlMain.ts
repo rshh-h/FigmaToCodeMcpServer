@@ -29,6 +29,12 @@ import {
   nodeHasImageFill,
 } from "../common/images";
 import { addWarning } from "../common/commonConversionWarnings";
+import {
+  annotateRenderSemantics,
+  shouldAllowNodeFlatten,
+  shouldAllowNodeMerge,
+  shouldPreserveNodeWrapper,
+} from "../common/renderSemantics";
 
 const selfClosingTags = ["img"];
 
@@ -328,6 +334,7 @@ export const htmlMain = async (
   previousExecutionCache = [];
   cssCollection = {};
   resetClassNameCounters(); // Reset counters for each new generation
+  annotateRenderSemantics(sceneNode);
 
   let htmlContent = await htmlWidgetGenerator(sceneNode, settings);
 
@@ -461,7 +468,12 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     return htmlWrapSVG(node as AltNode<SceneNode>, settings, localVectorPath);
   }
 
-  if (settings.embedVectors && (node as any).canBeFlattened) {
+  if (
+    settings.embedVectors &&
+    (node as any).canBeFlattened &&
+    shouldAllowNodeFlatten(node) &&
+    shouldAllowNodeMerge(node)
+  ) {
     const altNode = await renderAndAttachSVG(node);
     if (altNode.svg) {
       return htmlWrapSVG(altNode, settings);
@@ -531,11 +543,30 @@ const htmlGroup = async (
     return "";
   }
 
-  // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new HtmlDefaultBuilder(node, settings).commonPositionStyles();
+  const preserveWrapper = shouldPreserveNodeWrapper(node);
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .blend()
+    .size()
+    .position();
+  const forceWidth =
+    "layoutSizingHorizontal" in node
+      ? node.layoutSizingHorizontal === "HUG"
+      : false;
+  const forceHeight =
+    "layoutSizingVertical" in node ? node.layoutSizingVertical === "HUG" : false;
+  const additionalStyles = preserveWrapper
+    ? [
+        forceWidth
+          ? formatWithJSX("width", settings.htmlGenerationMode === "jsx", node.width)
+          : "",
+        forceHeight
+          ? formatWithJSX("height", settings.htmlGenerationMode === "jsx", node.height)
+          : "",
+      ].filter(Boolean)
+    : [];
 
-  if (builder.styles) {
-    const attr = builder.build();
+  if (preserveWrapper || builder.styles.length > 0) {
+    const attr = builder.build(additionalStyles);
     const generator = await htmlWidgetGenerator(node.children, settings);
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
