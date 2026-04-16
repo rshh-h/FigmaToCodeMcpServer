@@ -1,8 +1,14 @@
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
 import { addWarning } from "../common/commonConversionWarnings";
+import { formatStyleAttribute } from "../common/commonFormatAttributes";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import { getPlaceholderImage } from "../common/images";
+import { buildMaskRenderPlan } from "../common/maskNodes";
+import {
+  commonIsAbsolutePosition,
+  getCommonPositionValue,
+} from "../common/commonPosition";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
@@ -59,9 +65,64 @@ const tailwindWidgetGenerator = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   const visibleNodes = getVisibleNodes(sceneNode);
-  const promiseOfConvertedCode = visibleNodes.map(convertNode(settings));
+  const renderPlan = buildMaskRenderPlan(visibleNodes);
+  const convert = convertNode(settings);
+  const promiseOfConvertedCode = renderPlan.map(async (item) => {
+    if (item.kind === "mask-group") {
+      return await tailwindStructuralMaskGroup(
+        item.maskNode,
+        item.maskedNodes,
+        settings,
+      );
+    }
+
+    if (item.warning) {
+      addWarning(item.warning);
+    }
+
+    return await convert(item.node);
+  });
   const code = (await Promise.all(promiseOfConvertedCode)).join("");
   return code;
+};
+
+const tailwindStructuralMaskGroup = async (
+  maskNode: SceneNode,
+  maskedNodes: readonly SceneNode[],
+  settings: TailwindSettings,
+): Promise<string> => {
+  const childrenStr = await tailwindWidgetGenerator(maskedNodes, settings);
+  const { x, y } = getCommonPositionValue(maskNode, settings);
+  const isJSX = settings.tailwindGenerationMode === "jsx";
+  const rebasedChildren = wrapMaskChildrenWithOffset(childrenStr, -x, -y, isJSX);
+  const additionalClasses = [
+    "overflow-hidden",
+    commonIsAbsolutePosition(maskNode) ? "" : "relative",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const builder = new TailwindDefaultBuilder(maskNode, settings)
+    .size()
+    .position()
+    .blend()
+    .radius();
+
+  return `\n<div${builder.build(additionalClasses)}>${indentString(rebasedChildren)}\n</div>`;
+};
+
+const wrapMaskChildrenWithOffset = (
+  children: string,
+  offsetX: number,
+  offsetY: number,
+  isJSX: boolean,
+): string => {
+  const styles = [
+    formatWithJSX("position", isJSX, "absolute"),
+    formatWithJSX("left", isJSX, offsetX),
+    formatWithJSX("top", isJSX, offsetY),
+  ];
+
+  return `\n<div${formatStyleAttribute(styles, isJSX)}>${indentString(children)}\n</div>`;
 };
 
 const convertNode =
@@ -165,6 +226,11 @@ export const tailwindText = (
     .commonPositionStyles()
     .textAlignHorizontal()
     .textAlignVertical();
+
+  if (node.textAutoResize === "WIDTH_AND_HEIGHT") {
+    // Preserve Figma's hug-content text behavior and prevent browser line wraps.
+    layoutBuilder.addAttributes("w-max", "whitespace-nowrap");
+  }
 
   const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);

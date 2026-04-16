@@ -2,6 +2,11 @@ import { indentString } from "../common/indentString";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
+import { formatStyleAttribute } from "../common/commonFormatAttributes";
+import {
+  commonIsAbsolutePosition,
+  getCommonPositionValue,
+} from "../common/commonPosition";
 import { formatWithJSX } from "../common/parseJSX";
 import {
   PluginSettings,
@@ -16,6 +21,7 @@ import {
   isLocalVectorChildNode,
   renderAndAttachSVG,
 } from "../altNodes/altNodeUtils";
+import { buildMaskRenderPlan } from "../common/maskNodes";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import {
   exportNodeAsBase64PNG,
@@ -383,11 +389,66 @@ const htmlWidgetGenerator = async (
   settings: HTMLSettings,
 ): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
-    convertNode(settings),
-  );
+  const visibleNodes = getVisibleNodes(sceneNode);
+  const renderPlan = buildMaskRenderPlan(visibleNodes);
+  const convert = convertNode(settings);
+  const promiseOfConvertedCode = renderPlan.map(async (item) => {
+    if (item.kind === "mask-group") {
+      return await htmlStructuralMaskGroup(item.maskNode, item.maskedNodes, settings);
+    }
+
+    if (item.warning) {
+      addWarning(item.warning);
+    }
+
+    return await convert(item.node);
+  });
   const code = (await Promise.all(promiseOfConvertedCode)).join("");
   return code;
+};
+
+const htmlStructuralMaskGroup = async (
+  maskNode: SceneNode,
+  maskedNodes: readonly SceneNode[],
+  settings: HTMLSettings,
+): Promise<string> => {
+  const childrenStr = await htmlWidgetGenerator(maskedNodes, settings);
+  const { x, y } = getCommonPositionValue(maskNode, settings);
+  const isJSX = settings.htmlGenerationMode === "jsx";
+  const rebasedChildren = wrapHtmlMaskChildrenWithOffset(
+    childrenStr,
+    -x,
+    -y,
+    isJSX,
+  );
+  const builder = new HtmlDefaultBuilder(maskNode, settings)
+    .size()
+    .position()
+    .blend()
+    .radius();
+  const additionalStyles = [
+    formatWithJSX("overflow", isJSX, "hidden"),
+    commonIsAbsolutePosition(maskNode)
+      ? ""
+      : formatWithJSX("position", isJSX, "relative"),
+  ].filter(Boolean);
+
+  return `\n<div${builder.build(additionalStyles)}>${indentString(rebasedChildren)}\n</div>`;
+};
+
+const wrapHtmlMaskChildrenWithOffset = (
+  children: string,
+  offsetX: number,
+  offsetY: number,
+  isJSX: boolean,
+): string => {
+  const styles = [
+    formatWithJSX("position", isJSX, "absolute"),
+    formatWithJSX("left", isJSX, offsetX),
+    formatWithJSX("top", isJSX, offsetY),
+  ];
+
+  return `\n<div${formatStyleAttribute(styles, isJSX)}>${indentString(children)}\n</div>`;
 };
 
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
@@ -488,6 +549,15 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
     .textTrim()
     .textAlignHorizontal()
     .textAlignVertical();
+
+  if (node.textAutoResize === "WIDTH_AND_HEIGHT") {
+    // Match Figma's auto-sized text boxes: keep intrinsic width and disable wrapping.
+    const isJSX = settings.htmlGenerationMode === "jsx";
+    layoutBuilder.addStyles(
+      formatWithJSX("width", isJSX, "max-content"),
+      formatWithJSX("white-space", isJSX, "nowrap"),
+    );
+  }
 
   const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);

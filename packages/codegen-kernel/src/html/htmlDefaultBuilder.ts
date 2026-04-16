@@ -158,7 +158,7 @@ export class HtmlDefaultBuilder {
 
   border(settings: HTMLSettings): this {
     const { node } = this;
-    this.addStyles(...htmlBorderRadius(node, this.isJSX));
+    this.radius();
 
     const commonBorder = commonStroke(node);
     if (!commonBorder) {
@@ -259,6 +259,11 @@ export class HtmlDefaultBuilder {
         );
       }
     }
+    return this;
+  }
+
+  radius(): this {
+    this.addStyles(...htmlBorderRadius(this.node, this.isJSX));
     return this;
   }
 

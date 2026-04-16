@@ -28,6 +28,12 @@ const nodeNameCounters: Map<string, number> = new Map();
 
 const variableCache = new Map<string, string>();
 
+export const hasDirectMaskChild = (node: AltNode): boolean =>
+  Array.isArray(node.children) &&
+  node.children.some(
+    (child) => (child as AltNode & { isMask?: boolean }).isMask === true,
+  );
+
 /**
  * Maps variable IDs to color names and caches the result
  */
@@ -317,7 +323,12 @@ const processNodePair = async (
 
   // Inline all GROUP nodes by processing their children directly, except
   // local vector roots that must remain as the exported parent replacement.
-  if (nodeType === "GROUP" && jsonNode.children && !runtimeNode.localVectorPath) {
+  if (
+    nodeType === "GROUP" &&
+    jsonNode.children &&
+    !runtimeNode.localVectorPath &&
+    !hasDirectMaskChild(jsonNode)
+  ) {
     const processedChildren = [];
 
     if (

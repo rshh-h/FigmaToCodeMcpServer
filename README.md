@@ -158,12 +158,10 @@ tool_timeout_sec    = 300  # 工具 5 分钟
 
 [mcp_servers.figma_to_code.env]
 FIGMA_ACCESS_TOKEN = "your figma token"
-ENABLE_VARIABLES = "false"
 ENABLE_IMAGE_EMBED = "true"
 ENABLE_VECTOR_EMBED = "true"
 ROUND_TAILWIND_VALUES = "false"
 ROUND_TAILWIND_COLORS = "false"
-SHOW_LAYER_NAMES = "false"
 ```
 
 构建并启动 HTTP 模式：
