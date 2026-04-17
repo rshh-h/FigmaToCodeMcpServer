@@ -8,10 +8,7 @@ import { TailwindColorType } from "../../pluginTypes";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
 // Import the HTML gradient functions
-import {
-  htmlAngularGradient,
-  htmlRadialGradient,
-} from "../../html/builderImpl/htmlColor";
+import { htmlAngularGradient, htmlRadialGradient } from "../../html/builderImpl/htmlColor";
 import { GradientPaint, Paint } from "../../api_types";
 import { localTailwindSettings } from "../tailwindMain";
 
@@ -191,6 +188,45 @@ export const tailwindGradientFromFills = (
   }
 
   return "";
+};
+
+export const tailwindBackgroundFromFills = (
+  fills: ReadonlyArray<Paint>,
+): string => {
+  const layers = tailwindBackgroundLayerClassesFromFills(fills);
+  return layers.length > 1 ? "" : layers[0] ?? "";
+};
+
+/**
+ * Builds one Tailwind background class per visible fill, preserving Figma's
+ * bottom-to-top order so callers can render them as stacked DOM layers.
+ */
+export const tailwindBackgroundLayerClassesFromFills = (
+  fills: ReadonlyArray<Paint> | undefined,
+): string[] => {
+  if (!Array.isArray(fills)) {
+    return [];
+  }
+
+  return fills
+    .filter((fill) => fill.visible !== false)
+    .map((fill) => {
+      if (fill.type === "SOLID") {
+        return tailwindColorFromFills([fill], "bg");
+      }
+
+      if (
+        fill.type === "GRADIENT_LINEAR" ||
+        fill.type === "GRADIENT_RADIAL" ||
+        fill.type === "GRADIENT_ANGULAR" ||
+        fill.type === "GRADIENT_DIAMOND"
+      ) {
+        return tailwindGradientFromFills([fill]);
+      }
+
+      return "";
+    })
+    .filter((value) => value.length > 0);
 };
 
 /**

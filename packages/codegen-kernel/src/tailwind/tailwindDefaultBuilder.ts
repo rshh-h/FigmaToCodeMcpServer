@@ -15,6 +15,7 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import {
+  tailwindBackgroundLayerClassesFromFills,
   tailwindColorFromFills,
   tailwindGradientFromFills,
 } from "./builderImpl/tailwindColor";
@@ -165,6 +166,13 @@ export class TailwindDefaultBuilder {
    */
   customColor(paint: ReadonlyArray<Paint>, kind: TailwindColorType): this {
     if (this.visible) {
+      if (
+        kind === "bg" &&
+        tailwindBackgroundLayerClassesFromFills(paint).length > 1
+      ) {
+        return this;
+      }
+
       let gradient = "";
       if (kind === "bg") {
         gradient = tailwindGradientFromFills(paint);

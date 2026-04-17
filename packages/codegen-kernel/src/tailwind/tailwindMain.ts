@@ -30,6 +30,8 @@ import {
 import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes";
 import { ImagePaint } from "../api_types";
 import { pxToLayoutSize } from "./conversionTables";
+import { tailwindBorderRadius } from "./builderImpl/tailwindBorder";
+import { tailwindBackgroundLayerClassesFromFills } from "./builderImpl/tailwindColor";
 
 export let localTailwindSettings: PluginSettings;
 let previousExecutionCache: {
@@ -426,11 +428,18 @@ export const tailwindContainer = (
     return children;
   }
 
+  const backgroundLayers = buildTailwindBackgroundLayers(node, settings);
   const builder = new TailwindDefaultBuilder(node, settings)
     .commonPositionStyles()
     .commonShapeStyles();
   const topFill = retrieveTopFill(node.fills);
   const hasImageFill = topFill?.type === "IMAGE";
+  const needsLayerWrapper =
+    backgroundLayers.length > 0 && !commonIsAbsolutePosition(node);
+
+  if (needsLayerWrapper) {
+    builder.addAttributes("relative");
+  }
 
   if (!builder.attributes && !additionalAttr && !hasImageFill) {
     return children;
@@ -439,7 +448,10 @@ export const tailwindContainer = (
   // Determine if we should use img tag
   let tag = "div";
   let src = "";
-  let renderedChildren = children;
+  let renderedChildren =
+    backgroundLayers.length > 0
+      ? `${backgroundLayers}${children}`
+      : children;
 
   if (hasImageFill && !hasNestedImageFillChild(node)) {
     const localImagePath = getLocalImagePath(node);
@@ -521,6 +533,46 @@ export const tailwindContainer = (
   }
 };
 
+const buildTailwindBackgroundLayers = (
+  node: SceneNode &
+    SceneNodeMixin &
+    BlendMixin &
+    LayoutMixin &
+    GeometryMixin &
+    MinimalBlendMixin,
+  settings: TailwindSettings,
+): string => {
+  if (!("fills" in node)) {
+    return "";
+  }
+
+  const layerClasses = tailwindBackgroundLayerClassesFromFills(node.fills);
+  if (layerClasses.length <= 1) {
+    return "";
+  }
+
+  const radiusClass = tailwindBorderRadius(node);
+  const isJSX = settings.tailwindGenerationMode === "jsx";
+  const classLabel = isJSX ? "className" : "class";
+
+  return layerClasses
+    .map((backgroundClass) => {
+      const classes = [
+        "w-full",
+        "h-full",
+        "left-0",
+        "top-0",
+        "absolute",
+        radiusClass,
+        backgroundClass,
+      ]
+        .filter(Boolean)
+        .join(" ");
+      return `\n<div ${classLabel}="${classes}" />`;
+    })
+    .join("");
+};
+
 export const tailwindLine = (
   node: LineNode,
   settings: TailwindSettings,
@@ -537,14 +589,22 @@ export const tailwindSection = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   const childrenStr = await tailwindWidgetGenerator(node.children, settings);
+  const backgroundLayers = buildTailwindBackgroundLayers(node as any, settings);
   const builder = new TailwindDefaultBuilder(node, settings)
     .size()
     .position()
     .customColor(node.fills, "bg");
 
+  if (backgroundLayers.length > 0 && !commonIsAbsolutePosition(node)) {
+    builder.addAttributes("relative");
+  }
+
   const build = builder.build();
-  return childrenStr
-    ? `\n<div${build}>${indentString(childrenStr)}\n</div>`
+  const content = backgroundLayers.length > 0
+    ? `${backgroundLayers}${childrenStr}`
+    : childrenStr;
+  return content
+    ? `\n<div${build}>${indentString(content)}\n</div>`
     : `\n<div${build}></div>`;
 };
 
