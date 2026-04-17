@@ -5,6 +5,7 @@ import { formatStyleAttribute } from "../common/commonFormatAttributes";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import { getPlaceholderImage } from "../common/images";
 import { buildMaskRenderPlan } from "../common/maskNodes";
+import { getImageFillRenderPlan } from "../common/imageFillRender";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
@@ -27,6 +28,8 @@ import {
   shouldPreserveNodeWrapper,
 } from "../common/renderSemantics";
 import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes";
+import { ImagePaint } from "../api_types";
+import { pxToLayoutSize } from "./conversionTables";
 
 export let localTailwindSettings: PluginSettings;
 let previousExecutionCache: {
@@ -102,7 +105,14 @@ const tailwindStructuralMaskGroup = async (
   const childrenStr = await tailwindWidgetGenerator(maskedNodes, settings);
   const { x, y } = getCommonPositionValue(maskNode, settings);
   const isJSX = settings.tailwindGenerationMode === "jsx";
-  const rebasedChildren = wrapMaskChildrenWithOffset(childrenStr, -x, -y, isJSX);
+  const rebasedChildren = wrapMaskChildrenWithOffset(
+    childrenStr,
+    -x,
+    -y,
+    maskNode.width,
+    maskNode.height,
+    isJSX,
+  );
   const additionalClasses = [
     "overflow-hidden",
     commonIsAbsolutePosition(maskNode) ? "" : "relative",
@@ -122,15 +132,35 @@ const wrapMaskChildrenWithOffset = (
   children: string,
   offsetX: number,
   offsetY: number,
+  width: number,
+  height: number,
   isJSX: boolean,
 ): string => {
-  const styles = [
-    formatWithJSX("position", isJSX, "absolute"),
-    formatWithJSX("left", isJSX, offsetX),
-    formatWithJSX("top", isJSX, offsetY),
-  ];
+  const attributes = [
+    "absolute",
+    offsetX === 0 ? "left-0" : `left-[${numberToFixedString(offsetX)}px]`,
+    offsetY === 0 ? "top-0" : `top-[${numberToFixedString(offsetY)}px]`,
+    formatMaskWrapperSize(width, "w"),
+    formatMaskWrapperSize(height, "h"),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const classLabel = isJSX ? "className" : "class";
 
-  return `\n<div${formatStyleAttribute(styles, isJSX)}>${indentString(children)}\n</div>`;
+  return `\n<div ${classLabel}="${attributes}">${indentString(children)}\n</div>`;
+};
+
+const formatMaskWrapperSize = (
+  value: number,
+  prefix: "w" | "h",
+): string => {
+  const tailwindValue = pxToLayoutSize(value);
+  if (!tailwindValue.startsWith("[")) {
+    return `${prefix}-${tailwindValue}`;
+  }
+
+  const fixed = numberToFixedString(value);
+  return fixed === "0" ? `${prefix}-0` : `${prefix}-[${fixed}px]`;
 };
 
 const convertNode =
@@ -413,22 +443,66 @@ export const tailwindContainer = (
 
   if (hasImageFill && !hasNestedImageFillChild(node)) {
     const localImagePath = getLocalImagePath(node);
-    const imageURL = localImagePath ?? getPlaceholderImage(node.width, node.height);
+    const imageURL =
+      localImagePath ?? getPlaceholderImage(node.width, node.height);
+    const renderPlan = getImageFillRenderPlan(
+      topFill as ImagePaint,
+      children.trim().length > 0,
+    );
 
     if (!localImagePath) {
       addWarning("Image fills are replaced with placeholders");
     }
 
-    if (!children.trim()) {
+    if (renderPlan.renderMode === "img") {
       tag = "img";
       src = ` src="${imageURL}"`;
+      if (renderPlan.disableMaxWidth) {
+        builder.addAttributes("max-w-none");
+      }
+      if (renderPlan.objectFit) {
+        builder.addAttributes(`object-${renderPlan.objectFit}`);
+      }
+      if (renderPlan.objectPosition === "center") {
+        builder.addAttributes("object-center");
+      }
     } else {
       builder.addStyles(
-        formatWithJSX("background-image", settings.tailwindGenerationMode === "jsx", `url(\"${imageURL}\")`),
-        formatWithJSX("background-size", settings.tailwindGenerationMode === "jsx", "cover"),
-        formatWithJSX("background-position", settings.tailwindGenerationMode === "jsx", "center"),
-        formatWithJSX("background-repeat", settings.tailwindGenerationMode === "jsx", "no-repeat"),
+        formatWithJSX(
+          "background-image",
+          settings.tailwindGenerationMode === "jsx",
+          `url(\"${imageURL}\")`,
+        ),
       );
+      if (renderPlan.backgroundSize === "cover") {
+        builder.addAttributes("bg-cover");
+      } else if (renderPlan.backgroundSize === "contain") {
+        builder.addAttributes("bg-contain");
+      } else if (renderPlan.backgroundSize) {
+        builder.addStyles(
+          formatWithJSX(
+            "background-size",
+            settings.tailwindGenerationMode === "jsx",
+            renderPlan.backgroundSize,
+          ),
+        );
+      }
+      if (renderPlan.backgroundPosition === "center") {
+        builder.addAttributes("bg-center");
+      } else if (renderPlan.backgroundPosition) {
+        builder.addStyles(
+          formatWithJSX(
+            "background-position",
+            settings.tailwindGenerationMode === "jsx",
+            renderPlan.backgroundPosition,
+          ),
+        );
+      }
+      if (renderPlan.backgroundRepeat === "repeat") {
+        builder.addAttributes("bg-repeat");
+      } else if (renderPlan.backgroundRepeat === "no-repeat") {
+        builder.addAttributes("bg-no-repeat");
+      }
     }
   }
 

@@ -28,6 +28,7 @@ import {
   getPlaceholderImage,
   nodeHasImageFill,
 } from "../common/images";
+import { retrieveTopFill } from "../common/retrieveFill";
 import { addWarning } from "../common/commonConversionWarnings";
 import {
   annotateRenderSemantics,
@@ -35,6 +36,8 @@ import {
   shouldAllowNodeMerge,
   shouldPreserveNodeWrapper,
 } from "../common/renderSemantics";
+import { getImageFillRenderPlan } from "../common/imageFillRender";
+import { ImagePaint } from "../api_types";
 
 const selfClosingTags = ["img"];
 
@@ -426,6 +429,8 @@ const htmlStructuralMaskGroup = async (
     childrenStr,
     -x,
     -y,
+    maskNode.width,
+    maskNode.height,
     isJSX,
   );
   const builder = new HtmlDefaultBuilder(maskNode, settings)
@@ -447,12 +452,16 @@ const wrapHtmlMaskChildrenWithOffset = (
   children: string,
   offsetX: number,
   offsetY: number,
+  width: number,
+  height: number,
   isJSX: boolean,
 ): string => {
   const styles = [
     formatWithJSX("position", isJSX, "absolute"),
     formatWithJSX("left", isJSX, offsetX),
     formatWithJSX("top", isJSX, offsetY),
+    formatWithJSX("width", isJSX, width),
+    formatWithJSX("height", isJSX, height),
   ];
 
   return `\n<div${formatStyleAttribute(styles, isJSX)}>${indentString(children)}\n</div>`;
@@ -716,6 +725,7 @@ const htmlContainer = async (
       const altNode = node as AltNode<ExportableNode>;
       const hasChildren = "children" in node && node.children.length > 0;
       const localImagePath = getLocalImagePath(node);
+      const topFill = "fills" in node ? retrieveTopFill(node.fills) : undefined;
       let imgUrl = "";
 
       if (localImagePath) {
@@ -729,7 +739,12 @@ const htmlContainer = async (
         imgUrl = getPlaceholderImage(node.width, node.height);
       }
 
-      if (hasChildren) {
+      const renderPlan = getImageFillRenderPlan(
+        topFill as ImagePaint,
+        hasChildren,
+      );
+
+      if (renderPlan.renderMode === "background") {
         builder.addStyles(
           formatWithJSX(
             "background-image",
@@ -737,9 +752,63 @@ const htmlContainer = async (
             `url(${imgUrl})`,
           ),
         );
+        if (renderPlan.backgroundSize) {
+          builder.addStyles(
+            formatWithJSX(
+              "background-size",
+              settings.htmlGenerationMode === "jsx",
+              renderPlan.backgroundSize,
+            ),
+          );
+        }
+        if (renderPlan.backgroundPosition) {
+          builder.addStyles(
+            formatWithJSX(
+              "background-position",
+              settings.htmlGenerationMode === "jsx",
+              renderPlan.backgroundPosition,
+            ),
+          );
+        }
+        if (renderPlan.backgroundRepeat) {
+          builder.addStyles(
+            formatWithJSX(
+              "background-repeat",
+              settings.htmlGenerationMode === "jsx",
+              renderPlan.backgroundRepeat,
+            ),
+          );
+        }
       } else {
         tag = "img";
         src = ` src="${imgUrl}"`;
+        if (renderPlan.disableMaxWidth) {
+          builder.addStyles(
+            formatWithJSX(
+              "max-width",
+              settings.htmlGenerationMode === "jsx",
+              "none",
+            ),
+          );
+        }
+        if (renderPlan.objectFit) {
+          builder.addStyles(
+            formatWithJSX(
+              "object-fit",
+              settings.htmlGenerationMode === "jsx",
+              renderPlan.objectFit,
+            ),
+          );
+        }
+        if (renderPlan.objectPosition) {
+          builder.addStyles(
+            formatWithJSX(
+              "object-position",
+              settings.htmlGenerationMode === "jsx",
+              renderPlan.objectPosition,
+            ),
+          );
+        }
       }
     }
 

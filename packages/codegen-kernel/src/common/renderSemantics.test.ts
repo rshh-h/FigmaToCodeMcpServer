@@ -183,6 +183,94 @@ describe("renderSemantics", () => {
     expect(output.html).toContain("position: 'relative'");
   });
 
+  it("renders sized structural mask wrappers in Tailwind", async () => {
+    const mask = {
+      id: "mask",
+      name: "Mask",
+      type: "RECTANGLE",
+      width: 172,
+      height: 228,
+      x: 12,
+      y: 135,
+      visible: true,
+      isMask: true,
+      maskType: "ALPHA",
+      fills: [],
+      strokes: [],
+      effects: [],
+    } as any as SceneNode;
+    const content = {
+      id: "content",
+      name: "Content",
+      type: "RECTANGLE",
+      width: 404,
+      height: 228,
+      x: -116,
+      y: 135,
+      visible: true,
+      fills: [],
+      strokes: [],
+      effects: [],
+      parent: {
+        id: "parent",
+        name: "Parent",
+        type: "FRAME",
+        layoutMode: "NONE",
+        absoluteBoundingBox: { x: 0, y: 0, width: 375, height: 812 },
+      },
+    } as any as SceneNode;
+    (mask as any).parent = (content as any).parent;
+
+    const code = await tailwindMain([mask, content], createSettings("Tailwind"));
+    expect(code).toContain('className="w-[172px] h-[228px] left-[12px] top-[135px] absolute overflow-hidden"');
+    expect(code).toContain('className="absolute left-[-12px] top-[-135px] w-[172px] h-[228px]"');
+  });
+
+  it("renders sized structural mask wrappers in HTML/JSX", async () => {
+    const parent = {
+      id: "parent",
+      name: "Parent",
+      type: "FRAME",
+      layoutMode: "NONE",
+      absoluteBoundingBox: { x: 0, y: 0, width: 375, height: 812 },
+    } as any as SceneNode;
+    const mask = {
+      id: "mask",
+      name: "Mask",
+      type: "RECTANGLE",
+      width: 172,
+      height: 228,
+      x: 12,
+      y: 135,
+      visible: true,
+      isMask: true,
+      maskType: "ALPHA",
+      fills: [],
+      strokes: [],
+      effects: [],
+      parent,
+    } as any as SceneNode;
+    const content = {
+      id: "content",
+      name: "Content",
+      type: "RECTANGLE",
+      width: 404,
+      height: 228,
+      x: -116,
+      y: 135,
+      visible: true,
+      fills: [],
+      strokes: [],
+      effects: [],
+      parent,
+    } as any as SceneNode;
+
+    const output = await htmlMain([mask, content], createSettings("HTML"));
+    expect(output.html).toContain("position: 'absolute'");
+    expect(output.html).toContain("width: 172");
+    expect(output.html).toContain("height: 228");
+  });
+
   it("forbids merge for local-coordinate groups with non-primitive direct children", () => {
     const group = {
       id: "cards",
