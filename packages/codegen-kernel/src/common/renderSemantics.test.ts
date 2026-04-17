@@ -51,6 +51,48 @@ const createRectangle = (
     effects: [],
   }) as any as SceneNode;
 
+const createDividerNode = (): SceneNode => {
+  const parent = {
+    id: "parent",
+    name: "Parent",
+    type: "FRAME",
+    layoutMode: "VERTICAL",
+  } as any as SceneNode;
+
+  return {
+    id: "divider",
+    name: "Divider",
+    type: "FRAME",
+    width: 342,
+    height: 0.5,
+    visible: true,
+    parent,
+    children: [],
+    fills: [
+      {
+        type: "SOLID",
+        blendMode: "NORMAL",
+        color: {
+          r: 0.08627451211214066,
+          g: 0.0941176488995552,
+          b: 0.13725490868091583,
+        },
+        opacity: 0.11999999731779099,
+      },
+    ],
+    strokes: [],
+    effects: [],
+    layoutMode: "HORIZONTAL",
+    paddingLeft: 16,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    itemSpacing: 10,
+    layoutSizingHorizontal: "FILL",
+    layoutSizingVertical: "FIXED",
+  } as any as SceneNode;
+};
+
 describe("renderSemantics", () => {
   it("preserves groups that organize multiple children by local offsets", () => {
     const group = {
@@ -269,6 +311,27 @@ describe("renderSemantics", () => {
     expect(output.html).toContain("position: 'absolute'");
     expect(output.html).toContain("width: 172");
     expect(output.html).toContain("height: 228");
+  });
+
+  it("does not emit padding for empty auto-layout divider frames in Tailwind", async () => {
+    const code = await tailwindMain([createDividerNode()], createSettings("Tailwind"));
+
+    expect(code).toContain("self-stretch");
+    expect(code).toContain("h-[0.50px]");
+    expect(code).toContain("bg-gray-900/10");
+    expect(code).not.toContain("pl-4");
+    expect(code).not.toContain("pr-2.5");
+    expect(code).not.toContain("py-2.5");
+  });
+
+  it("does not emit padding styles for empty auto-layout divider frames in HTML/JSX", async () => {
+    const output = await htmlMain([createDividerNode()], createSettings("HTML"));
+
+    expect(output.html).toContain("height: 0.5");
+    expect(output.html).not.toContain("paddingLeft");
+    expect(output.html).not.toContain("paddingRight");
+    expect(output.html).not.toContain("paddingTop");
+    expect(output.html).not.toContain("paddingBottom");
   });
 
   it("forbids merge for local-coordinate groups with non-primitive direct children", () => {

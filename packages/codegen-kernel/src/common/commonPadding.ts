@@ -4,6 +4,10 @@ export const commonPadding = (
   node: InferredAutoLayoutResult,
 ): PaddingType | null => {
   if ("layoutMode" in node && node.layoutMode !== "NONE") {
+    if ("children" in node && node.children.length === 0) {
+      return null;
+    }
+
     const paddingLeft = parseFloat((node.paddingLeft ?? 0).toFixed(2));
     const paddingRight = parseFloat((node.paddingRight ?? 0).toFixed(2));
     const paddingTop = parseFloat((node.paddingTop ?? 0).toFixed(2));
