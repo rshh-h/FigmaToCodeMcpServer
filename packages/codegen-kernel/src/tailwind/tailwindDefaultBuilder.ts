@@ -123,11 +123,19 @@ export class TailwindDefaultBuilder {
   border(): this {
     if ("strokes" in this.node) {
       const { isOutline, property } = tailwindBorderWidth(this.node);
-      this.addAttributes(property);
-      this.customColor(
-        this.node.strokes as MinimalStrokesTrait,
+      if (!property) {
+        return this;
+      }
+
+      const colorClass = tailwindColorFromFills(
+        this.node.strokes as ReadonlyArray<Paint>,
         isOutline ? "outline" : "border",
       );
+      if (!colorClass) {
+        return this;
+      }
+
+      this.addAttributes(property, colorClass);
     }
 
     return this;

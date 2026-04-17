@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getImageFillRenderPlan } from "./imageFillRender";
+import {
+  isCircularImageFillVectorNode,
+  isCircularVectorPath,
+} from "./vectorShape";
 import { tailwindMain } from "../tailwind/tailwindMain";
 import { htmlMain } from "../html/htmlMain";
 import { PluginSettings } from "../pluginTypes";
@@ -53,6 +57,83 @@ const createImageNode = (scaleMode: "FILL" | "FIT" | "STRETCH" | "TILE") =>
       layoutMode: "NONE",
     },
     localImagePath: `/tmp/${scaleMode.toLowerCase()}.png`,
+  }) as any as SceneNode;
+
+const circlePath =
+  "M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z";
+
+const createCircularVectorImageNode = (strokeVisible: boolean) =>
+  ({
+    id: `vector-${strokeVisible ? "visible" : "hidden"}`,
+    name: "Oval",
+    type: "VECTOR",
+    width: 48,
+    height: 48,
+    x: 0,
+    y: 0,
+    visible: true,
+    fills: [
+      {
+        type: "IMAGE",
+        scaleMode: "FILL",
+        imageRef: "avatar",
+      },
+    ],
+    fillGeometry: [
+      {
+        path: circlePath,
+        windingRule: "NONZERO",
+      },
+    ],
+    strokes: strokeVisible
+      ? [
+          {
+            type: "SOLID",
+            opacity: 0.12,
+            color: {
+              r: 0.08627451211214066,
+              g: 0.0941176488995552,
+              b: 0.13725490868091583,
+              a: 1,
+            },
+          },
+        ]
+      : [
+          {
+            type: "SOLID",
+            visible: false,
+            color: {
+              r: 1,
+              g: 1,
+              b: 1,
+              a: 1,
+            },
+          },
+        ],
+    strokeWeight: strokeVisible ? 0.5 : 3,
+    strokeAlign: strokeVisible ? "INSIDE" : "OUTSIDE",
+    effects: [],
+    parent: {
+      id: `parent-vector-${strokeVisible ? "visible" : "hidden"}`,
+      name: "Parent",
+      type: "FRAME",
+      layoutMode: "NONE",
+    },
+    localImagePath: "/tmp/avatar.png",
+  }) as any as SceneNode;
+
+const createRectangleVectorImageNode = () =>
+  ({
+    ...createCircularVectorImageNode(false),
+    id: "vector-rectangle",
+    width: 48,
+    height: 48,
+    fillGeometry: [
+      {
+        path: "M0 0C16 0 32 0 48 0C48 16 48 32 48 48C32 48 16 48 0 48C0 32 0 16 0 0Z",
+        windingRule: "NONZERO",
+      },
+    ],
   }) as any as SceneNode;
 
 describe("imageFillRender", () => {
@@ -158,5 +239,49 @@ describe("imageFillRender", () => {
     expect(code).toContain("bg-repeat");
     expect(code).toContain("backgroundImage");
     expect(code).not.toContain("<img");
+  });
+
+  it("detects circular vector image fills", () => {
+    const node = createCircularVectorImageNode(false);
+
+    expect(isCircularVectorPath(node)).toBe(true);
+    expect(isCircularImageFillVectorNode(node)).toBe(true);
+    expect(isCircularVectorPath(createRectangleVectorImageNode())).toBe(false);
+  });
+
+  it("renders circular vector image fills as rounded img in Tailwind without invisible outline", async () => {
+    const code = await tailwindMain(
+      [createCircularVectorImageNode(false)],
+      createSettings("Tailwind"),
+    );
+
+    expect(code).toContain("<img");
+    expect(code).toContain("rounded-full");
+    expect(code).toContain("object-cover");
+    expect(code).not.toContain("outline");
+    expect(code).not.toContain("border-");
+  });
+
+  it("renders circular vector image fills with visible inside stroke as rounded border in Tailwind", async () => {
+    const code = await tailwindMain(
+      [createCircularVectorImageNode(true)],
+      createSettings("Tailwind"),
+    );
+
+    expect(code).toContain("<img");
+    expect(code).toContain("rounded-full");
+    expect(code).toContain("border-[0.50px]");
+    expect(code).not.toContain("outline");
+  });
+
+  it("renders circular vector image fills as rounded img in HTML/JSX", async () => {
+    const output = await htmlMain(
+      [createCircularVectorImageNode(false)],
+      createSettings("HTML"),
+    );
+
+    expect(output.html).toContain("borderRadius: 9999");
+    expect(output.html).toContain("objectFit: 'cover'");
+    expect(output.html).not.toContain("outline:");
   });
 });

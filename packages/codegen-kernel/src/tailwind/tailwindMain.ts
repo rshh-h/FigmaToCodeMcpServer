@@ -6,6 +6,7 @@ import { getVisibleNodes } from "../common/nodeVisibility";
 import { getPlaceholderImage } from "../common/images";
 import { buildMaskRenderPlan } from "../common/maskNodes";
 import { getImageFillRenderPlan } from "../common/imageFillRender";
+import { isCircularImageFillVectorNode } from "../common/vectorShape";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
@@ -170,6 +171,15 @@ const convertNode =
   async (node: SceneNode): Promise<string> => {
     if (isLocalVectorChildNode(node)) {
       return "";
+    }
+
+    if (isCircularImageFillVectorNode(node)) {
+      return tailwindContainer(
+        { ...node, type: "ELLIPSE" } as any,
+        "",
+        "",
+        settings,
+      );
     }
 
     const localVectorPath = getLocalVectorPath(node);

@@ -38,6 +38,7 @@ import {
 } from "../common/renderSemantics";
 import { getImageFillRenderPlan } from "../common/imageFillRender";
 import { ImagePaint } from "../api_types";
+import { isCircularImageFillVectorNode } from "../common/vectorShape";
 
 const selfClosingTags = ["img"];
 
@@ -470,6 +471,15 @@ const wrapHtmlMaskChildrenWithOffset = (
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
   if (isLocalVectorChildNode(node)) {
     return "";
+  }
+
+  if (isCircularImageFillVectorNode(node)) {
+    return await htmlContainer(
+      { ...node, type: "ELLIPSE" } as any,
+      "",
+      [],
+      settings,
+    );
   }
 
   const localVectorPath = getLocalVectorPath(node);
