@@ -79,16 +79,16 @@ const tailwindWidgetGenerator = async (
   const renderPlan = buildMaskRenderPlan(visibleNodes);
   const convert = convertNode(settings);
   const promiseOfConvertedCode = renderPlan.map(async (item) => {
+    if (item.warning) {
+      addWarning(item.warning);
+    }
+
     if (item.kind === "mask-group") {
       return await tailwindStructuralMaskGroup(
         item.maskNode,
         item.maskedNodes,
         settings,
       );
-    }
-
-    if (item.warning) {
-      addWarning(item.warning);
     }
 
     return await convert(item.node);

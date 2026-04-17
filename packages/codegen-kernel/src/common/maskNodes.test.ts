@@ -61,6 +61,36 @@ describe("maskNodes", () => {
     );
   });
 
+  it("routes vector masks through the structural mask path with an approximation warning", () => {
+    const maskNode = {
+      id: "mask",
+      name: "Vector Mask",
+      type: "VECTOR",
+      isMask: true,
+      maskType: "ALPHA",
+      width: 47,
+      height: 47,
+    } as SceneNode;
+    const maskedNode = {
+      id: "content",
+      name: "Content",
+      type: "RECTANGLE",
+      parent: absoluteParent,
+    } as SceneNode;
+
+    const plan = buildMaskRenderPlan([maskNode, maskedNode]);
+
+    expect(plan).toEqual([
+      {
+        kind: "mask-group",
+        maskNode,
+        maskedNodes: [maskedNode],
+        warning:
+          'Mask node "Vector Mask" (mask) is a VECTOR mask and is being approximated with rectangular overflow clipping.',
+      },
+    ]);
+  });
+
   it("warns when masked siblings are not absolutely positioned", () => {
     const maskNode = {
       id: "mask",

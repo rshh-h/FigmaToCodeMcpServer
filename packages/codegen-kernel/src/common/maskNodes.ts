@@ -13,6 +13,7 @@ export type MaskRenderPlanItem =
       kind: "mask-group";
       maskNode: SceneNode;
       maskedNodes: readonly SceneNode[];
+      warning?: string;
     };
 
 const STRUCTURABLE_MASK_NODE_TYPES = new Set<SceneNode["type"]>([
@@ -60,7 +61,7 @@ const getUnsupportedMaskReason = (
     return `Mask node "${maskNode.name}" (${maskNode.id}) uses unsupported maskType "${maskType}".`;
   }
 
-  if (!STRUCTURABLE_MASK_NODE_TYPES.has(maskNode.type)) {
+  if (!STRUCTURABLE_MASK_NODE_TYPES.has(maskNode.type) && maskNode.type !== "VECTOR") {
     return `Mask node "${maskNode.name}" (${maskNode.id}) is not a simple structural mask shape.`;
   }
 
@@ -69,6 +70,14 @@ const getUnsupportedMaskReason = (
   }
 
   return null;
+};
+
+const getMaskApproximationWarning = (maskNode: SceneNode): string | undefined => {
+  if (maskNode.type === "VECTOR") {
+    return `Mask node "${maskNode.name}" (${maskNode.id}) is a VECTOR mask and is being approximated with rectangular overflow clipping.`;
+  }
+
+  return undefined;
 };
 
 export const buildMaskRenderPlan = (
@@ -105,6 +114,7 @@ export const buildMaskRenderPlan = (
       kind: "mask-group",
       maskNode: node,
       maskedNodes,
+      warning: getMaskApproximationWarning(node),
     });
     index += maskedNodes.length + 1;
   }
