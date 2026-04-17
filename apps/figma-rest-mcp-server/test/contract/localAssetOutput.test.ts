@@ -254,7 +254,7 @@ describe("local asset code output", () => {
     const artifact = await generator.generate(tree, context);
 
     expect(artifact.code).toContain(
-      '<img className="w-full h-full left-0 top-0 absolute" src=".figma-to-code/cache/assets/FILE/1-1/figma-image-photo-ref.png" />',
+      `backgroundImage: 'url(".figma-to-code/cache/assets/FILE/1-1/figma-image-photo-ref.png")'`,
     );
     expect(artifact.code).toContain(
       'src=".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-1-2-1.svg"',

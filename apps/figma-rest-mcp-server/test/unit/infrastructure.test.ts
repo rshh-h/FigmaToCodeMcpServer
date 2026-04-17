@@ -25,31 +25,46 @@ describe("infrastructure", () => {
   });
 
   it("retries retryable http failures", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ err: "rate limited" }), { status: 429 }),
-      )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ ok: true }), { status: 200 }),
-      );
+    vi.useFakeTimers();
 
-    vi.stubGlobal("fetch", fetchMock);
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ err: "rate limited" }), {
+            status: 429,
+            headers: {
+              "Retry-After": "3",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        );
 
-    const client = new HttpClient({
-      baseUrl: "https://api.figma.com",
-      timeoutMs: 1000,
-      retryMax: 1,
-      logger: stderrLogger,
-      metrics: noopMetrics,
-    });
+      vi.stubGlobal("fetch", fetchMock);
 
-    const response = await client.getJson<{ ok: boolean }>({
-      path: "/v1/files/demo/images",
-    });
+      const client = new HttpClient({
+        baseUrl: "https://api.figma.com",
+        timeoutMs: 10_000,
+        retryMax: 1,
+        logger: stderrLogger,
+        metrics: noopMetrics,
+      });
 
-    expect(response.ok).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+      const responsePromise = client.getJson<{ ok: boolean }>({
+        path: "/v1/files/demo/images",
+      });
+
+      await vi.advanceTimersByTimeAsync(2_999);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(responsePromise).resolves.toMatchObject({ ok: true });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("records retry metrics and actionable http suggestions", async () => {
@@ -67,7 +82,7 @@ describe("infrastructure", () => {
 
     const client = new HttpClient({
       baseUrl: "https://api.figma.com",
-      timeoutMs: 1000,
+      timeoutMs: 3_000,
       retryMax: 1,
       logger: stderrLogger,
       metrics,
@@ -99,6 +114,105 @@ describe("infrastructure", () => {
         status: "404",
       },
     });
+  });
+
+  it("falls back to backoff when Retry-After is invalid", async () => {
+    vi.useFakeTimers();
+
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ err: "rate limited" }), {
+            status: 429,
+            headers: {
+              "Retry-After": "later",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        );
+
+      vi.stubGlobal("fetch", fetchMock);
+
+      const client = new HttpClient({
+        baseUrl: "https://api.figma.com",
+        timeoutMs: 10_000,
+        retryMax: 1,
+        logger: stderrLogger,
+        metrics: noopMetrics,
+      });
+
+      const responsePromise = client.getJson<{ ok: boolean }>({
+        path: "/v1/files/demo/images",
+      });
+
+      await vi.advanceTimersByTimeAsync(999);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(responsePromise).resolves.toMatchObject({ ok: true });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("uses the updated retry backoff schedule", async () => {
+    vi.useFakeTimers();
+
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ err: "server error 1" }), { status: 500 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ err: "server error 2" }), { status: 500 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ err: "server error 3" }), { status: 500 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        );
+
+      vi.stubGlobal("fetch", fetchMock);
+
+      const client = new HttpClient({
+        baseUrl: "https://api.figma.com",
+        timeoutMs: 50_000,
+        retryMax: 3,
+        logger: stderrLogger,
+        metrics: noopMetrics,
+      });
+
+      const responsePromise = client.getJson<{ ok: boolean }>({
+        path: "/v1/files/demo/images",
+      });
+
+      await vi.advanceTimersByTimeAsync(999);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(9_999);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+
+      await vi.advanceTimersByTimeAsync(29_999);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(responsePromise).resolves.toMatchObject({ ok: true });
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("deduplicates work inside a request cache scope", async () => {

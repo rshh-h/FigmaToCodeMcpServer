@@ -25,6 +25,8 @@ export interface BinaryResponse {
   contentType: string;
 }
 
+const RETRY_BACKOFF_SCHEDULE_MS = [1_000, 10_000, 30_000] as const;
+
 function buildUrl(baseUrl: string, path: string, query?: Record<string, string>): URL {
   const url = new URL(path, baseUrl);
   if (query) {
@@ -110,7 +112,8 @@ export class HttpClient {
               status: String(response.status),
               attempt: String(attempt + 1),
             });
-            await sleep(Math.min(backoffMs(attempt), Math.max(deadline - Date.now(), 0)));
+            const retryDelayMs = getRetryDelayMs(response, attempt);
+            await sleep(Math.min(retryDelayMs, Math.max(deadline - Date.now(), 0)));
             continue;
           }
 
@@ -245,7 +248,29 @@ function safeJsonParse(text: string): unknown {
 }
 
 function backoffMs(attempt: number): number {
-  return 200 * 2 ** attempt;
+  return RETRY_BACKOFF_SCHEDULE_MS[Math.min(attempt, RETRY_BACKOFF_SCHEDULE_MS.length - 1)];
+}
+
+function getRetryDelayMs(response: Response, attempt: number): number {
+  if (response.status !== 429) {
+    return backoffMs(attempt);
+  }
+
+  return retryAfterMs(response.headers) ?? backoffMs(attempt);
+}
+
+function retryAfterMs(headers: Headers): number | undefined {
+  const retryAfter = headers.get("retry-after")?.trim();
+  if (!retryAfter) {
+    return undefined;
+  }
+
+  const retryAfterSeconds = Number(retryAfter);
+  if (!Number.isInteger(retryAfterSeconds) || retryAfterSeconds < 0) {
+    return undefined;
+  }
+
+  return retryAfterSeconds * 1_000;
 }
 
 function sleep(ms: number): Promise<void> {

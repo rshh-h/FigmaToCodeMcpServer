@@ -10,6 +10,7 @@
 - 当前服务通过 Figma API 获取数据，与原始插件版的数据来源和运行环境不同，因此生成代码与原始插件版可能存在差异。当前版本的生成质量不代表原始插件版本的生成质量。
 - 当 figma 中 svg 通过 effets 设置阴影时，导出的 svg 宽高可能和原始不匹配
 - 不支持 figma 多层设计，代码会生成到一个层里
+- vector mask 不支持
 
 ## 工作区结构
 
@@ -156,7 +157,7 @@ type = "stdio"
 command = "pnpm"
 args = ["--dir", "path to FigmaToCodeMCPServer/apps/figma-rest-mcp-server", "exec", "tsx", "src/stdio.ts"]
 startup_timeout_sec = 20   # 启动 20 秒
-tool_timeout_sec    = 300  # 工具 5 分钟
+tool_timeout_sec    = 600  # 工具 10 分钟
 
 [mcp_servers.figma_to_code.env]
 FIGMA_ACCESS_TOKEN = "your figma token"
