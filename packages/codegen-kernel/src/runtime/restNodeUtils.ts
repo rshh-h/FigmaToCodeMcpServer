@@ -26,6 +26,12 @@ export function normalizeLineHeight(
   fontSize = 0,
 ): LineHeight {
   const lineHeightUnit = style.lineHeightUnit;
+  const percentLineHeight =
+    typeof style.lineHeightPercentFontSize === "number"
+      ? style.lineHeightPercentFontSize
+      : typeof style.lineHeightPercent === "number"
+        ? style.lineHeightPercent
+        : 100;
 
   if (!lineHeightUnit) {
     return { unit: "AUTO", value: fontSize || 0 };
@@ -41,18 +47,24 @@ export function normalizeLineHeight(
     };
   }
 
-  if (
-    lineHeightUnit === "FONT_SIZE_%" ||
-    lineHeightUnit === "INTRINSIC_%"
-  ) {
+  if (lineHeightUnit === "INTRINSIC_%") {
+    if (typeof style.lineHeightPx === "number") {
+      return {
+        unit: "PIXELS",
+        value: style.lineHeightPx,
+      };
+    }
+
     return {
       unit: "PERCENT",
-      value:
-        typeof style.lineHeightPercentFontSize === "number"
-          ? style.lineHeightPercentFontSize
-          : typeof style.lineHeightPercent === "number"
-            ? style.lineHeightPercent
-            : 100,
+      value: percentLineHeight,
+    };
+  }
+
+  if (lineHeightUnit === "FONT_SIZE_%") {
+    return {
+      unit: "PERCENT",
+      value: percentLineHeight,
     };
   }
 
