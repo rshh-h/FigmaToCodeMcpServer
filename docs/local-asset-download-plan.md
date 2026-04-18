@@ -12,17 +12,15 @@
 - 需要把图片与 SVG 作为工程资产一起保存
 - 需要在代码中使用稳定的本地相对路径
 
-## 对应参数
+## 相关配置
 
-在 `figma_to_code_convert` 的 `options` 中可使用：
+当前公开 `figma_to_code_convert` MCP 请求不暴露本地资源下载开关。
 
-- `downloadImagesToLocal`
-- `downloadVectorsToLocal`
+现状如下：
 
-语义如下：
-
-- 不传或传 `false`：沿用远程资源引用方式
-- 传 `true`：下载对应资源并在生成结果中引用本地路径
+- 服务端通过环境变量 `DOWNLOAD_IMAGES_TO_LOCAL` 控制图片是否默认下载到工作区本地
+- 服务端通过环境变量 `DOWNLOAD_VECTORS_TO_LOCAL` 控制向量是否默认下载到工作区本地
+- 服务内部仍保留 `downloadImagesToLocal` / `downloadVectorsToLocal` 这两个 conversion options，但它们不是当前公开工具的请求字段
 
 ## 能力落点
 
@@ -49,7 +47,7 @@
 
 ## 图片处理
 
-启用 `downloadImagesToLocal` 后，服务会：
+当服务端启用本地图片下载后，服务会：
 
 1. 从节点快照中收集 `imageRef`
 2. 读取 Figma 文件级图片映射
@@ -59,7 +57,7 @@
 
 ## SVG 处理
 
-启用 `downloadVectorsToLocal` 后，服务会：
+当服务端启用本地向量下载后，服务会：
 
 1. 分析可导出的 vector root
 2. 以 root 节点为单位导出 SVG
@@ -86,7 +84,6 @@
 
 本地资源能力与以下输出配合使用最常见：
 
-- `preview`
 - `diagnostics`
 - `warnings`
 

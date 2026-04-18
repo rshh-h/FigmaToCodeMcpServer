@@ -8,7 +8,7 @@
 
 - 为 MCP 调用方提供稳定、可预测的工具接口
 - 把 Figma REST 原始响应收敛为稳定的内部快照与中间表示
-- 在生成代码的同时输出 preview、warnings 与 diagnostics
+- 为调用方返回生成代码路径、warnings，以及按服务端配置决定是否附带 diagnostics
 
 ## 分层结构
 
@@ -64,8 +64,8 @@ flowchart LR
 3. 读取能力快照
 4. 拉取源节点快照
 5. 归一化为内部表示
-6. 生成代码与预览
-7. 汇总 diagnostics
+6. 生成代码
+7. 汇总 warnings 与 diagnostics
 
 ### Domain Layer
 
@@ -86,7 +86,7 @@ flowchart LR
 - Figma REST 数据读取
 - 资源下载与本地路径物化
 - 多端 generator 适配
-- preview 适配
+- preview 适配（当前保留为内部能力，未接入公开 `figma_to_code_convert` 返回链路）
 
 ### Infrastructure Layer
 
@@ -117,19 +117,19 @@ flowchart LR
 3. 构建 `SourceSnapshot`
 4. 标准化为 `NormalizedTree`
 5. 生成目标 framework 代码
-6. 生成 preview
+6. 写入生成产物
 7. 汇总 diagnostics 与 warnings
 
 ## 能力与诊断
 
-服务会同时返回结果质量相关的信息，例如：
+服务会返回结果质量相关的信息，例如：
 
 - 当前 framework 是否支持对应能力
 - 哪些功能发生了降级
 - 哪些 warning 影响展示 fidelity
 - 各主要阶段的 timing
 
-这让调用方不仅能拿到代码，也能理解结果边界。
+当前公开工具不会返回 `preview`，但 preview 相关适配器和诊断阶段定义仍保留在实现内部。这让调用方不仅能拿到代码，也能理解结果边界。
 
 ## 支持的输出方向
 

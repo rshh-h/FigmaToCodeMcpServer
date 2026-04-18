@@ -4,7 +4,7 @@
 
 项目中的代码生成能力参考 [bernaferrari/FigmaToCode](https://github.com/bernaferrari/FigmaToCode)，并在当前仓库中补齐了面向 MCP 服务的输入解析与诊断输出。
 
-当前服务通过 Figma API 获取数据，与原始插件版的数据来源和运行环境不同，因此生成代码与原始插件版可能存在差异。当前版本的生成质量不代表原始插件版本的生成质量。
+当前服务通过 Figma API 获取数据，同时添加了下载资源文件的能力。与原始插件版的数据来源和运行环境不同，因此生成代码与原始插件版可能存在差异。当前版本的生成质量不代表原始插件版本的生成质量。
 
 ## 已知问题
 
@@ -105,7 +105,7 @@ curl http://127.0.0.1:3101/health
 3. 构建稳定的 `SourceSnapshot`
 4. 归一化为内部 `NormalizedTree`
 5. 调用目标 framework generator 生成代码
-6. 按需返回 preview、warnings 和 diagnostics
+6. 返回生成代码路径与 warnings，并按环境变量决定是否返回 diagnostics
 
 当前对外提供两个 MCP 工具：
 
@@ -139,7 +139,8 @@ curl http://127.0.0.1:3101/health
 说明：
 
 - 本地图片和向量资源默认写入 `<workspaceRoot>/.figma-to-code/cache/assets/`
-- `preview` 当前未对外开放，请求侧固定不生成
+- 公开 `figma_to_code_convert` 请求当前不暴露 `downloadImagesToLocal` / `downloadVectorsToLocal` 字段；本地资源下载行为由服务端环境变量 `DOWNLOAD_IMAGES_TO_LOCAL` / `DOWNLOAD_VECTORS_TO_LOCAL` 控制
+- `preview` 相关内部模块与响应 schema 仍然保留，但当前公开工具固定不生成 `preview`
 
 缓存默认写入：
 

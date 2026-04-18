@@ -39,7 +39,7 @@
 
 - 创建 request context
 - 协调 source 解析、快照抓取、标准化与生成
-- 控制 preview、diagnostics、warnings 的汇总逻辑
+- 控制 diagnostics、warnings 的汇总逻辑，并保留 preview 相关内部扩展点
 
 它是服务链路的调度中心，但不直接处理底层 REST 细节。
 
@@ -63,7 +63,7 @@
 - source snapshot adapter
 - normalization adapter
 - generator adapter
-- preview adapter
+- preview adapter（当前未接入公开 `figma_to_code_convert` 响应）
 - 本地资源处理能力
 
 这一层把 Figma REST 数据与现有代码生成链路转换为服务内部可消费的形式。
