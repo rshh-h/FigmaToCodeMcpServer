@@ -1,26 +1,22 @@
 # Figma REST MCP Server
 
-这个仓库提供一个基于 Figma REST API 的 MCP 服务，用于把单个 Figma 节点转换为 `HTML`、`Tailwind`、`Flutter`、`SwiftUI`、`Compose` 代码，并返回 preview、warnings 与 diagnostics。
+这个仓库提供一个基于 Figma REST API 的 MCP 服务，用于把单个 Figma 节点转换为 `HTML`、`Tailwind`、`Flutter`、`SwiftUI`、`Compose` 代码。
 
-项目中的代码生成能力参考并整合了上游项目 [bernaferrari/FigmaToCode](https://github.com/bernaferrari/FigmaToCode)，并在当前仓库中补齐了面向 MCP 服务的输入解析、快照构建、能力探测、预览与诊断输出。
+项目中的代码生成能力参考 [bernaferrari/FigmaToCode](https://github.com/bernaferrari/FigmaToCode)，并在当前仓库中补齐了面向 MCP 服务的输入解析与诊断输出。
+
+当前服务通过 Figma API 获取数据，与原始插件版的数据来源和运行环境不同，因此生成代码与原始插件版可能存在差异。当前版本的生成质量不代表原始插件版本的生成质量。
 
 ## 已知问题
 
 - `file_variables:read` 相关能力受 Figma 企业版权限限制影响，当前版本暂时没有完成实际功能验证。
-- 当前服务通过 Figma API 获取数据，与原始插件版的数据来源和运行环境不同，因此生成代码与原始插件版可能存在差异。当前版本的生成质量不代表原始插件版本的生成质量。
 - 当 figma 中 svg 通过 effets 设置阴影时，导出的 svg 宽高可能和原始不匹配
 - 不支持 figma 多层设计，代码会生成到一个层里
-- vector mask 不支持
+- vector mask 不支持，直接按照普通 Rectangle mask 处理
+- 修改后只对Tailwind，jsx 类型进行了测试，其他输出格式未验证。
 
 ## 工作区结构
 
 当前仓库采用 `pnpm + turbo + TypeScript`，包含 3 个工作区：
-
-- `apps/figma-rest-mcp-server`
-- `packages/codegen-types`
-- `packages/codegen-kernel`
-
-其中：
 
 - `apps/figma-rest-mcp-server` 负责 MCP 服务、Figma REST 访问、缓存、能力探测与响应组装
 - `packages/codegen-kernel` 负责转换核心与多端代码生成
@@ -70,7 +66,6 @@
 说明：
 
 - 本地图片和向量资源默认写入 `<workspaceRoot>/.figma-to-code/cache/assets/`
-- 原 `options` 字段已移除，生成相关默认值统一由环境变量控制
 - `preview` 当前未对外开放，请求侧固定不生成
 
 缓存默认写入：
@@ -149,14 +144,15 @@ pnpm --filter figma-to-code-mcp-server dev
 mcp 本地配置：
 
 如果需要像素级一致，需要关闭ROUND_TAILWIND_VALUES和ROUND_TAILWIND_COLORS
-通过 figma rest api 拉取数据可能受网络影响，所以推荐这里把超时时间设的长一些
+通过 figma rest api 拉取数据可能受网络影响和频率限制，所以推荐这里把超时时间设的长一些
+
+codex 配置 ~/.codex/config.toml
 
 ```
 [mcp_servers.figma_to_code]
 type = "stdio"
 command = "pnpm"
 args = ["--dir", "path to FigmaToCodeMCPServer/apps/figma-rest-mcp-server", "exec", "tsx", "src/stdio.ts"]
-startup_timeout_sec = 20   # 启动 20 秒
 tool_timeout_sec    = 600  # 工具 10 分钟
 
 [mcp_servers.figma_to_code.env]
@@ -225,12 +221,6 @@ pnpm build
 FIGMA_ACCESS_TOKEN=xxxxx \
 FIGMA_FILE_URL='https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427' \
 pnpm --filter figma-to-code-mcp-server verify:real
-```
-
-可选：
-
-```bash
-FIGMA_VERIFY_FRAMEWORK=Tailwind
 ```
 
 ## 常见错误
