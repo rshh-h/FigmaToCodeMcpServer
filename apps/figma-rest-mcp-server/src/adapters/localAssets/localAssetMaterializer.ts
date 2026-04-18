@@ -109,6 +109,8 @@ export class LocalAssetMaterializer implements AssetMaterializer {
   }: Parameters<AssetMaterializer["materialize"]>[0]): Promise<SourceSnapshot> {
     const downloadImagesToLocal = context.options.downloadImagesToLocal === true;
     const downloadVectorsToLocal = context.options.downloadVectorsToLocal === true;
+    const shouldMaterializeVariables =
+      this.config.ENABLE_VARIABLES && context.options.useColorVariables !== false;
 
     if (!downloadImagesToLocal && !downloadVectorsToLocal) {
       return snapshot;
@@ -124,7 +126,8 @@ export class LocalAssetMaterializer implements AssetMaterializer {
 
     let nextSnapshot: SourceSnapshot = snapshot;
 
-    try {
+    if (shouldMaterializeVariables) {
+      try {
         const result = await fetchNodeVariablesForDocuments({
           fileKey: target.fileKey,
           documents: gatewayData.documents,
@@ -135,9 +138,9 @@ export class LocalAssetMaterializer implements AssetMaterializer {
           httpClient: this.httpClient,
           outputSlug,
         });
-      nextSnapshot = {
-        ...nextSnapshot,
-        variablesRaw: result.variablesRaw,
+        nextSnapshot = {
+          ...nextSnapshot,
+          variablesRaw: result.variablesRaw,
           localAssetManifestPaths: {
             ...(nextSnapshot.localAssetManifestPaths ?? {}),
             variableRefsPath: toRelativeManifestPath(context, result.variableRefsPath),
@@ -145,13 +148,14 @@ export class LocalAssetMaterializer implements AssetMaterializer {
             variableManifestPath: toRelativeManifestPath(context, result.manifestPath),
           },
         };
-    } catch (error) {
-      this.logger.warn("Variable materialization failed", {
-        fileKey: target.fileKey,
-        nodeIds: target.nodeIds,
-        error: error instanceof Error ? error.message : String(error),
-      });
-      addVariableFailureWarning(context, "color_variable_fetch_failed");
+      } catch (error) {
+        this.logger.warn("Variable materialization failed", {
+          fileKey: target.fileKey,
+          nodeIds: target.nodeIds,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        addVariableFailureWarning(context, "color_variable_fetch_failed");
+      }
     }
 
     if (downloadImagesToLocal) {
@@ -164,6 +168,8 @@ export class LocalAssetMaterializer implements AssetMaterializer {
           useCache: context.workspace.useCache,
           token,
           httpClient: this.httpClient,
+          logger: this.logger,
+          traceId: context.traceId,
           outputSlug,
         });
         nextSnapshot = {

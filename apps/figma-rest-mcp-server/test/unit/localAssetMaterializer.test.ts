@@ -73,6 +73,51 @@ function createSnapshot(): SourceSnapshot {
   };
 }
 
+function createSnapshotWithMultipleImages(): SourceSnapshot {
+  return {
+    fileKey: "FILE",
+    targetNodeIds: ["1:1"],
+    sourceNodes: [
+      {
+        nodeId: "1:1",
+        document: {
+          id: "1:1",
+          name: "Root",
+          type: "FRAME",
+          visible: true,
+          absoluteBoundingBox: { x: 0, y: 0, width: 120, height: 120 },
+          children: [
+            {
+              id: "1:2",
+              name: "Hero",
+              type: "RECTANGLE",
+              visible: true,
+              absoluteBoundingBox: { x: 0, y: 0, width: 60, height: 60 },
+              fills: [{ type: "IMAGE", imageRef: "hero-ref" }],
+            },
+            {
+              id: "1:3",
+              name: "Banner",
+              type: "RECTANGLE",
+              visible: true,
+              absoluteBoundingBox: { x: 60, y: 0, width: 60, height: 60 },
+              fills: [{ type: "IMAGE", imageRef: "banner-ref" }],
+            },
+          ],
+        },
+      },
+    ],
+    imageRefs: ["hero-ref", "banner-ref"],
+    imageUrls: {},
+    vectorCandidates: [],
+    vectorUrls: {},
+    metadata: {
+      fetchedAt: new Date(0).toISOString(),
+      requestCount: 1,
+    },
+  };
+}
+
 function createConfig(overrides: NodeJS.ProcessEnv = {}) {
   return readConfig({
     FIGMA_ACCESS_TOKEN: "token",
@@ -563,6 +608,217 @@ describe("LocalAssetMaterializer", () => {
 
     expect(result.localImagePaths?.["hero-ref"]).toMatch(/figma-image-hero-ref\.png$/);
     expect(result.localVectorPaths?.["2:1"]).toMatch(/figma-vector-root-2-1\.svg$/);
+  });
+
+  it("skips variable materialization when color variables are disabled", async () => {
+    const workspaceRoot = `/tmp/figma-local-assets-no-variables-${Date.now()}`;
+    const requestedPaths: string[] = [];
+    const materializer = new LocalAssetMaterializer(
+      createConfig({ ENABLE_VARIABLES: "false" }),
+      {
+        async getJson(request: { path?: string }) {
+          requestedPaths.push(String(request.path));
+          if (request.path === "/v1/files/FILE/images") {
+            return {
+              meta: {
+                images: {
+                  "hero-ref": "https://cdn.example.test/hero.png",
+                },
+              },
+            };
+          }
+
+          if (request.path === "/v1/images/FILE") {
+            return {
+              images: {
+                "2:1": "https://cdn.example.test/icon.svg",
+              },
+            };
+          }
+
+          throw new Error(`Unexpected getJson request: ${String(request.path)}`);
+        },
+        async getBinary() {
+          return {
+            buffer: Buffer.from("png-binary"),
+            contentType: "image/png",
+          };
+        },
+        async getText() {
+          return '<svg viewBox="0 0 24 24"></svg>';
+        },
+      } as any,
+      {
+        getToken() {
+          return "token";
+        },
+      } as any,
+      {
+        debug() {},
+        info() {},
+        warn() {},
+        error() {},
+      },
+    );
+
+    const context = createRequestContext({
+      traceId: "trace-local-assets-no-variables",
+      options: {
+        framework: "HTML",
+        useColorVariables: false,
+        downloadImagesToLocal: true,
+        downloadVectorsToLocal: true,
+      },
+      workspace: {
+        workspaceRoot,
+        useCache: true,
+      },
+      serviceCapabilitySnapshot: {
+        scope: "service",
+        frameworks: [],
+        features: {
+          colorVariables: "none",
+          textSegmentation: "partial",
+          preview: "full",
+          images: "partial",
+          vectors: "partial",
+          diagnostics: "full",
+        },
+        limits: [],
+      },
+    });
+
+    const result = await materializer.materialize({
+      target: {
+        fileKey: "FILE",
+        nodeIds: ["1:1"],
+        raw: { url: "https://www.figma.com/design/FILE/Demo?node-id=1-1" },
+        sourceKind: "url",
+      },
+      gatewayData: {
+        fileKey: "FILE",
+        documents: createSnapshot().sourceNodes.map((sourceNode) => ({
+          nodeId: sourceNode.nodeId,
+          document: sourceNode.document,
+        })),
+      },
+      snapshot: createSnapshot(),
+      context,
+    });
+
+    expect(requestedPaths).not.toContain("/v1/files/FILE/variables/local");
+    expect(result.variablesRaw).toBeUndefined();
+    expect(result.localAssetManifestPaths?.variableManifestPath).toBeUndefined();
+  });
+
+  it("continues downloading remaining images when one local image download fails", async () => {
+    const workspaceRoot = `/tmp/figma-local-assets-partial-image-${Date.now()}`;
+    const snapshot = createSnapshotWithMultipleImages();
+    const materializer = new LocalAssetMaterializer(
+      createConfig(),
+      {
+        async getJson(request: { path?: string }) {
+          if (request.path === "/v1/files/FILE/variables/local") {
+            return {
+              meta: {
+                variables: {},
+                variableCollections: {},
+              },
+            };
+          }
+
+          if (request.path === "/v1/files/FILE/images") {
+            return {
+              meta: {
+                images: {
+                  "hero-ref": "https://cdn.example.test/hero.png",
+                  "banner-ref": "https://cdn.example.test/banner.png",
+                },
+              },
+            };
+          }
+
+          throw new Error(`Unexpected getJson request: ${String(request.path)}`);
+        },
+        async getBinary(request: { url?: string }) {
+          if (request.url === "https://cdn.example.test/banner.png") {
+            throw new Error("download failed");
+          }
+
+          return {
+            buffer: Buffer.from("png-binary"),
+            contentType: "image/png",
+          };
+        },
+        async getText() {
+          throw new Error("unexpected svg download");
+        },
+      } as any,
+      {
+        getToken() {
+          return "token";
+        },
+      } as any,
+      {
+        debug() {},
+        info() {},
+        warn() {},
+        error() {},
+      },
+    );
+
+    const context = createRequestContext({
+      traceId: "trace-local-assets-partial-image",
+      options: {
+        framework: "HTML",
+        downloadImagesToLocal: true,
+        downloadVectorsToLocal: false,
+      },
+      workspace: {
+        workspaceRoot,
+        useCache: true,
+      },
+      serviceCapabilitySnapshot: {
+        scope: "service",
+        frameworks: [],
+        features: {
+          colorVariables: "partial",
+          textSegmentation: "partial",
+          preview: "full",
+          images: "partial",
+          vectors: "partial",
+          diagnostics: "full",
+        },
+        limits: [],
+      },
+    });
+
+    const result = await materializer.materialize({
+      target: {
+        fileKey: "FILE",
+        nodeIds: ["1:1"],
+        raw: { url: "https://www.figma.com/design/FILE/Demo?node-id=1-1" },
+        sourceKind: "url",
+      },
+      gatewayData: {
+        fileKey: "FILE",
+        documents: snapshot.sourceNodes.map((sourceNode) => ({
+          nodeId: sourceNode.nodeId,
+          document: sourceNode.document,
+        })),
+      },
+      snapshot,
+      context,
+    });
+
+    expect(result.localImagePaths).toEqual({
+      "hero-ref": ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
+    });
+    expect(context.warningCollector.list()).not.toContain("local_image_download_failed");
+    expect(result.localAssetManifestPaths?.imageManifestPath).toMatch(
+      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-downloaded-images-FILE-1-1\.json$/,
+    );
+    await access(resolve(workspaceRoot, result.localImagePaths?.["hero-ref"] ?? ""));
   });
 
   it("deduplicates identical svg assets while preserving root mappings", async () => {

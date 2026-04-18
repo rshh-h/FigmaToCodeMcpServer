@@ -65,7 +65,14 @@ anchor-d2c-mcp init opencode
 ```
 
 如果需要像素级一致，建议关闭 `ROUND_TAILWIND_VALUES` 和 `ROUND_TAILWIND_COLORS`。
-通过 Figma REST API 拉取数据可能受网络影响和频率限制，推荐适当增大工具超时。
+通过 Figma REST API 拉取数据可能受网络影响和频率限制，推荐适当增大工具超时时间。
+
+#### 转码方法
+
+```text
+https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427
+将这个 figma 设计转换为 Tailwind jsx 风格的代码
+```
 
 ### HTTP 模式
 

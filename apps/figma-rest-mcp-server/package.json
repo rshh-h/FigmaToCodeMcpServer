@@ -1,6 +1,6 @@
 {
   "name": "anchor-d2c-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "MCP server for converting a single Figma node into frontend code through the Figma REST API.",
   "keywords":["d2c", "figma", "figma to code", "anchor", "mcp"],

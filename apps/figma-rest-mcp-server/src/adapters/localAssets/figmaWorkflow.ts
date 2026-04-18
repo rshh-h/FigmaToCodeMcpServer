@@ -264,23 +264,34 @@ export async function fetchNodeImagesForDocuments(
       continue;
     }
 
-    const { buffer, contentType } = await options.httpClient.getBinary({
-      url: downloadUrl,
-    });
-    const extension = extensionFromContentType(contentType);
-    const outputPath = await saveBuffer(
-      `figma-image-${imageRef}.${extension}`,
-      buffer,
-      { baseDir: options.baseDir },
-    );
+    try {
+      const { buffer, contentType } = await options.httpClient.getBinary({
+        url: downloadUrl,
+      });
+      const extension = extensionFromContentType(contentType);
+      const outputPath = await saveBuffer(
+        `figma-image-${imageRef}.${extension}`,
+        buffer,
+        { baseDir: options.baseDir },
+      );
 
-    downloadedImages.push({
-      imageRef,
-      contentType,
-      outputPath,
-      sourceUrl: downloadUrl,
-    });
-    localImagePaths[imageRef] = toRepoRelativePath(options.workspaceRoot, outputPath);
+      downloadedImages.push({
+        imageRef,
+        contentType,
+        outputPath,
+        sourceUrl: downloadUrl,
+      });
+      localImagePaths[imageRef] = toRepoRelativePath(options.workspaceRoot, outputPath);
+    } catch (error) {
+      options.logger?.warn("Local image download failed", {
+        traceId: options.traceId,
+        fileKey: options.fileKey,
+        imageRef,
+        sourceUrl: downloadUrl,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      missingImages.push(imageRef);
+    }
   }
 
   const manifestPath = await saveJson(
