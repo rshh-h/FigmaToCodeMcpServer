@@ -1,18 +1,49 @@
 {
-  "name": "figma-to-code-mcp-server",
-  "version": "0.0.0",
-  "private": true,
+  "name": "anchor-d2c-mcp",
+  "version": "1.0.1",
   "type": "module",
+  "description": "MCP server for converting a single Figma node into frontend code through the Figma REST API.",
+  "keywords":["d2c", "figma", "figma to code", "anchor", "mcp"],
+  "author":{
+    "name": "agjyxzz",
+    "email": "sdcwhfll@163.com",
+    "url": "https://github.com/rshh-h/FigmaToCodeMcpServer"
+  },
+  "license": "GPL-3.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js"
+    },
+    "./stdio": {
+      "types": "./dist/stdio.d.ts",
+      "import": "./dist/stdio.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "bin": {
-    "figma-to-code-mcp-server": "./dist/index.js",
-    "figma-to-code-mcp-server-http": "./dist/http.js",
-    "figma-to-code-mcp-server-stdio": "./dist/stdio.js"
+    "anchor-d2c-mcp": "./dist/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/http.ts src/stdio.ts --format esm --dts --clean",
-    "dev": "tsx watch src/index.ts",
+    "build": "tsup --config tsup.config.ts",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "dev": "tsx watch src/index.ts stdio",
+    "prepack": "pnpm test && pnpm build",
+    "prepublishOnly": "pnpm test && pnpm build",
+    "release": "pnpm clean && pnpm publish --access public",
     "test": "vitest run",
     "type-check": "tsc --noEmit",
     "lint": "tsc --noEmit",
@@ -20,13 +51,13 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "codegen-kernel": "workspace:*",
-    "codegen-types": "workspace:*",
     "express": "^5.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "codegen-kernel": "workspace:*",
+    "codegen-types": "workspace:*",
     "tsup": "^8.5.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",

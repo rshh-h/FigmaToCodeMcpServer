@@ -83,7 +83,7 @@ function fail(message: string): never {
     [
       message,
       "Example:",
-      "  FIGMA_ACCESS_TOKEN=... FIGMA_FILE_URL='https://www.figma.com/design/3JlJhGRKW81I8RTH1Lernb/D2C-test-case?node-id=1-1427&t=mIXdjMtAnUvQcgH6-4' pnpm --filter figma-to-code-mcp-server verify:real",
+      "  FIGMA_ACCESS_TOKEN=... FIGMA_FILE_URL='https://www.figma.com/design/3JlJhGRKW81I8RTH1Lernb/D2C-test-case?node-id=1-1427&t=mIXdjMtAnUvQcgH6-4' pnpm --filter anchor-d2c-mcp verify:real",
     ].join("\n"),
   );
   process.exit(2);

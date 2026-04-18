@@ -1,6 +1,6 @@
-# Figma REST MCP Server
+# Anchor D2C MCP
 
-这个仓库提供一个基于 Figma REST API 的 MCP 服务，用于把单个 Figma 节点转换为 `HTML`、`Tailwind`、`Flutter`、`SwiftUI`、`Compose` 代码。
+`anchor-d2c-mcp` 是一个基于 Figma REST API 的 MCP 服务，用于把单个 Figma 节点转换为 `HTML`、`Tailwind`、`Flutter`、`SwiftUI`、`Compose` 代码。
 
 项目中的代码生成能力参考 [bernaferrari/FigmaToCode](https://github.com/bernaferrari/FigmaToCode)，并在当前仓库中补齐了面向 MCP 服务的输入解析与诊断输出。
 
@@ -13,6 +13,73 @@
 - 不支持 figma 多层设计，代码会生成到一个层里
 - vector mask 不支持，直接按照普通 Rectangle mask 处理
 - 修改后只对Tailwind，jsx 类型进行了测试，其他输出格式未验证。
+
+## 安装与启动
+
+推荐通过 pnpm 包安装后，使用统一命令 `anchor-d2c-mcp`：
+
+```bash
+pnpm install -g anchor-d2c-mcp
+```
+
+可用子命令：
+
+```bash
+anchor-d2c-mcp init codex
+anchor-d2c-mcp init claude
+anchor-d2c-mcp init opencode
+anchor-d2c-mcp stdio
+anchor-d2c-mcp http
+anchor-d2c-mcp help
+anchor-d2c-mcp --version
+```
+
+`init` 会提示输入 `FIGMA_ACCESS_TOKEN`。如果直接回车，会把空字符串写入配置。写完后 CLI 会提示实际写入的文件位置，你可以再自己打开文件调整。
+
+### 初始化配置
+
+使用 init 命令配置到不同的 cli
+
+Codex：
+
+```bash
+anchor-d2c-mcp init codex
+```
+
+Claude：
+
+```bash
+anchor-d2c-mcp init claude
+```
+
+使用 `claude mcp add` 安装，等价于：
+
+```bash
+claude mcp add --transport stdio --scope user ... anchor-d2c-mcp -- anchor-d2c-mcp stdio
+```
+
+OpenCode：
+
+```bash
+anchor-d2c-mcp init opencode
+```
+
+如果需要像素级一致，建议关闭 `ROUND_TAILWIND_VALUES` 和 `ROUND_TAILWIND_COLORS`。
+通过 Figma REST API 拉取数据可能受网络影响和频率限制，推荐适当增大工具超时。
+
+### HTTP 模式
+
+启动 HTTP 模式：
+
+```bash
+anchor-d2c-mcp http
+```
+
+健康检查：
+
+```bash
+curl http://127.0.0.1:3101/health
+```
 
 ## 工作区结构
 
@@ -128,54 +195,17 @@ export ENABLE_IMAGE_EMBED=true
 export ENABLE_VECTOR_EMBED=true
 ```
 
-## 本地运行
-
-安装依赖：
+### 开发者运行
 
 ```bash
 pnpm install
+pnpm --filter anchor-d2c-mcp dev
 ```
 
-启动 `stdio` 模式：
+构建：
 
 ```bash
-pnpm --filter figma-to-code-mcp-server dev
-```
-
-mcp 本地配置：
-
-如果需要像素级一致，需要关闭ROUND_TAILWIND_VALUES和ROUND_TAILWIND_COLORS
-通过 figma rest api 拉取数据可能受网络影响和频率限制，所以推荐这里把超时时间设的长一些
-
-codex 配置 ~/.codex/config.toml
-
-```
-[mcp_servers.figma_to_code]
-type = "stdio"
-command = "pnpm"
-args = ["--dir", "path to FigmaToCodeMCPServer/apps/figma-rest-mcp-server", "exec", "tsx", "src/stdio.ts"]
-tool_timeout_sec    = 600  # 工具 10 分钟
-
-[mcp_servers.figma_to_code.env]
-FIGMA_ACCESS_TOKEN = "your figma token"
-INCLUDE_DIAGNOSTICS = "false"
-ENABLE_IMAGE_EMBED = "true"
-ENABLE_VECTOR_EMBED = "true"
-ROUND_TAILWIND_VALUES = "false"
-ROUND_TAILWIND_COLORS = "false"
-```
-
-构建并启动 HTTP 模式：
-
-```bash
-pnpm --filter figma-to-code-mcp-server build
-node apps/figma-rest-mcp-server/dist/http.js
-```
-
-健康检查：
-
-```bash
-curl http://127.0.0.1:3101/health
+pnpm --filter anchor-d2c-mcp build
 ```
 
 ## Inspector 调试
@@ -183,15 +213,15 @@ curl http://127.0.0.1:3101/health
 `stdio`：
 
 ```bash
-pnpm --filter figma-to-code-mcp-server build
-FIGMA_ACCESS_TOKEN=xxxxx npx @modelcontextprotocol/inspector node apps/figma-rest-mcp-server/dist/stdio.js
+pnpm --filter anchor-d2c-mcp build
+FIGMA_ACCESS_TOKEN=xxxxx npx @modelcontextprotocol/inspector anchor-d2c-mcp stdio
 ```
 
 `Streamable HTTP`：
 
 ```bash
-pnpm --filter figma-to-code-mcp-server build
-FIGMA_ACCESS_TOKEN=xxxxx node apps/figma-rest-mcp-server/dist/http.js
+pnpm --filter anchor-d2c-mcp build
+FIGMA_ACCESS_TOKEN=xxxxx anchor-d2c-mcp http
 npx @modelcontextprotocol/inspector
 ```
 
@@ -222,7 +252,7 @@ pnpm build
 ```bash
 FIGMA_ACCESS_TOKEN=xxxxx \
 FIGMA_FILE_URL='https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427' \
-pnpm --filter figma-to-code-mcp-server verify:real
+pnpm --filter anchor-d2c-mcp verify:real
 ```
 
 ## 常见错误

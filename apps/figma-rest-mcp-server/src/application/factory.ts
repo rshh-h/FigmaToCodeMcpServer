@@ -20,11 +20,12 @@ import { RateLimitGate } from "../infrastructure/rateLimitGate.js";
 import { TokenProvider } from "../infrastructure/tokenProvider.js";
 import { uuidTracer } from "../infrastructure/tracer.js";
 import type { ConversionOptions } from "../core/contracts.js";
+import { PACKAGE_NAME } from "../product.js";
 
 function validateStartupConfig(config: ReturnType<typeof readConfig>) {
   if (!config.FIGMA_ACCESS_TOKEN) {
     throw new Error(
-      "FIGMA_ACCESS_TOKEN is required to start figma-to-code-mcp-server.",
+      `FIGMA_ACCESS_TOKEN is required to start ${PACKAGE_NAME}.`,
     );
   }
 }

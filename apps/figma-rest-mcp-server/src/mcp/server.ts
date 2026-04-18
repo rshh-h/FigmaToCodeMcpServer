@@ -11,6 +11,7 @@ import {
   convertResponseSchema,
 } from "./schemas.js";
 import { createConvertHelpResponse } from "./convertToolMetadata.js";
+import { MCP_SERVER_NAME, PRODUCT_VERSION } from "../product.js";
 
 const readOnlyAnnotations: ToolAnnotations = {
   readOnlyHint: true,
@@ -39,8 +40,8 @@ type ToolCallExtra = {
 export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
   const app = createApplication(env);
   const server = new McpServer({
-    name: "figma-to-code-mcp-server",
-    version: "0.0.0",
+    name: MCP_SERVER_NAME,
+    version: PRODUCT_VERSION,
   });
 
   const handlers = createToolHandlers(app.convertUseCase, app.capabilitiesUseCase);

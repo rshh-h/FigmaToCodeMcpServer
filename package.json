@@ -6,6 +6,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --concurrency 20",
+    "release:mcp": "pnpm --filter anchor-d2c-mcp release",
     "test": "turbo run test",
     "type-check": "turbo run type-check",
     "lint": "turbo run lint"
@@ -17,4 +18,3 @@
     "vitest": "^3.2.4"
   }
 }
-
