@@ -296,12 +296,11 @@ export interface ConversionOptions {
 }
 
 export interface ConvertRequest {
-  source: FigmaSourceRef;
+  figmaUrl: string;
   workspaceRoot: string;
   useCache?: boolean;
   framework: Framework;
   generationMode?: GenerationMode;
-  includeDiagnostics?: boolean;
 }
 
 export interface ConvertResponse {

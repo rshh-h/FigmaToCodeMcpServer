@@ -34,9 +34,7 @@ describe("MCP tool handlers", () => {
     );
 
     const result = await handlers.convert({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
     });
@@ -79,9 +77,7 @@ describe("MCP tool handlers", () => {
     );
 
     const result = await handlers.convert({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
     });
@@ -161,9 +157,7 @@ describe("MCP tool handlers", () => {
 
     await handlers.convert(
       {
-        source: {
-          url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-        },
+        figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
         workspaceRoot: "/tmp/workspace",
         framework: "HTML",
       },
@@ -264,7 +258,7 @@ describe("MCP tool handlers", () => {
     const result = await handlers.convertHelp();
 
     expect((result.structuredContent as any).example.framework).toBe("Tailwind");
-    expect((result.structuredContent as any).fields[0].name).toBe("source.url");
+    expect((result.structuredContent as any).fields[0].name).toBe("figmaUrl");
     expect(result.content[0].text).toContain("request template");
   });
 });

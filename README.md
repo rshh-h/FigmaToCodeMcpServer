@@ -26,7 +26,7 @@
 
 服务主链路包含以下步骤：
 
-1. 解析 `source.url` 中的 `fileKey` 和 `node-id`
+1. 解析 `figmaUrl` 中的 `fileKey` 和 `node-id`
 2. 拉取目标节点对应的 Figma REST snapshot
 3. 构建稳定的 `SourceSnapshot`
 4. 归一化为内部 `NormalizedTree`
@@ -46,12 +46,11 @@
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |---|---|---|---|---|
-| `source.url` | `string` | 是 | 无 | 单节点 Figma URL，必须包含 `node-id` |
+| `figmaUrl` | `string` | 是 | 无 | 单节点 Figma URL，必须包含 `node-id` |
 | `workspaceRoot` | `string` | 是 | 无 | 工作区根目录，用于保存缓存、中间产物与生成结果 |
 | `useCache` | `boolean` | 否 | `false` | 是否复用当前工作区下的 REST 缓存和本地资产中间产物 |
 | `framework` | `"HTML" \| "Tailwind" \| "Flutter" \| "SwiftUI" \| "Compose"` | 是 | 无 | 目标代码框架 |
 | `generationMode` | `string` | 否 | 无 | 对应框架的生成模式，取值受 `framework` 限制 |
-| `includeDiagnostics` | `boolean` | 否 | `true` | 是否在响应中返回 diagnostics |
 
 `generationMode` 可选值：
 
@@ -103,6 +102,7 @@
 | `AUTH_CACHE_TTL_MS` | `number` | 否 | 无 | 认证缓存 TTL，未设置时沿用 `CACHE_TTL_MS` |
 | `CACHE_MAX_ENTRIES` | `number` | 否 | `500` | 进程内缓存最大条目数 |
 | `ENABLE_VARIABLES` | `boolean` | 否 | `false` | 是否启用变量能力，同时也是颜色变量输出的默认来源 |
+| `INCLUDE_DIAGNOSTICS` | `boolean` | 否 | `false` | 是否默认在响应中返回 diagnostics |
 | `ENABLE_IMAGE_EMBED` | `boolean` | 否 | `true` | 是否启用图片嵌入能力，同时也是图片嵌入输出的默认来源 |
 | `ENABLE_VECTOR_EMBED` | `boolean` | 否 | `true` | 是否启用向量嵌入能力，同时也是向量嵌入输出的默认来源 |
 | `ENABLE_METRICS_LOGGING` | `boolean` | 否 | `false` | 是否输出 metrics 日志 |
@@ -123,6 +123,7 @@
 ```bash
 export FIGMA_ACCESS_TOKEN=xxxxx
 export ENABLE_VARIABLES=false
+export INCLUDE_DIAGNOSTICS=false
 export ENABLE_IMAGE_EMBED=true
 export ENABLE_VECTOR_EMBED=true
 ```
@@ -157,6 +158,7 @@ tool_timeout_sec    = 600  # 工具 10 分钟
 
 [mcp_servers.figma_to_code.env]
 FIGMA_ACCESS_TOKEN = "your figma token"
+INCLUDE_DIAGNOSTICS = "false"
 ENABLE_IMAGE_EMBED = "true"
 ENABLE_VECTOR_EMBED = "true"
 ROUND_TAILWIND_VALUES = "false"
@@ -228,9 +230,9 @@ pnpm --filter figma-to-code-mcp-server verify:real
 - `missing_figma_access_token`：启动或调用前设置 `FIGMA_ACCESS_TOKEN`
 - `figma_http_401`：检查 token 是否有效、是否过期或被撤销
 - `figma_http_403`：确认 token 所属账号能访问目标 Figma 文件
-- `figma_http_404`：检查 `source.url` 中的文件和 `node-id` 是否正确
+- `figma_http_404`：检查 `figmaUrl` 中的文件和 `node-id` 是否正确
 - `figma_http_429`：降低并发或稍后重试
-- `missing_source_node_id`：`source.url` 必须带 `node-id`
+- `missing_source_node_id`：`figmaUrl` 必须带 `node-id`
 
 ## 文档
 

@@ -112,7 +112,7 @@ flowchart LR
 
 一次 `figma_to_code_convert` 调用通常包含以下阶段：
 
-1. 解析 `source.url`
+1. 解析 `figmaUrl`
 2. 读取 Figma REST snapshot
 3. 构建 `SourceSnapshot`
 4. 标准化为 `NormalizedTree`

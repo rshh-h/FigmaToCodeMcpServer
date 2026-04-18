@@ -8,9 +8,7 @@ describe("FigmaLinkParserAdapter", () => {
     "https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427&t=fixture-token";
 
   it("parses a single-node figma url into a single target", () => {
-    const resolved = resolver.resolve({
-      url: validUrl,
-    });
+    const resolved = resolver.resolve(validUrl);
 
     expect(resolved.fileKey).toBe("ANONFILEKEY1234567890AB");
     expect(resolved.nodeIds).toEqual(["1:1427"]);
@@ -18,9 +16,7 @@ describe("FigmaLinkParserAdapter", () => {
   });
 
   it("parses a legacy file url path", () => {
-    const resolved = resolver.resolve({
-      url: "https://www.figma.com/file/FILE123/Demo?node-id=1-2",
-    });
+    const resolved = resolver.resolve("https://www.figma.com/file/FILE123/Demo?node-id=1-2");
 
     expect(resolved.fileKey).toBe("FILE123");
     expect(resolved.nodeIds).toEqual(["1:2"]);
@@ -28,17 +24,13 @@ describe("FigmaLinkParserAdapter", () => {
 
   it("throws when url does not contain node-id", () => {
     expect(() =>
-      resolver.resolve({
-        url: "https://www.figma.com/design/FILE123/Demo",
-      }),
+      resolver.resolve("https://www.figma.com/design/FILE123/Demo"),
     ).toThrow(ServiceError);
   });
 
   it("throws when url does not contain a file key", () => {
     expect(() =>
-      resolver.resolve({
-        url: "https://www.figma.com/proto/Demo?node-id=1-2",
-      }),
+      resolver.resolve("https://www.figma.com/proto/Demo?node-id=1-2"),
     ).toThrow(ServiceError);
   });
 });

@@ -4,9 +4,7 @@ import { convertRequestSchema } from "../../src/mcp/schemas.js";
 describe("convertRequestSchema", () => {
   it("rejects a url without node-id", () => {
     const result = convertRequestSchema.safeParse({
-      source: {
-        url: "https://www.figma.com/file/FILE/demo",
-      },
+      figmaUrl: "https://www.figma.com/file/FILE/demo",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
     });
@@ -16,9 +14,7 @@ describe("convertRequestSchema", () => {
 
   it("rejects a url without a valid figma file key", () => {
     const result = convertRequestSchema.safeParse({
-      source: {
-        url: "https://www.figma.com/proto/demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/proto/demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
     });
@@ -28,9 +24,7 @@ describe("convertRequestSchema", () => {
 
   it("accepts useCache when explicitly provided", () => {
     const result = convertRequestSchema.safeParse({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
       generationMode: "jsx",
@@ -42,9 +36,7 @@ describe("convertRequestSchema", () => {
 
   it("defaults useCache to false", () => {
     const result = convertRequestSchema.safeParse({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "HTML",
     });
@@ -55,9 +47,7 @@ describe("convertRequestSchema", () => {
 
   it("rejects a generationMode that does not match framework", () => {
     const result = convertRequestSchema.safeParse({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: "/tmp/workspace",
       framework: "Tailwind",
       generationMode: "screen",

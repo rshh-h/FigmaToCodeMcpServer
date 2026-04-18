@@ -142,17 +142,14 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
-      {},
+      { includeDiagnostics: true },
       metrics,
     );
 
     const result = await useCase.execute({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: process.cwd(),
       framework: "HTML",
-      includeDiagnostics: true,
     });
 
     expect(result.code).toBe("tmp/generated/trace-1/html.html");
@@ -311,17 +308,14 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
-      {},
+      { includeDiagnostics: true },
     );
 
     await useCase.execute(
       {
-        source: {
-          url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-        },
+        figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
         workspaceRoot: process.cwd(),
         framework: "HTML",
-        includeDiagnostics: true,
       },
       {
         onProgress(update) {
@@ -490,16 +484,13 @@ describe("ConvertFigmaNodeUseCase", () => {
           } as any;
         },
       },
-      {},
+      { includeDiagnostics: true },
     );
 
     const result = await useCase.execute({
-      source: {
-        url: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
-      },
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
       workspaceRoot: process.cwd(),
       framework: "HTML",
-      includeDiagnostics: true,
     });
 
     expect(result.code).toBe("tmp/generated/trace-assets/html.html");

@@ -91,17 +91,14 @@ describe("case-007 mocked e2e", () => {
       new NoopCodeArtifactWriter(),
       new PreviewAdapter(),
       new DefaultDiagnosticsBuilder(),
-      {},
+      { includeDiagnostics: true },
     );
 
     const response = await useCase.execute({
-      source: {
-        url: `https://www.figma.com/design/${fixture.fileKey}/case-007?node-id=${fixture.nodeId.replace(":", "-")}`,
-      },
+      figmaUrl: `https://www.figma.com/design/${fixture.fileKey}/case-007?node-id=${fixture.nodeId.replace(":", "-")}`,
       workspaceRoot: process.cwd(),
       framework: "Compose",
       generationMode: "screen",
-      includeDiagnostics: true,
     });
 
     expect(response.framework).toBe("Compose");

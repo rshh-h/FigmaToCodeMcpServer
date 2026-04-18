@@ -1,7 +1,4 @@
-import type {
-  FigmaSourceRef,
-  ResolvedNodeTarget,
-} from "../core/contracts.js";
+import type { ResolvedNodeTarget } from "../core/contracts.js";
 import { ServiceError } from "../core/errors.js";
 import type { SourceResolver } from "../core/interfaces.js";
 
@@ -33,8 +30,8 @@ function parseFigmaUrl(urlString: string): { fileKey: string; nodeId?: string } 
 }
 
 export class FigmaLinkParserAdapter implements SourceResolver {
-  resolve(source: FigmaSourceRef): ResolvedNodeTarget {
-    const parsed = parseFigmaUrl(source.url);
+  resolve(figmaUrl: string): ResolvedNodeTarget {
+    const parsed = parseFigmaUrl(figmaUrl);
     const normalizedNodeId = parsed.nodeId ? normalizeNodeId(parsed.nodeId) : undefined;
 
     if (!normalizedNodeId) {
@@ -52,7 +49,7 @@ export class FigmaLinkParserAdapter implements SourceResolver {
     return {
       fileKey: parsed.fileKey,
       nodeIds: [normalizedNodeId],
-      raw: source,
+      raw: { url: figmaUrl },
       sourceKind: "url",
     };
   }

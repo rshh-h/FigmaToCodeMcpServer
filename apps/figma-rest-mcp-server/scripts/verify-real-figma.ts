@@ -28,33 +28,34 @@ if (!process.env.FIGMA_ACCESS_TOKEN) {
 
   const requests: ConvertRequest[] = [
     {
-      source: { url: fileUrl },
+      figmaUrl: fileUrl,
       workspaceRoot: process.cwd(),
       framework,
-      includeDiagnostics: true,
     },
   ];
 
   for (const request of requests) {
     const response = await app.convertUseCase.execute(request);
-    if (!response.code || !response.diagnostics?.sourceNodeIds?.length) {
-      throw new Error("Convert response did not include code and source diagnostics.");
+    if (!response.code) {
+      throw new Error("Convert response did not include generated code.");
     }
 
     console.log(
       JSON.stringify(
         {
           check: "convert",
-          source: Object.keys(request.source),
+          figmaUrl: request.figmaUrl,
           framework: response.framework,
           codeLength: response.code.length,
           warningCount: response.warnings.length,
           preview: Boolean(response.preview),
-          diagnostics: {
-            sourceFileKey: response.diagnostics.sourceFileKey,
-            sourceNodeIds: response.diagnostics.sourceNodeIds,
-            decisions: response.diagnostics.decisions,
-          },
+          diagnostics: response.diagnostics
+            ? {
+                sourceFileKey: response.diagnostics.sourceFileKey,
+                sourceNodeIds: response.diagnostics.sourceNodeIds,
+                decisions: response.diagnostics.decisions,
+              }
+            : undefined,
         },
         null,
         2,

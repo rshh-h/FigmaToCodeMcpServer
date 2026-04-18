@@ -40,6 +40,7 @@ export const configSchema = z.object({
   AUTH_CACHE_TTL_MS: z.coerce.number().int().positive().optional(),
   CACHE_MAX_ENTRIES: z.coerce.number().int().positive().default(500),
   ENABLE_VARIABLES: booleanFromEnv.default(false),
+  INCLUDE_DIAGNOSTICS: booleanFromEnv.default(false),
   ENABLE_IMAGE_EMBED: booleanFromEnv.default(true),
   ENABLE_VECTOR_EMBED: booleanFromEnv.default(true),
   ENABLE_METRICS_LOGGING: booleanFromEnv.default(false),

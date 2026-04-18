@@ -28,10 +28,8 @@ import type { Metrics } from "../infrastructure/metrics.js";
 import { noopMetrics } from "../infrastructure/metrics.js";
 import { resolveWorkspaceRoot } from "../infrastructure/workspacePaths.js";
 
-function getConvertProgressTotal(request: ConvertRequest): number {
-  return (
-    9 + Number(request.includeDiagnostics !== false)
-  );
+function getConvertProgressTotal(includeDiagnostics: boolean): number {
+  return 9 + Number(includeDiagnostics);
 }
 
 function resolveGenerationModeOptions(
@@ -116,7 +114,9 @@ export class ConvertFigmaNodeUseCase {
     return await withRequestCache(async () => {
       const startedAt = Date.now();
       let context: ReturnType<typeof createRequestContext> | undefined;
-      const totalProgress = getConvertProgressTotal(request);
+      const totalProgress = getConvertProgressTotal(
+        this.defaultConversionOptions.includeDiagnostics === true,
+      );
       let progress = 0;
       const reportProgress = async (
         stage: ConvertProgressStage,
@@ -159,7 +159,7 @@ export class ConvertFigmaNodeUseCase {
             ...this.defaultConversionOptions,
             ...resolveGenerationModeOptions(request.framework, request.generationMode),
             returnPreview: false,
-            includeDiagnostics: request.includeDiagnostics,
+            includeDiagnostics: this.defaultConversionOptions.includeDiagnostics,
           },
           workspace,
           serviceCapabilitySnapshot,
@@ -167,7 +167,7 @@ export class ConvertFigmaNodeUseCase {
         context = requestContext;
 
         const target = await requestContext.stageTimer.measure("resolve_source", () =>
-          this.sourceResolver.resolve(request.source),
+          this.sourceResolver.resolve(request.figmaUrl),
         );
         await advanceProgress("fetch_nodes", "Fetching node data");
 
@@ -274,7 +274,7 @@ export class ConvertFigmaNodeUseCase {
         artifact = await this.codeArtifactWriter.write(artifact, requestContext);
 
         const diagnostics =
-          request.includeDiagnostics === false
+          requestContext.options.includeDiagnostics !== true
             ? undefined
             : await (async () => {
                 await advanceProgress("build_diagnostics", "Building diagnostics");

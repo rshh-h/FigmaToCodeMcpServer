@@ -4,7 +4,6 @@ import type {
   ConversionOptions,
   ConvertRequest,
   DiagnosticsReport,
-  FigmaSourceRef,
   NormalizedTree,
   PreviewArtifact,
   ResolvedNodeTarget,
@@ -39,7 +38,7 @@ export interface ConvertExecutionHooks {
 }
 
 export interface SourceResolver {
-  resolve(source: FigmaSourceRef): ResolvedNodeTarget;
+  resolve(figmaUrl: string): ResolvedNodeTarget;
 }
 
 export interface SourceGateway {

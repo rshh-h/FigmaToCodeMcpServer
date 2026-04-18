@@ -30,19 +30,16 @@ export const allGenerationModes = [
 ] as const;
 
 export const convertHelpExample = {
-  source: {
-    url: "https://www.figma.com/design/FILE_KEY/Example-File?node-id=1-1427&t=EXAMPLE-1",
-  },
+  figmaUrl: "https://www.figma.com/design/FILE_KEY/Example-File?node-id=1-1427&t=EXAMPLE-1",
   workspaceRoot: "/absolute/path/to/your/project",
   useCache: false,
   framework: "Tailwind",
   generationMode: "jsx",
-  includeDiagnostics: true,
 } as const;
 
 export const convertHelpFields = [
   {
-    name: "source.url",
+    name: "figmaUrl",
     type: "string",
     required: true,
     description:
@@ -76,18 +73,12 @@ export const convertHelpFields = [
     required: false,
     description: "Optional generation mode. Valid values depend on framework.",
   },
-  {
-    name: "includeDiagnostics",
-    type: "boolean",
-    required: false,
-    default: true,
-    description: "Whether to include diagnostics in the response.",
-  },
 ] as const;
 
 export const convertHelpNotes = [
   "Call this tool first when you need a valid figma_to_code_convert request template.",
-  "source.url must include both a valid Figma file key and node-id.",
+  "figmaUrl must include both a valid Figma file key and node-id.",
+  "Diagnostics are controlled by the INCLUDE_DIAGNOSTICS server environment variable.",
   "figma_to_code_convert returns code as a generated file path relative to workspaceRoot.",
   "preview is defined in the schema but is currently disabled by the implementation.",
 ] as const;

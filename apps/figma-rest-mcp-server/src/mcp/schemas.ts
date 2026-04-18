@@ -8,7 +8,7 @@ import {
 const frameworkSchema = z.enum(supportedFrameworks);
 const generationModeSchema = z.enum(allGenerationModes);
 
-const sourceUrlDescription =
+const figmaUrlDescription =
   "A Figma design/file URL for a single node. The URL must include the node-id query parameter, for example: https://www.figma.com/design/FILE_KEY/Example-File?node-id=1-1427&t=EXAMPLE-1";
 
 function parseFigmaSourceUrl(urlString: string): { fileKey?: string; nodeId?: string } {
@@ -27,27 +27,7 @@ function parseFigmaSourceUrl(urlString: string): { fileKey?: string; nodeId?: st
 
 export const convertRequestSchema = z
   .object({
-    source: z.object({
-      url: z.string().url().describe(sourceUrlDescription),
-    }).superRefine((value, ctx) => {
-      const parsed = parseFigmaSourceUrl(value.url);
-
-      if (!parsed.fileKey) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "source.url must include a valid Figma file key",
-          path: ["url"],
-        });
-      }
-
-      if (!parsed.nodeId) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "source.url must include node-id",
-          path: ["url"],
-        });
-      }
-    }),
+    figmaUrl: z.string().url().describe(figmaUrlDescription),
     workspaceRoot: z
       .string()
       .min(1)
@@ -62,7 +42,25 @@ export const convertRequestSchema = z
       ),
     framework: frameworkSchema,
     generationMode: generationModeSchema.optional(),
-    includeDiagnostics: z.boolean().default(true),
+  })
+  .superRefine((value, ctx) => {
+    const parsed = parseFigmaSourceUrl(value.figmaUrl);
+
+    if (!parsed.fileKey) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "figmaUrl must include a valid Figma file key",
+        path: ["figmaUrl"],
+      });
+    }
+
+    if (!parsed.nodeId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "figmaUrl must include node-id",
+        path: ["figmaUrl"],
+      });
+    }
   })
   .superRefine((value, ctx) => {
     if (
@@ -197,14 +195,11 @@ export const convertHelpRequestSchema = z.object({});
 
 export const convertHelpResponseSchema = z.object({
   example: z.object({
-    source: z.object({
-      url: z.string().url(),
-    }),
+    figmaUrl: z.string().url(),
     workspaceRoot: z.string(),
     useCache: z.boolean(),
     framework: frameworkSchema,
     generationMode: generationModeSchema.optional(),
-    includeDiagnostics: z.boolean(),
   }),
   fields: z.array(
     z.object({

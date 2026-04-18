@@ -35,6 +35,7 @@ function createDefaultConversionOptions(
   return {
     showLayerNames: config.SHOW_LAYER_NAMES,
     useColorVariables: config.ENABLE_VARIABLES,
+    includeDiagnostics: config.INCLUDE_DIAGNOSTICS,
     embedImages: config.ENABLE_IMAGE_EMBED,
     embedVectors: config.ENABLE_VECTOR_EMBED,
     roundTailwindValues: config.ROUND_TAILWIND_VALUES,

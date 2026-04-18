@@ -18,6 +18,7 @@ describe("infrastructure", () => {
     expect(config.HTTP_MAX_CONCURRENCY).toBe(6);
     expect(config.CACHE_MAX_ENTRIES).toBe(500);
     expect(config.ENABLE_METRICS_LOGGING).toBe(false);
+    expect(config.INCLUDE_DIAGNOSTICS).toBe(false);
     expect(config.SHOW_LAYER_NAMES).toBe(false);
     expect(config.USE_TAILWIND4).toBe(false);
     expect(config.DOWNLOAD_IMAGES_TO_LOCAL).toBe(true);
