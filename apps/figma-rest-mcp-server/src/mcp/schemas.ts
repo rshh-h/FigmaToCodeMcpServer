@@ -168,6 +168,48 @@ export const convertResponseSchema = z.object({
     .optional(),
 });
 
+export const fetchScreenshotRequestSchema = z
+  .object({
+    figmaUrl: z.string().url().describe(figmaUrlDescription),
+    workspaceRoot: z
+      .string()
+      .min(1)
+      .describe(
+        "Absolute or project-relative workspace root for this request. Screenshot caches are stored under this directory.",
+      ),
+    useCache: z
+      .boolean()
+      .default(false)
+      .describe(
+        "Whether to reuse a previously cached screenshot file for the same file key and node id. Defaults to false.",
+      ),
+  })
+  .superRefine((value, ctx) => {
+    const parsed = parseFigmaSourceUrl(value.figmaUrl);
+
+    if (!parsed.fileKey) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "figmaUrl must include a valid Figma file key",
+        path: ["figmaUrl"],
+      });
+    }
+
+    if (!parsed.nodeId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "figmaUrl must include node-id",
+        path: ["figmaUrl"],
+      });
+    }
+  });
+
+export const fetchScreenshotResponseSchema = z.object({
+  screenshotPath: z.string(),
+  fileKey: z.string(),
+  nodeId: z.string(),
+});
+
 export const capabilitiesRequestSchema = z.object({
   framework: frameworkSchema.optional(),
 });
@@ -222,4 +264,5 @@ export const convertHelpResponseSchema = z.object({
 });
 
 export type ConvertRequestInput = z.infer<typeof convertRequestSchema>;
+export type FetchScreenshotRequestInput = z.infer<typeof fetchScreenshotRequestSchema>;
 export type CapabilitiesRequestInput = z.infer<typeof capabilitiesRequestSchema>;

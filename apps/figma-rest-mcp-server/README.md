@@ -77,6 +77,17 @@ https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1
 将这个 figma 设计转换为 Tailwind jsx 风格的代码
 ```
 
+#### 截图工具用法
+
+当你需要单个 Figma 节点的渲染截图时，使用 `figma_to_code_fetch_screenshot`。这个工具会导出节点截图，并保存到工作区缓存里。
+
+示例提示词：
+
+```text
+抓取这个 Figma 节点的截图，并保存到工作区缓存：
+https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427
+```
+
 ### 环境变量
 
 必填项：
@@ -183,6 +194,17 @@ Supported targets:
 ```text
 https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427
 Convert this Figma design into Tailwind JSX code.
+```
+
+#### Screenshot Tool Usage
+
+Use `figma_to_code_fetch_screenshot` when you need the rendered screenshot for a single Figma node. The tool exports the node image and stores it in the workspace cache.
+
+Prompt example:
+
+```text
+Fetch the screenshot for this Figma node and save it to the workspace cache:
+https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1427
 ```
 
 ### Environment Variables

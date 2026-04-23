@@ -29,7 +29,11 @@
 - 标准错误映射
 - `structuredContent` 返回格式
 
-当前对外工具集中在 `figma_to_code_convert` 和 `figma_to_code_convert_help`。
+当前对外工具集中在：
+
+- `figma_to_code_convert`
+- `figma_to_code_fetch_screenshot`
+- `figma_to_code_convert_help`
 
 ## `src/application`
 
@@ -64,6 +68,7 @@
 - normalization adapter
 - generator adapter
 - preview adapter（当前未接入公开 `figma_to_code_convert` 响应）
+- screenshot artifact writer（独立节点截图缓存输出）
 - 本地资源处理能力
 
 这一层把 Figma REST 数据与现有代码生成链路转换为服务内部可消费的形式。

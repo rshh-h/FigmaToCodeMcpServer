@@ -31,6 +31,7 @@ export type StageName =
   | "fetch_snapshot"
   | "normalize"
   | "generate_code"
+  | "write_artifact"
   | "generate_preview"
   | "build_diagnostics";
 
@@ -310,6 +311,19 @@ export interface ConvertResponse {
   warnings: string[];
   preview?: PreviewArtifact;
   diagnostics?: DiagnosticsReport;
+}
+
+export interface FetchScreenshotRequest {
+  figmaUrl: string;
+  workspaceRoot: string;
+  useCache?: boolean;
+}
+
+export interface FetchScreenshotResponse {
+  [key: string]: unknown;
+  screenshotPath: string;
+  fileKey: string;
+  nodeId: string;
 }
 
 export interface CapabilitiesRequest {

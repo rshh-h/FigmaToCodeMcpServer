@@ -2,6 +2,16 @@ import { describe, expect, it } from "vitest";
 import { createToolHandlers } from "../../src/mcp/server.js";
 import { ServiceError } from "../../src/core/errors.js";
 
+const screenshotUseCase = {
+  async execute() {
+    return {
+      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+      fileKey: "FILE",
+      nodeId: "1:2",
+    };
+  },
+};
+
 describe("MCP tool handlers", () => {
   it("returns structured convert output", async () => {
     const handlers = createToolHandlers(
@@ -31,6 +41,7 @@ describe("MCP tool handlers", () => {
           };
         },
       },
+      screenshotUseCase,
     );
 
     const result = await handlers.convert({
@@ -74,6 +85,7 @@ describe("MCP tool handlers", () => {
           };
         },
       },
+      screenshotUseCase,
     );
 
     const result = await handlers.convert({
@@ -132,6 +144,7 @@ describe("MCP tool handlers", () => {
           };
         },
       },
+      screenshotUseCase,
     );
 
     const sendNotification = async (notification: {
@@ -220,6 +233,7 @@ describe("MCP tool handlers", () => {
           };
         },
       },
+      screenshotUseCase,
     );
 
     const result = await handlers.capabilities({
@@ -253,6 +267,7 @@ describe("MCP tool handlers", () => {
           };
         },
       },
+      screenshotUseCase,
     );
 
     const result = await handlers.convertHelp();
@@ -260,5 +275,43 @@ describe("MCP tool handlers", () => {
     expect((result.structuredContent as any).example.framework).toBe("Tailwind");
     expect((result.structuredContent as any).fields[0].name).toBe("figmaUrl");
     expect(result.content[0].text).toContain("request template");
+  });
+
+  it("returns structured screenshot output", async () => {
+    const handlers = createToolHandlers(
+      {
+        async execute() {
+          throw new Error("unused");
+        },
+      },
+      {
+        async execute() {
+          return {
+            frameworks: [],
+            features: {
+              colorVariables: "partial",
+              textSegmentation: "partial",
+              preview: "full",
+              images: "partial",
+              vectors: "partial",
+              diagnostics: "full",
+            },
+            limits: [],
+          };
+        },
+      },
+      screenshotUseCase,
+    );
+
+    const result = await handlers.fetchScreenshot({
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
+      workspaceRoot: "/tmp/workspace",
+      useCache: true,
+    });
+
+    expect(result.content[0].text).toContain("Fetched Figma node screenshot");
+    expect((result.structuredContent as any).screenshotPath).toBe(
+      ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+    );
   });
 });

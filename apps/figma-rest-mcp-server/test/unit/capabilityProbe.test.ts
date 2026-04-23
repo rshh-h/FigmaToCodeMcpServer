@@ -21,6 +21,9 @@ describe("CapabilityProbeAdapter", () => {
         async fetchVariables() {
           return undefined;
         },
+        async fetchScreenshot() {
+          throw new Error("unused");
+        },
         async probeVariables() {
           return false;
         },
@@ -56,6 +59,9 @@ describe("CapabilityProbeAdapter", () => {
         async fetchVariables() {
           return undefined;
         },
+        async fetchScreenshot() {
+          throw new Error("unused");
+        },
         async probeVariables() {
           return false;
         },
@@ -88,6 +94,9 @@ describe("CapabilityProbeAdapter", () => {
         },
         async fetchVariables() {
           return undefined;
+        },
+        async fetchScreenshot() {
+          throw new Error("unused");
         },
         async probeVariables() {
           return false;

@@ -34,6 +34,10 @@ export function resolveLocalAssetOutputDir(
   return resolveWorkspacePath(workspaceRoot, `${WORKSPACE_METADATA_DIR}/cache/assets`);
 }
 
+export function resolveScreenshotCacheDir(workspaceRoot: string): string {
+  return resolveWorkspacePath(workspaceRoot, WORKSPACE_METADATA_DIR, "cache", "screenshot");
+}
+
 export function resolveGeneratedCodeCacheDir(workspaceRoot: string): string {
   return resolveWorkspacePath(workspaceRoot, WORKSPACE_METADATA_DIR, "cache", "generated");
 }

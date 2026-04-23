@@ -3,12 +3,18 @@ import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { createApplication } from "../application/factory.js";
 import { ServiceError, toServiceError } from "../core/errors.js";
 import type { ConvertExecutionHooks, ConvertProgressUpdate } from "../core/interfaces.js";
-import type { ConvertFigmaNodeUseCase, GetCapabilitiesUseCase } from "../application/useCases.js";
+import type {
+  ConvertFigmaNodeUseCase,
+  FetchFigmaNodeScreenshotUseCase,
+  GetCapabilitiesUseCase,
+} from "../application/useCases.js";
 import {
   convertHelpRequestSchema,
   convertHelpResponseSchema,
   convertRequestSchema,
   convertResponseSchema,
+  fetchScreenshotRequestSchema,
+  fetchScreenshotResponseSchema,
 } from "./schemas.js";
 import { createConvertHelpResponse } from "./convertToolMetadata.js";
 import { MCP_SERVER_NAME, PRODUCT_VERSION } from "../product.js";
@@ -44,7 +50,11 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
     version: PRODUCT_VERSION,
   });
 
-  const handlers = createToolHandlers(app.convertUseCase, app.capabilitiesUseCase);
+  const handlers = createToolHandlers(
+    app.convertUseCase,
+    app.capabilitiesUseCase,
+    app.screenshotUseCase,
+  );
 
   server.registerTool(
     "figma_to_code_convert",
@@ -57,6 +67,19 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
       annotations: readOnlyAnnotations,
     },
     handlers.convert,
+  );
+
+  server.registerTool(
+    "figma_to_code_fetch_screenshot",
+    {
+      title: "Figma To Code Fetch Screenshot",
+      description:
+        "Fetch a screenshot image for a single Figma node and cache it as Preview.png under the workspace cache directory.",
+      inputSchema: fetchScreenshotRequestSchema,
+      outputSchema: fetchScreenshotResponseSchema,
+      annotations: readOnlyAnnotations,
+    },
+    handlers.fetchScreenshot,
   );
 
   server.registerTool(
@@ -78,6 +101,7 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
 export function createToolHandlers(
   convertUseCase: Pick<ConvertFigmaNodeUseCase, "execute">,
   capabilitiesUseCase: Pick<GetCapabilitiesUseCase, "execute">,
+  screenshotUseCase: Pick<FetchFigmaNodeScreenshotUseCase, "execute">,
 ) {
   return {
     convert: async (
@@ -130,6 +154,32 @@ export function createToolHandlers(
           code: "unhandled_capabilities_error",
           stage: "probe_capabilities",
           message: "Unexpected capabilities error.",
+          suggestion: "Inspect the server logs and retry the request.",
+          retryable: false,
+        });
+        return toToolErrorResult(serviceError);
+      }
+    },
+    fetchScreenshot: async (
+      request: Parameters<FetchFigmaNodeScreenshotUseCase["execute"]>[0],
+    ) => {
+      try {
+        const response = await screenshotUseCase.execute(request);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Fetched Figma node screenshot at ${response.screenshotPath}.`,
+            },
+          ],
+          structuredContent: response,
+        };
+      } catch (error) {
+        const serviceError = toServiceError(error, {
+          category: "InternalServiceError",
+          code: "unhandled_fetch_screenshot_error",
+          stage: "fetch_snapshot",
+          message: "Unexpected screenshot fetch error.",
           suggestion: "Inspect the server logs and retry the request.",
           retryable: false,
         });

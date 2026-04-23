@@ -107,9 +107,10 @@ curl http://127.0.0.1:3101/health
 5. 调用目标 framework generator 生成代码
 6. 返回生成代码路径与 warnings，并按环境变量决定是否返回 diagnostics
 
-当前对外提供两个 MCP 工具：
+当前对外提供三个 MCP 工具：
 
 - `figma_to_code_convert`
+- `figma_to_code_fetch_screenshot`
 - `figma_to_code_convert_help`
 
 ## `figma_to_code_convert`
@@ -142,6 +143,30 @@ curl http://127.0.0.1:3101/health
 - 公开 `figma_to_code_convert` 请求当前不暴露 `downloadImagesToLocal` / `downloadVectorsToLocal` 字段；本地资源下载行为由服务端环境变量 `DOWNLOAD_IMAGES_TO_LOCAL` / `DOWNLOAD_VECTORS_TO_LOCAL` 控制
 - `preview` 相关内部模块与响应 schema 仍然保留，但当前公开工具固定不生成 `preview`
 
+## `figma_to_code_fetch_screenshot`
+
+入参表：
+
+| 字段 | 类型 | 必填 | 默认值 | 说明 |
+|---|---|---|---|---|
+| `figmaUrl` | `string` | 是 | 无 | 单节点 Figma URL，必须包含 `node-id` |
+| `workspaceRoot` | `string` | 是 | 无 | 工作区根目录，用于保存截图缓存 |
+| `useCache` | `boolean` | 否 | `false` | 是否优先复用当前工作区下已缓存的节点截图 |
+
+返回字段：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `screenshotPath` | `string` | 相对 `workspaceRoot` 的截图缓存路径 |
+| `fileKey` | `string` | 从 `figmaUrl` 解析出的 file key |
+| `nodeId` | `string` | 归一化后的节点 id |
+
+说明：
+
+- 这是独立的 Figma 节点截图工具，与现有 HTML preview 能力无关
+- 截图固定写入 `<workspaceRoot>/.figma-to-code/cache/screenshot/<fileKey>/<nodeId>/Preview.png`
+- `useCache=true` 时，若目标截图文件已存在，则不会再次请求 Figma 截图导出接口
+
 缓存默认写入：
 
 - `<workspaceRoot>/.figma-to-code/cache/rest/`
@@ -167,7 +192,7 @@ curl http://127.0.0.1:3101/health
 |---|---|---|---|---|
 | `FIGMA_ACCESS_TOKEN` | `string` | 是 | 无 | Figma API token，服务启动必需 |
 | `FIGMA_API_BASE_URL` | `string` | 否 | `https://api.figma.com` | Figma API 基地址 |
-| `HTTP_TIMEOUT_MS` | `number` | 否 | `15000` | HTTP 请求超时毫秒数 |
+| `HTTP_TIMEOUT_MS` | `number` | 否 | `60000` | HTTP 请求超时毫秒数 |
 | `HTTP_RETRY_MAX` | `number` | 否 | `2` | HTTP 最大重试次数 |
 | `HTTP_MAX_CONCURRENCY` | `number` | 否 | `6` | HTTP 并发上限 |
 | `CACHE_TTL_MS` | `number` | 否 | `300000` | 通用缓存 TTL |

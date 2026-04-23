@@ -4,6 +4,8 @@ import type {
   ConvertRequest,
   ConvertResponse,
   ConversionOptions,
+  FetchScreenshotRequest,
+  FetchScreenshotResponse,
   GenerationMode,
   SourceSnapshot,
 } from "../core/contracts.js";
@@ -17,6 +19,7 @@ import type {
   DiagnosticsBuilder,
   Normalizer,
   PreviewGenerator,
+  ScreenshotArtifactWriter,
   SnapshotAdapter,
   SourceGateway,
   SourceResolver,
@@ -378,5 +381,60 @@ export class GetCapabilitiesUseCase {
       features: snapshot.features,
       limits: snapshot.limits,
     };
+  }
+}
+
+export class FetchFigmaNodeScreenshotUseCase {
+  constructor(
+    private readonly tracer: Tracer,
+    private readonly sourceResolver: SourceResolver,
+    private readonly sourceGateway: SourceGateway,
+    private readonly screenshotArtifactWriter: ScreenshotArtifactWriter,
+    private readonly metrics: Metrics = noopMetrics,
+  ) {}
+
+  async execute(request: FetchScreenshotRequest): Promise<FetchScreenshotResponse> {
+    return await withRequestCache(async () => {
+      const workspace = {
+        workspaceRoot: resolveWorkspaceRoot(request.workspaceRoot ?? process.cwd()),
+        useCache: request.useCache ?? false,
+      };
+      const target = this.sourceResolver.resolve(request.figmaUrl);
+      const nodeId = target.nodeIds[0];
+      const traceId = this.tracer.createTraceId();
+
+      this.metrics.increment("figma_screenshot_request_total", 1);
+
+      const cachedScreenshotPath = workspace.useCache
+        ? await this.screenshotArtifactWriter.readCached(target, workspace)
+        : undefined;
+      if (cachedScreenshotPath) {
+        this.metrics.increment("figma_screenshot_cache_hit_total", 1);
+        return {
+          screenshotPath: cachedScreenshotPath,
+          fileKey: target.fileKey,
+          nodeId,
+        };
+      }
+
+      this.metrics.increment("figma_screenshot_cache_miss_total", 1);
+      const screenshot = await this.sourceGateway.fetchScreenshot(target, workspace);
+      const screenshotPath = await this.screenshotArtifactWriter.write({
+        target,
+        workspace,
+        buffer: screenshot.buffer,
+        contentType: screenshot.contentType,
+      });
+
+      this.metrics.increment("figma_screenshot_success_total", 1, {
+        traceId,
+      });
+
+      return {
+        screenshotPath,
+        fileKey: target.fileKey,
+        nodeId,
+      };
+    });
   }
 }

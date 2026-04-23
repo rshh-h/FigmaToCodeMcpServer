@@ -1,4 +1,5 @@
 import { CapabilityProbeAdapter } from "../adapters/capabilityProbe.js";
+import { FileScreenshotArtifactWriter } from "../adapters/fileScreenshotArtifactWriter.js";
 import { FigmaRestGateway } from "../adapters/figmaRestGateway.js";
 import { GeneratorAdapter } from "../adapters/generatorAdapter.js";
 import { FileCodeArtifactWriter } from "../adapters/fileCodeArtifactWriter.js";
@@ -8,7 +9,11 @@ import { PreviewAdapter } from "../adapters/previewAdapter.js";
 import { SourceSnapshotAdapter } from "../adapters/sourceSnapshotAdapter.js";
 import { FigmaLinkParserAdapter } from "../adapters/sourceResolver.js";
 import { DefaultDiagnosticsBuilder } from "./diagnosticsBuilder.js";
-import { ConvertFigmaNodeUseCase, GetCapabilitiesUseCase } from "./useCases.js";
+import {
+  ConvertFigmaNodeUseCase,
+  FetchFigmaNodeScreenshotUseCase,
+  GetCapabilitiesUseCase,
+} from "./useCases.js";
 import { readConfig } from "../infrastructure/config.js";
 import { HttpClient } from "../infrastructure/httpClient.js";
 import { stderrLogger } from "../infrastructure/logger.js";
@@ -96,6 +101,14 @@ export function createApplication(env: NodeJS.ProcessEnv = process.env) {
     metrics,
   );
 
+  const screenshotUseCase = new FetchFigmaNodeScreenshotUseCase(
+    uuidTracer,
+    new FigmaLinkParserAdapter(),
+    gateway,
+    new FileScreenshotArtifactWriter(),
+    metrics,
+  );
+
   const capabilitiesUseCase = new GetCapabilitiesUseCase(capabilityProbe);
 
   return {
@@ -104,6 +117,7 @@ export function createApplication(env: NodeJS.ProcessEnv = process.env) {
       await capabilityProbe.getServiceSnapshot();
     },
     convertUseCase,
+    screenshotUseCase,
     capabilitiesUseCase,
   };
 }

@@ -4,6 +4,8 @@ import type {
   ConversionOptions,
   ConvertRequest,
   DiagnosticsReport,
+  FetchScreenshotRequest,
+  FetchScreenshotResponse,
   NormalizedTree,
   PreviewArtifact,
   ResolvedNodeTarget,
@@ -56,6 +58,13 @@ export interface SourceGateway {
     fileKey: string,
     workspace: WorkspaceRequestOptions,
   ): Promise<unknown | undefined>;
+  fetchScreenshot(
+    target: ResolvedNodeTarget,
+    workspace: WorkspaceRequestOptions,
+  ): Promise<{
+    buffer: Buffer;
+    contentType: string;
+  }>;
   probeVariables(fileKey?: string, workspace?: WorkspaceRequestOptions): Promise<boolean>;
   probeAuthentication?(): Promise<boolean>;
 }
@@ -128,9 +137,26 @@ export interface DiagnosticsBuilder {
   ): DiagnosticsReport;
 }
 
+export interface ScreenshotArtifactWriter {
+  readCached(
+    target: ResolvedNodeTarget,
+    workspace: WorkspaceRequestOptions,
+  ): Promise<string | undefined>;
+  write(input: {
+    target: ResolvedNodeTarget;
+    workspace: WorkspaceRequestOptions;
+    buffer: Buffer;
+    contentType: string;
+  }): Promise<string>;
+}
+
 export interface ConvertUseCase {
   execute(request: ConvertRequest, hooks?: ConvertExecutionHooks): Promise<{
     artifact: ConversionArtifact;
     diagnostics?: DiagnosticsReport;
   }>;
+}
+
+export interface FetchScreenshotUseCase {
+  execute(request: FetchScreenshotRequest): Promise<FetchScreenshotResponse>;
 }

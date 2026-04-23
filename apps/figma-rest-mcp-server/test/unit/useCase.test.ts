@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { ConvertFigmaNodeUseCase } from "../../src/application/useCases.js";
+import {
+  ConvertFigmaNodeUseCase,
+  FetchFigmaNodeScreenshotUseCase,
+} from "../../src/application/useCases.js";
 import { InMemoryMetrics } from "../../src/infrastructure/metrics.js";
 
 describe("ConvertFigmaNodeUseCase", () => {
@@ -70,6 +73,9 @@ describe("ConvertFigmaNodeUseCase", () => {
         },
         async fetchVariables() {
           return undefined;
+        },
+        async fetchScreenshot() {
+          throw new Error("unused");
         },
         async probeVariables() {
           return false;
@@ -240,6 +246,9 @@ describe("ConvertFigmaNodeUseCase", () => {
         },
         async fetchVariables() {
           return undefined;
+        },
+        async fetchScreenshot() {
+          throw new Error("unused");
         },
         async probeVariables() {
           return false;
@@ -417,6 +426,9 @@ describe("ConvertFigmaNodeUseCase", () => {
         async fetchVariables() {
           return undefined;
         },
+        async fetchScreenshot() {
+          throw new Error("unused");
+        },
         async probeVariables() {
           return false;
         },
@@ -511,6 +523,71 @@ describe("ConvertFigmaNodeUseCase", () => {
       effective: false,
       supportLevel: "partial",
       reason: "vectors fetch failed and the conversion continued without embedded vectors.",
+    });
+  });
+});
+
+describe("FetchFigmaNodeScreenshotUseCase", () => {
+  it("reuses a cached screenshot path when useCache is enabled", async () => {
+    const metrics = new InMemoryMetrics();
+    const useCase = new FetchFigmaNodeScreenshotUseCase(
+      { createTraceId: () => "trace-screenshot" },
+      {
+        resolve() {
+          return {
+            fileKey: "FILE",
+            nodeIds: ["1:2"],
+            raw: { url: "https://www.figma.com/design/FILE/Demo?node-id=1-2" },
+            sourceKind: "url",
+          };
+        },
+      },
+      {
+        async fetchNodes() {
+          throw new Error("unused");
+        },
+        async fetchImages() {
+          throw new Error("unused");
+        },
+        async fetchVectors() {
+          throw new Error("unused");
+        },
+        async fetchVariables() {
+          throw new Error("unused");
+        },
+        async fetchScreenshot() {
+          throw new Error("network should be skipped");
+        },
+        async probeVariables() {
+          return false;
+        },
+      },
+      {
+        async readCached() {
+          return ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png";
+        },
+        async write() {
+          throw new Error("write should be skipped");
+        },
+      },
+      metrics,
+    );
+
+    const result = await useCase.execute({
+      figmaUrl: "https://www.figma.com/design/FILE/Demo?node-id=1-2",
+      workspaceRoot: process.cwd(),
+      useCache: true,
+    });
+
+    expect(result).toEqual({
+      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+      fileKey: "FILE",
+      nodeId: "1:2",
+    });
+    expect(metrics.increments).toContainEqual({
+      name: "figma_screenshot_cache_hit_total",
+      value: 1,
+      tags: undefined,
     });
   });
 });

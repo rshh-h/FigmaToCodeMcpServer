@@ -54,8 +54,6 @@ Current boundary patterns:
 
 When adding a new boundary, prefer Zod or another existing parsing point over scattered manual checks.
 
----
-
 ## Assertions and `any`
 
 `any` exists in the codebase, mostly around Figma plugin compatibility and legacy generator code in `packages/codegen-kernel`.

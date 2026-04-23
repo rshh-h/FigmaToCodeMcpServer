@@ -95,6 +95,56 @@ describe("FigmaRestGateway", () => {
     });
   });
 
+  it("downloads png screenshots from signed export URLs", async () => {
+    const workspace = createWorkspace();
+    const getJson = vi.fn().mockResolvedValue({
+      images: {
+        "1:2": "https://signed.example.com/node.png",
+      },
+    });
+    const getBinary = vi.fn().mockResolvedValue({
+      buffer: Buffer.from("png"),
+      contentType: "image/png",
+    });
+    const gateway = new FigmaRestGateway(
+      readConfig({ FIGMA_ACCESS_TOKEN: "token" }),
+      { getJson, getBinary } as any,
+      new TokenProvider(readConfig({ FIGMA_ACCESS_TOKEN: "token" })),
+      stderrLogger,
+      noopMetrics,
+    );
+
+    const screenshot = await withRequestCache(async () => {
+      return await gateway.fetchScreenshot(
+        {
+          fileKey: "FILE",
+          nodeIds: ["1:2"],
+          raw: { url: "https://www.figma.com/design/FILE/Demo?node-id=1-2" },
+          sourceKind: "url",
+        },
+        workspace,
+      );
+    });
+
+    expect(screenshot).toEqual({
+      buffer: Buffer.from("png"),
+      contentType: "image/png",
+    });
+    expect(getJson).toHaveBeenCalledWith({
+      path: "/v1/images/FILE",
+      headers: {
+        "X-Figma-Token": "token",
+      },
+      query: {
+        ids: "1:2",
+        format: "png",
+      },
+    });
+    expect(getBinary).toHaveBeenCalledWith({
+      url: "https://signed.example.com/node.png",
+    });
+  });
+
   it("drops non-SVG payloads returned by signed vector URLs", async () => {
     const workspace = createWorkspace();
     const getJson = vi.fn().mockResolvedValue({

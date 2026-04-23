@@ -30,7 +30,7 @@ const fontFamilyConfigFromEnv = z.preprocess((value) => {
 export const configSchema = z.object({
   FIGMA_ACCESS_TOKEN: z.string().min(1).optional(),
   FIGMA_API_BASE_URL: z.string().url().default("https://api.figma.com"),
-  HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
+  HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
   HTTP_RETRY_MAX: z.coerce.number().int().min(0).max(5).default(2),
   HTTP_MAX_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(6),
   CACHE_TTL_MS: z.coerce.number().int().positive().default(300_000),

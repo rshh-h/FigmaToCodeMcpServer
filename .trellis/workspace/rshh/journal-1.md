@@ -38,3 +38,36 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: 完成 Figma 节点截图工具
+
+**Date**: 2026-04-23
+**Task**: 完成 Figma 节点截图工具
+**Branch**: `main`
+
+### Summary
+
+新增 figma_to_code_fetch_screenshot 工具，支持将单节点截图缓存到独立 screenshot 目录；同步更新中英文 README、backend spec，并完成 type-check、test、build 验证。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1273919` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

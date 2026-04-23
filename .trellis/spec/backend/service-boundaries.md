@@ -120,3 +120,74 @@ Examples:
 - Patching isolated bugs with growing `if` trees when the real issue is missing structure or abstraction
 - Adding a second implementation path instead of reusing and extending an existing shared path
 - Avoiding the real fix by forcing a fallback path that changes or weakens existing behavior
+
+## Scenario: Standalone Figma Node Screenshot Tool
+
+### 1. Scope / Trigger
+
+- Trigger: 新增公开 MCP tool `figma_to_code_fetch_screenshot`
+- 原因: 这是新的跨层接口签名，贯穿 transport schema、application use case、Figma REST gateway 与 workspace cache 写入
+
+### 2. Signatures
+
+- MCP tool: `figma_to_code_fetch_screenshot`
+- Request:
+  - `figmaUrl: string`
+  - `workspaceRoot: string`
+  - `useCache?: boolean`
+- Response:
+  - `screenshotPath: string`
+  - `fileKey: string`
+  - `nodeId: string`
+
+### 3. Contracts
+
+- 输入 `figmaUrl` 必须是单节点 Figma URL，并包含 `node-id`
+- `workspaceRoot` 是截图缓存根目录；输出文件写入该目录下的 workspace cache
+- `useCache=true` 时，优先复用现有截图文件
+- 返回的 `screenshotPath` 必须是相对 `workspaceRoot` 的路径
+- 截图文件固定落在 `.figma-to-code/cache/screenshot/<fileKey>/<nodeId>/Preview.png`
+- 该 tool 只表示 Figma REST 导出的截图文件，不能复用 HTML preview artifact 语义
+
+### 4. Validation & Error Matrix
+
+- `figmaUrl` 缺失 file key -> `invalid_figma_url`
+- `figmaUrl` 缺失 `node-id` -> `missing_source_node_id`
+- Figma 导出接口未返回目标节点截图 URL -> `figma_screenshot_not_found`
+- 下载内容不是 PNG -> `figma_screenshot_invalid_content_type`
+- 其他未归类异常 -> transport 层统一映射为 `unhandled_fetch_screenshot_error`
+
+### 5. Good/Base/Bad Cases
+
+- Good: 合法单节点 URL，首次请求下载 PNG，并返回 `.figma-to-code/cache/screenshot/FILE/1-2/Preview.png`
+- Base: `useCache=true` 且目标文件已存在，直接返回已有路径，不再次请求 Figma
+- Bad: 把该工具的输出挂到 `ConvertResponse.preview` 或复用 `PreviewArtifact`
+
+### 6. Tests Required
+
+- Schema unit test:
+  - 合法 `figmaUrl` 可通过
+  - 缺失 `node-id` 时拒绝
+  - `useCache` 默认值为 `false`
+- Gateway unit test:
+  - 调用 `/v1/images/<fileKey>` 且 `format=png`
+  - 使用 signed URL 下载二进制 PNG
+- Writer unit test:
+  - 文件写入 `.figma-to-code/cache/screenshot/<fileKey>/<nodeId>/Preview.png`
+  - 返回相对 `workspaceRoot` 路径
+- MCP handler contract test:
+  - 返回 `screenshotPath/fileKey/nodeId`
+  - 文本响应描述截图缓存结果
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+- 在 `figma_to_code_convert` 里追加一个 `previewPath`
+- 或把截图文件塞进 `PreviewArtifact.html`
+
+#### Correct
+
+- 新增独立 tool `figma_to_code_fetch_screenshot`
+- 在独立 use case 中解析 URL、命中/写入缓存、返回截图路径
+- 仅复用 `SourceResolver`、`SourceGateway`、workspace cache 能力，不复用 HTML preview 链路

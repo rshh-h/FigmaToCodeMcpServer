@@ -54,6 +54,10 @@ When a change affects generated output, update or add the corresponding fixture/
 - Add package-appropriate tests for new behavior, especially schema, error, cache, and output changes.
 - Preserve deterministic fixtures and golden outputs.
 - Keep NodeNext-compatible `.js` import specifiers in TypeScript source.
+- When adding or changing a public MCP tool in `apps/figma-rest-mcp-server`, update the npm-facing `apps/figma-rest-mcp-server/README.md` with user-facing usage documentation.
+- Public tool usage docs in the npm-facing README should stay concise and focus on how to use the tool, not parameter-by-parameter breakdowns or implementation details.
+- Prefer a short purpose statement plus one example prompt or invocation shape.
+- If the npm-facing README is bilingual, keep the Chinese and English sections in sync when adding or revising public tool usage docs.
 - Before making a non-trivial change, align with the user on the intended solution and major tradeoffs.
 - If a solution is degraded, partial, or constrained by known blockers, say so explicitly in the completion message.
 - Consider whether request parameters, environment variables, and built-in defaults change the final output before declaring the fix correct.

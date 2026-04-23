@@ -64,6 +64,9 @@ describe("case-007 mocked e2e", () => {
       async fetchVariables() {
         return undefined;
       },
+      async fetchScreenshot() {
+        throw new Error("unused");
+      },
       async probeVariables() {
         return false;
       },

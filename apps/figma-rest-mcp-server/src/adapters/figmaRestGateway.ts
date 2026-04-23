@@ -367,6 +367,54 @@ export class FigmaRestGateway implements SourceGateway {
     });
   }
 
+  async fetchScreenshot(
+    target: ResolvedNodeTarget,
+    workspace: WorkspaceRequestOptions,
+  ): Promise<{
+    buffer: Buffer;
+    contentType: string;
+  }> {
+    const cacheKey = `screenshot:${target.fileKey}:${target.nodeIds.join(",")}`;
+    const effectiveWorkspace = this.defaultWorkspace(workspace);
+
+    return await rememberInRequestCache(cacheKey, async () => {
+      const nodeId = target.nodeIds[0];
+      const body = await this.httpClient.getJson<{
+        images?: Record<string, string>;
+      }>({
+        path: `/v1/images/${target.fileKey}`,
+        headers: {
+          "X-Figma-Token": this.tokenProvider.getToken(),
+        },
+        query: {
+          ids: target.nodeIds.join(","),
+          format: "png",
+        },
+      });
+
+      const signedUrl = body.images?.[nodeId];
+      if (!signedUrl) {
+        throw new ServiceError({
+          category: "SourceNotFoundError",
+          code: "figma_screenshot_not_found",
+          stage: "fetch_snapshot",
+          message: "The requested Figma node screenshot could not be exported.",
+          suggestion: "Check the file key, node id, and Figma access permissions.",
+          retryable: false,
+          details: {
+            fileKey: target.fileKey,
+            nodeId,
+            workspaceRoot: effectiveWorkspace.workspaceRoot,
+          },
+        });
+      }
+
+      return await this.httpClient.getBinary({
+        url: signedUrl,
+      });
+    });
+  }
+
   async probeVariables(
     fileKey?: string,
     workspace?: WorkspaceRequestOptions,
