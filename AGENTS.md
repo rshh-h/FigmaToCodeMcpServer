@@ -1,7 +1,22 @@
-# 代码编写要求
+<!-- TRELLIS:START -->
+# Trellis Instructions
 
-1 有架构思想，不要为了修改各种单点问题，加很多 if 分支。分支多的时候考虑重构。
-2 尽可能复用已有的通用逻辑，避免分散实现
-3 所有修改都先和用户讨论方案，再修改
-4 禁止实现到一半就说做好了。降级实现等情况要在完成时和用户明确提出来
-5 修改时考虑参数对最终输出的影响，例如环境变量参数，内置参数等
+These instructions are for AI assistants working in this project.
+
+Use the `/trellis:start` command when starting a new session to:
+- Initialize your developer identity
+- Understand current project context
+- Read relevant guidelines
+
+Use `@/.trellis/` to learn:
+- Development workflow (`workflow.md`)
+- Project structure guidelines (`spec/`)
+- Developer workspace (`workspace/`)
+
+If you're using Codex, project-scoped helpers may also live in:
+- `.agents/skills/` for reusable Trellis skills
+- `.codex/agents/` for optional custom subagents
+
+Keep this managed block so 'trellis update' can refresh the instructions.
+
+<!-- TRELLIS:END -->
