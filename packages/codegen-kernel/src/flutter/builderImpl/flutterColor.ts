@@ -1,13 +1,13 @@
-import { StarNode } from "./../../api_types";
-import { rgbTo8hex } from "../../common/color";
-import { addWarning } from "../../common/commonConversionWarnings";
+import { StarNode } from "./../../api_types.js";
+import { rgbTo8hex } from "../../common/color.js";
+import { addWarning } from "../../common/commonConversionWarnings.js";
 import {
   generateWidgetCode,
   numberToFixedString,
-} from "../../common/numToAutoFixed";
-import { retrieveTopFill } from "../../common/retrieveFill";
-import { getPlaceholderImage } from "../../common/images";
-import { GradientPaint, ImagePaint, Paint } from "../../api_types";
+} from "../../common/numToAutoFixed.js";
+import { retrieveTopFill } from "../../common/retrieveFill.js";
+import { getPlaceholderImage } from "../../common/images.js";
+import { GradientPaint } from "../../api_types.js";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
@@ -31,7 +31,7 @@ export const flutterColorFromFills = (
 export const flutterColorFromDirectFills = (
   fills: ReadonlyArray<Paint>,
 ): string => {
-  const fill = retrieveTopFill(fills);
+  const fill = retrieveTopFill(fills) as Paint | undefined;
 
   if (fill && fill.type === "SOLID") {
     return flutterColor(
@@ -68,7 +68,7 @@ export const flutterBoxDecorationColor = (
   let fills: ReadonlyArray<Paint>;
   fills = node[propertyPath as keyof SceneNode] as ReadonlyArray<Paint>;
 
-  const fill = retrieveTopFill(fills);
+  const fill = retrieveTopFill(fills) as Paint | undefined;
 
   if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
@@ -80,7 +80,7 @@ export const flutterBoxDecorationColor = (
     fill?.type === "GRADIENT_RADIAL" ||
     fill?.type === "GRADIENT_ANGULAR"
   ) {
-    return { gradient: flutterGradient(fill) };
+    return { gradient: flutterGradient(fill as unknown as GradientPaint) };
   } else if (fill?.type === "IMAGE") {
     return { image: flutterDecorationImage(node, fill) };
   }
@@ -97,13 +97,15 @@ export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
 };
 
 const fitToBoxFit = (fill: ImagePaint): string => {
+  if ((fill.scaleMode as string | undefined) === "STRETCH") {
+    return "BoxFit.fill";
+  }
+
   switch (fill.scaleMode) {
     case "FILL":
       return "BoxFit.cover"; // FILL in Figma covers the entire area, similar to BoxFit.cover
     case "FIT":
       return "BoxFit.contain"; // FIT in Figma fits the image while maintaining aspect ratio, like BoxFit.contain
-    case "STRETCH":
-      return "BoxFit.fill"; // STRETCH in Figma stretches the image, like BoxFit.fill
     case "TILE":
       return "BoxFit.none"; // TILE doesn't have a direct equivalent, but BoxFit.none is closest
     default:

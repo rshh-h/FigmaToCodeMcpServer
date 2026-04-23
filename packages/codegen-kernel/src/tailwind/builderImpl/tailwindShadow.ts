@@ -1,4 +1,4 @@
-import { localTailwindSettings } from "../tailwindMain";
+import { localTailwindSettings } from "../tailwindMain.js";
 
 /**
  * https://tailwindcss.com/docs/box-shadow/

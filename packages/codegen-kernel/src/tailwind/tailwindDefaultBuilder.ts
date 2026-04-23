@@ -1,40 +1,41 @@
 import {
   stringToClassName,
   numberToFixedString,
-} from "./../common/numToAutoFixed";
-import { tailwindShadow } from "./builderImpl/tailwindShadow";
+} from "./../common/numToAutoFixed.js";
+import { tailwindShadow } from "./builderImpl/tailwindShadow.js";
 import {
   tailwindVisibility,
   tailwindRotation,
   tailwindOpacity,
   tailwindBlendMode,
   tailwindBackgroundBlendMode,
-} from "./builderImpl/tailwindBlend";
+} from "./builderImpl/tailwindBlend.js";
 import {
   tailwindBorderWidth,
   tailwindBorderRadius,
-} from "./builderImpl/tailwindBorder";
+} from "./builderImpl/tailwindBorder.js";
 import {
   tailwindBackgroundLayerClassesFromFills,
   tailwindColorFromFills,
   tailwindGradientFromFills,
-} from "./builderImpl/tailwindColor";
-import { tailwindSizePartial } from "./builderImpl/tailwindSize";
-import { tailwindPadding } from "./builderImpl/tailwindPadding";
+} from "./builderImpl/tailwindColor.js";
+import { tailwindSizePartial } from "./builderImpl/tailwindSize.js";
+import { tailwindPadding } from "./builderImpl/tailwindPadding.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
-import { pxToBlur } from "./conversionTables";
+} from "../common/commonPosition.js";
+import { pxToBlur } from "./conversionTables.js";
 import {
   formatDataAttribute,
   formatStyleAttribute,
   formatTwigAttribute,
   getClassLabel,
   sanitizeAttributeName,
-} from "../common/commonFormatAttributes";
-import { TailwindColorType, TailwindSettings } from "../pluginTypes";
-import { MinimalFillsTrait, MinimalStrokesTrait, Paint } from "../api_types";
+} from "../common/commonFormatAttributes.js";
+import { TailwindColorType, TailwindSettings } from "../pluginTypes.js";
+import { MinimalFillsTrait, MinimalStrokesTrait } from "../api_types.js";
+import { hasEffectRadius } from "../common/effectGuards.js";
 
 const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -103,7 +104,9 @@ export class TailwindDefaultBuilder {
   }
 
   commonShapeStyles(): this {
-    this.customColor((this.node as MinimalFillsTrait).fills, "bg");
+    if ("fills" in this.node) {
+      this.customColor(this.node.fills, "bg");
+    }
     this.radius();
     this.shadow();
     this.border();
@@ -172,7 +175,10 @@ export class TailwindDefaultBuilder {
    * example: text-opacity-25
    * example: bg-blue-500
    */
-  customColor(paint: ReadonlyArray<Paint>, kind: TailwindColorType): this {
+  customColor(
+    paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
+    kind: TailwindColorType,
+  ): this {
     if (this.visible) {
       if (
         kind === "bg" &&
@@ -186,7 +192,9 @@ export class TailwindDefaultBuilder {
         gradient = tailwindGradientFromFills(paint);
 
         // Add background blend mode class if applicable
-        const blendModeClass = tailwindBackgroundBlendMode(paint);
+        const blendModeClass = Array.isArray(paint)
+          ? tailwindBackgroundBlendMode(paint)
+          : "";
         if (blendModeClass) {
           this.addAttributes(blendModeClass);
         }
@@ -256,7 +264,8 @@ export class TailwindDefaultBuilder {
     const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find(
-        (e) => e.type === "LAYER_BLUR" && e.visible,
+        (e): e is BlurEffect =>
+          e.type === "LAYER_BLUR" && e.visible && hasEffectRadius(e),
       );
       if (blur) {
         const blurValue = pxToBlur(blur.radius / 2);
@@ -268,7 +277,8 @@ export class TailwindDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR" && e.visible,
+        (e): e is BlurEffect =>
+          e.type === "BACKGROUND_BLUR" && e.visible && hasEffectRadius(e),
       );
       if (backgroundBlur) {
         const backgroundBlurValue = pxToBlur(backgroundBlur.radius / 2);

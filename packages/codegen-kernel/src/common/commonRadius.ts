@@ -1,5 +1,5 @@
-import { CornerRadius } from "../pluginTypes";
-import { figma } from "../runtime/figma";
+import { CornerRadius } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
 
 export const getCommonRadius = (node: SceneNode): CornerRadius => {
   if ("rectangleCornerRadii" in node) {

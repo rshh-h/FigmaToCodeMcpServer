@@ -1,18 +1,19 @@
-import { formatMultipleJSX, formatWithJSX, escapeJSXText } from "../common/parseJSX";
-import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { htmlColorFromFills } from "./builderImpl/htmlColor";
+import { formatMultipleJSX, formatWithJSX, escapeJSXText } from "../common/parseJSX.js";
+import { HtmlDefaultBuilder } from "./htmlDefaultBuilder.js";
+import { htmlColorFromFills } from "./builderImpl/htmlColor.js";
 import {
   commonLetterSpacing,
   commonLineHeight,
-} from "../common/commonTextHeightSpacing";
-import { HTMLSettings, StyledTextSegmentSubset } from "../pluginTypes";
-import { figma } from "../runtime/figma";
+} from "../common/commonTextHeightSpacing.js";
+import { HTMLSettings, StyledTextSegmentSubset } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
+import { isLayerBlurEffect } from "../common/effectGuards.js";
 import {
   cssCollection,
   generateUniqueClassName,
   stylesToCSS,
   getComponentName,
-} from "./htmlMain";
+} from "./htmlMain.js";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: TextNode, settings: HTMLSettings) {
@@ -255,8 +256,8 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     if (this.node && (this.node as TextNode).effects) {
       const effects = (this.node as TextNode).effects;
       const blurEffect = effects.find(
-        (effect) =>
-          effect.type === "LAYER_BLUR" &&
+        (effect): effect is BlurEffect & { type: "LAYER_BLUR" } =>
+          isLayerBlurEffect(effect) &&
           effect.visible !== false &&
           effect.radius > 0,
       );

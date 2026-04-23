@@ -1,5 +1,5 @@
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { SwiftUIModifier } from "../../pluginTypes";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { SwiftUIModifier } from "../../pluginTypes.js";
 
 export const swiftuiShadow = (node: SceneNode): SwiftUIModifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {

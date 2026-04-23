@@ -1,9 +1,9 @@
-import { AltNode } from "../pluginTypes";
-import { curry } from "../common/curry";
-import { exportAsyncProxy } from "../common/exportAsyncProxy";
-import { addWarning } from "../common/commonConversionWarnings";
-import { getVariableNameFromColor } from "./jsonNodeConversion";
-import { htmlColor } from "../html/builderImpl/htmlColor";
+import { AltNode } from "../pluginTypes.js";
+import { curry } from "../common/curry.js";
+import { exportAsyncProxy } from "../common/exportAsyncProxy.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { getVariableNameFromColor } from "./jsonNodeConversion.js";
+import { htmlColor } from "../html/builderImpl/htmlColor.js";
 
 export const overrideReadonlyProperty = curry(
   <T, K extends keyof T>(prop: K, value: any, obj: T): T =>

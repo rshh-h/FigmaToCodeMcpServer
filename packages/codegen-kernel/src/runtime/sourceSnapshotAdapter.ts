@@ -1,7 +1,26 @@
-import type { KernelSourceSnapshot } from "../types";
-import { deriveTextSegmentsFromRestNode } from "./restNodeUtils";
+import type { StyledTextSegmentSubset } from "../pluginTypes.js";
+import type { KernelSourceSnapshot } from "../types.js";
+import { deriveTextSegmentsFromRestNode } from "./restNodeUtils.js";
 
 const MIXED = Symbol.for("figma-source-snapshot-adapter.mixed");
+
+type SnapshotSceneNode = SceneNode & {
+  parent?: SnapshotSceneNode | null;
+  children?: SnapshotSceneNode[];
+  exportAsync?: (
+    settings:
+      | ExportSettings
+      | ExportSettingsSVGString
+      | ExportSettingsREST
+      | undefined,
+  ) => Promise<unknown>;
+  getStyledTextSegments?: (fields?: string[]) => StyledTextSegmentSubset[];
+  localImagePath?: string;
+  localVectorPath?: string;
+  isLocalVectorChild?: boolean;
+  localVectorRootId?: string;
+  canBeFlattened?: boolean;
+};
 
 function cloneJson<T>(value: T): T {
   return value == null ? value : JSON.parse(JSON.stringify(value));
@@ -109,7 +128,7 @@ export async function createSourceSnapshotPluginApiAdapter(input: {
 }) {
   const { snapshot } = input;
   const rawNodeById = new Map<string, Record<string, unknown>>();
-  const decoratedNodeById = new Map<string, SceneNode>();
+  const decoratedNodeById = new Map<string, SnapshotSceneNode>();
   const textSegmentsCache = new Map<string, StyledTextSegmentSubset[]>();
   const localVectorRoots = new Map(
     (snapshot.localVectorRootMappings ?? []).map((mapping) => [
@@ -127,10 +146,10 @@ export async function createSourceSnapshotPluginApiAdapter(input: {
   }
 
   const adapter = {
-    mixed: MIXED as PluginAPI["mixed"],
+    mixed: MIXED as unknown as PluginAPI["mixed"],
     variables: new SnapshotVariablesApi(variableMap),
     currentPage: {
-      selection: [] as SceneNode[],
+      selection: [] as SnapshotSceneNode[],
     },
     async getNodeByIdAsync(nodeId: string) {
       return decoratedNodeById.get(nodeId) ?? null;
@@ -140,7 +159,7 @@ export async function createSourceSnapshotPluginApiAdapter(input: {
       for (const selectionNode of adapter.currentPage.selection) {
         collectPaints(selectionNode, paints);
       }
-      return { paints };
+      return { paints, styles: [] };
     },
     getImageByHash(imageHash: string) {
       const imageUrl = snapshot.imageUrls[imageHash];
@@ -153,57 +172,58 @@ export async function createSourceSnapshotPluginApiAdapter(input: {
 
   const decorateNode = (
     rawNode: Record<string, unknown>,
-    parentNode: SceneNode | null,
-  ): SceneNode => {
+    parentNode: SnapshotSceneNode | null,
+  ): SnapshotSceneNode => {
     const nodeId = rawNode.id;
     if (typeof nodeId !== "string") {
-      return rawNode as unknown as SceneNode;
+      return rawNode as unknown as SnapshotSceneNode;
     }
 
     if (decoratedNodeById.has(nodeId)) {
       return decoratedNodeById.get(nodeId)!;
     }
 
-    const decorated = cloneJson(rawNode) as SceneNode & {
-      parent?: SceneNode | null;
-      exportAsync?: (settings: ExportSettings | ExportSettingsSVGString) => Promise<unknown>;
-      getStyledTextSegments?: (fields?: string[]) => StyledTextSegmentSubset[];
-      localImagePath?: string;
-      localVectorPath?: string;
-      isLocalVectorChild?: boolean;
-      localVectorRootId?: string;
-    };
+    const decorated = cloneJson(rawNode) as unknown as SnapshotSceneNode;
 
-    decorated.parent = parentNode;
-    decorated.exportAsync = async (
-      settings:
-        | ExportSettings
-        | ExportSettingsSVGString
-        | ExportSettingsREST,
-    ) => {
-      if (settings.format === "JSON_REST_V1") {
-        return {
-          document: cloneJson(rawNode),
-        };
-      }
-
-      if (settings.format === "SVG_STRING") {
-        const svg = snapshot.vectorUrls[nodeId];
-        if (!svg) {
-          throw new Error(`No SVG content was found for node ${nodeId}`);
+    (decorated as unknown as { parent?: SnapshotSceneNode | null }).parent = parentNode;
+    (decorated as unknown as { exportAsync?: SnapshotSceneNode["exportAsync"] }).exportAsync =
+      (async (
+        settings?:
+          | ExportSettings
+          | ExportSettingsSVGString
+          | ExportSettingsREST,
+      ) => {
+        if (!settings) {
+          throw new Error(
+            `An explicit export format is required for node ${nodeId} in the snapshot adapter.`,
+          );
         }
-        return svg;
-      }
 
-      if (settings.format === "PNG") {
-        throw new Error(
-          `PNG export is unavailable for node ${nodeId} in the snapshot adapter.`,
-        );
-      }
+        if (settings.format === "JSON_REST_V1") {
+          return {
+            document: cloneJson(rawNode),
+          };
+        }
 
-      throw new Error(`Unsupported export format: ${String(settings.format)}`);
-    };
-    decorated.getStyledTextSegments = (fields?: string[]) => {
+        if (settings.format === "SVG_STRING") {
+          const svg = snapshot.vectorUrls[nodeId];
+          if (!svg) {
+            throw new Error(`No SVG content was found for node ${nodeId}`);
+          }
+          return svg;
+        }
+
+        if (settings.format === "PNG") {
+          throw new Error(
+            `PNG export is unavailable for node ${nodeId} in the snapshot adapter.`,
+          );
+        }
+
+        throw new Error(`Unsupported export format: ${String(settings.format)}`);
+      }) as unknown as SnapshotSceneNode["exportAsync"];
+    (decorated as unknown as {
+      getStyledTextSegments?: SnapshotSceneNode["getStyledTextSegments"];
+    }).getStyledTextSegments = (fields?: string[]) => {
       if (!textSegmentsCache.has(nodeId)) {
         textSegmentsCache.set(
           nodeId,
@@ -246,28 +266,37 @@ export async function createSourceSnapshotPluginApiAdapter(input: {
           ],
       ) as { imageRef?: string } | undefined;
       if (localImageFill?.imageRef) {
-        decorated.localImagePath = snapshot.localImagePaths?.[localImageFill.imageRef];
+        (decorated as unknown as { localImagePath?: string }).localImagePath =
+          snapshot.localImagePaths?.[localImageFill.imageRef];
       }
     }
 
     const localVectorRoot = localVectorRoots.get(nodeId);
     if (localVectorRoot) {
-      decorated.localVectorPath = localVectorRoot.path;
+      (decorated as unknown as { localVectorPath?: string }).localVectorPath =
+        localVectorRoot.path;
       (decorated as unknown as { canBeFlattened?: boolean }).canBeFlattened = true;
     }
 
     const localVectorRootId = localVectorChildren.get(nodeId);
     if (localVectorRootId) {
-      decorated.isLocalVectorChild = true;
-      decorated.localVectorRootId = localVectorRootId;
+      (decorated as unknown as {
+        isLocalVectorChild?: boolean;
+        localVectorRootId?: string;
+      }).isLocalVectorChild = true;
+      (decorated as unknown as {
+        isLocalVectorChild?: boolean;
+        localVectorRootId?: string;
+      }).localVectorRootId = localVectorRootId;
     }
 
     decoratedNodeById.set(nodeId, decorated);
 
     if (Array.isArray(rawNode.children)) {
-      decorated.children = rawNode.children.map((child) =>
-        decorateNode(child as Record<string, unknown>, decorated),
-      );
+      (decorated as unknown as { children?: SnapshotSceneNode[] }).children =
+        rawNode.children.map((child) =>
+          decorateNode(child as Record<string, unknown>, decorated),
+        );
     }
 
     return decorated;

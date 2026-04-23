@@ -289,6 +289,5 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
   }
 
   info.push(`Result: ${result ? "YES" : "NO"} (${reason})`);
-  if (logDetails) console.log(info.join(" | "));
   return result;
 }

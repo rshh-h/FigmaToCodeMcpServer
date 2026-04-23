@@ -1,26 +1,26 @@
 import {
   stringToClassName,
   generateWidgetCode,
-} from "../common/numToAutoFixed";
-import { retrieveTopFill } from "../common/retrieveFill";
-import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
-import { FlutterTextBuilder } from "./flutterTextBuilder";
-import { indentString } from "../common/indentString";
+} from "../common/numToAutoFixed.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { FlutterDefaultBuilder } from "./flutterDefaultBuilder.js";
+import { FlutterTextBuilder } from "./flutterTextBuilder.js";
+import { indentString } from "../common/indentString.js";
 
 import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
   getWrapAlignment,
   getWrapRunAlignment,
-} from "./builderImpl/flutterAutoLayout";
-import { PluginSettings } from "../pluginTypes";
-import { addWarning } from "../common/commonConversionWarnings";
-import { getVisibleNodes } from "../common/nodeVisibility";
+} from "./builderImpl/flutterAutoLayout.js";
+import { PluginSettings } from "../pluginTypes.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { getVisibleNodes } from "../common/nodeVisibility.js";
 import {
   getLocalImagePath,
   getLocalVectorPath,
   isLocalVectorChildNode,
-} from "../altNodes/altNodeUtils";
+} from "../altNodes/altNodeUtils.js";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -162,7 +162,11 @@ const flutterContainer = (node: SceneNode, child: string): string => {
 
   if (localImagePath) {
     propChild = `Image.asset('${localImagePath}', width: ${Math.round(node.width)}, height: ${Math.round(node.height)}, fit: BoxFit.fill)`;
-  } else if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
+  } else if (
+    "fills" in node &&
+    Array.isArray(node.fills) &&
+    (retrieveTopFill(node.fills) as { type?: string } | undefined)?.type === "IMAGE"
+  ) {
     addWarning("Image fills are replaced with placeholders");
   }
 

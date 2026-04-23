@@ -1,5 +1,5 @@
-import { pxToLayoutSize } from "../conversionTables";
-import { commonPadding } from "../../common/commonPadding";
+import { pxToLayoutSize } from "../conversionTables.js";
+import { commonPadding } from "../../common/commonPadding.js";
 
 /**
  * https://tailwindcss.com/docs/margin/

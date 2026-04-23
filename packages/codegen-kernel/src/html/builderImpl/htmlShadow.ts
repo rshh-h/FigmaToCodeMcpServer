@@ -1,4 +1,4 @@
-import { htmlColor } from "./htmlColor";
+import { htmlColor } from "./htmlColor.js";
 
 /**
  * https://tailwindcss.com/docs/box-shadow/

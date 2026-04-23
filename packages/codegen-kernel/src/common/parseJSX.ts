@@ -1,4 +1,4 @@
-import { numberToFixedString } from "./numToAutoFixed";
+import { numberToFixedString } from "./numToAutoFixed.js";
 
 const encodeHtmlEntities = (text: string): string =>
   text

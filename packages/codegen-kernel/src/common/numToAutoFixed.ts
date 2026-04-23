@@ -1,4 +1,4 @@
-import { indentStringFlutter } from "./indentString";
+import { indentStringFlutter } from "./indentString.js";
 
 // this is necessary to avoid a height of 4.999999523162842.
 export const numberToFixedString = (num: number): string => {
@@ -45,7 +45,6 @@ export const generateWidgetCode = (
   properties: Record<string, number | string | string[]>,
   positionedValues?: string[],
 ): string => {
-  console.log("properties", properties);
   const propertiesArray = Object.entries(properties)
     .filter(([, value]) => {
       if (Array.isArray(value)) {

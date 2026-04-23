@@ -1,9 +1,9 @@
-import { rgbTo8hex } from "../../common/color";
+import { rgbTo8hex } from "../../common/color.js";
 import {
   generateWidgetCode,
   numberToFixedString,
-} from "../../common/numToAutoFixed";
-import { indentStringFlutter } from "../../common/indentString";
+} from "../../common/numToAutoFixed.js";
+import { indentStringFlutter } from "../../common/indentString.js";
 
 // TODO Document it can't do flutter shadows.
 export const flutterShadow = (node: SceneNode): string => {

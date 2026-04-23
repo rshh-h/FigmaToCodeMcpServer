@@ -1,41 +1,42 @@
-import { formatWithJSX } from "../common/parseJSX";
-import { htmlShadow } from "./builderImpl/htmlShadow";
+import { formatWithJSX } from "../common/parseJSX.js";
+import { htmlShadow } from "./builderImpl/htmlShadow.js";
 import {
   htmlVisibility,
   htmlRotation,
   htmlOpacity,
   htmlBlendMode,
-} from "./builderImpl/htmlBlend";
+} from "./builderImpl/htmlBlend.js";
 import {
   buildBackgroundValues,
   htmlColorFromFills,
-} from "./builderImpl/htmlColor";
-import { htmlPadding } from "./builderImpl/htmlPadding";
-import { htmlSizePartial } from "./builderImpl/htmlSize";
-import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
+} from "./builderImpl/htmlColor.js";
+import { htmlPadding } from "./builderImpl/htmlPadding.js";
+import { htmlSizePartial } from "./builderImpl/htmlSize.js";
+import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
+} from "../common/commonPosition.js";
 import {
   numberToFixedString,
   stringToClassName,
-} from "../common/numToAutoFixed";
-import { commonStroke } from "../common/commonStroke";
+} from "../common/numToAutoFixed.js";
+import { commonStroke } from "../common/commonStroke.js";
 import {
   formatClassAttribute,
   formatDataAttribute,
   formatStyleAttribute,
   sanitizeAttributeName,
-} from "../common/commonFormatAttributes";
-import { HTMLSettings } from "../pluginTypes";
-import { figma } from "../runtime/figma";
+} from "../common/commonFormatAttributes.js";
+import { HTMLSettings } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
+import { hasEffectRadius } from "../common/effectGuards.js";
 import {
   cssCollection,
   generateUniqueClassName,
   stylesToCSS,
   getComponentName,
-} from "./htmlMain";
+} from "./htmlMain.js";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -400,7 +401,8 @@ export class HtmlDefaultBuilder {
     const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find(
-        (e) => e.type === "LAYER_BLUR" && e.visible,
+        (e): e is BlurEffect =>
+          e.type === "LAYER_BLUR" && e.visible && hasEffectRadius(e),
       );
       if (blur) {
         this.addStyles(
@@ -413,7 +415,8 @@ export class HtmlDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR" && e.visible,
+        (e): e is BlurEffect =>
+          e.type === "BACKGROUND_BLUR" && e.visible && hasEffectRadius(e),
       );
       if (backgroundBlur) {
         this.addStyles(

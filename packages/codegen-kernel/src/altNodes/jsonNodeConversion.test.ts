@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasDirectMaskChild } from "./jsonNodeConversion";
+import { hasDirectMaskChild } from "./jsonNodeConversion.js";
 
 describe("jsonNodeConversion", () => {
   it("detects direct mask children on groups", () => {

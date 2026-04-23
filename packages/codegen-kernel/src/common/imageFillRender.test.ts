@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { getImageFillRenderPlan } from "./imageFillRender";
+import { getImageFillRenderPlan } from "./imageFillRender.js";
 import {
   isCircularImageFillVectorNode,
   isCircularVectorPath,
-} from "./vectorShape";
-import { tailwindMain } from "../tailwind/tailwindMain";
-import { htmlMain } from "../html/htmlMain";
-import { PluginSettings } from "../pluginTypes";
+} from "./vectorShape.js";
+import { tailwindMain } from "../tailwind/tailwindMain.js";
+import { htmlMain } from "../html/htmlMain.js";
+import { PluginSettings } from "../pluginTypes.js";
 
 const createSettings = (framework: "Tailwind" | "HTML"): PluginSettings =>
   ({

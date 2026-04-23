@@ -1,22 +1,22 @@
-import { stringToClassName } from "../common/numToAutoFixed";
-import { retrieveTopFill } from "../common/retrieveFill";
-import { ComposeDefaultBuilder } from "./composeDefaultBuilder";
-import { ComposeTextBuilder } from "./composeTextBuilder";
-import { indentString } from "../common/indentString";
+import { stringToClassName } from "../common/numToAutoFixed.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { ComposeDefaultBuilder } from "./composeDefaultBuilder.js";
+import { ComposeTextBuilder } from "./composeTextBuilder.js";
+import { indentString } from "../common/indentString.js";
 
 import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
-} from "./builderImpl/composeAutoLayout";
-import { PluginSettings } from "../pluginTypes";
-import { figma } from "../runtime/figma";
-import { addWarning } from "../common/commonConversionWarnings";
-import { getVisibleNodes } from "../common/nodeVisibility";
+} from "./builderImpl/composeAutoLayout.js";
+import { PluginSettings } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { getVisibleNodes } from "../common/nodeVisibility.js";
 import {
   getLocalImagePath,
   getLocalVectorPath,
   isLocalVectorChildNode,
-} from "../altNodes/altNodeUtils";
+} from "../altNodes/altNodeUtils.js";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -220,7 +220,11 @@ const composeContainer = (node: SceneNode, child: string): string => {
 
   if (localImagePath) {
     propChild = `Text("${localImagePath}")`;
-  } else if ("fills" in node && node.fills !== figma.mixed && retrieveTopFill(node.fills as any)?.type === "IMAGE") {
+  } else if (
+    "fills" in node &&
+    node.fills !== figma.mixed &&
+    (retrieveTopFill(node.fills) as { type?: string } | undefined)?.type === "IMAGE"
+  ) {
     addWarning("Image fills are replaced with placeholders in Compose");
   }
 

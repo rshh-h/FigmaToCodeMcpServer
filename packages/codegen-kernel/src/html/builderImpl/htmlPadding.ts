@@ -1,5 +1,5 @@
-import { commonPadding } from "../../common/commonPadding";
-import { formatWithJSX } from "../../common/parseJSX";
+import { commonPadding } from "../../common/commonPadding.js";
+import { formatWithJSX } from "../../common/parseJSX.js";
 
 export const htmlPadding = (
   node: InferredAutoLayoutResult,

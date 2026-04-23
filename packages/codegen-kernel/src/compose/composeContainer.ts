@@ -1,13 +1,13 @@
-import { retrieveTopFill } from "../common/retrieveFill";
-import { getCommonRadius } from "../common/commonRadius";
-import { composeSize } from "./builderImpl/composeSize";
-import { composeBorder } from "./builderImpl/composeBorder";
-import { composeColor } from "./builderImpl/composeColor";
-import { composeShadow } from "./builderImpl/composeShadow";
-import { composePadding } from "./builderImpl/composePadding";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { getCommonRadius } from "../common/commonRadius.js";
+import { composeSize } from "./builderImpl/composeSize.js";
+import { composeBorder } from "./builderImpl/composeBorder.js";
+import { composeColor } from "./builderImpl/composeColor.js";
+import { composeShadow } from "./builderImpl/composeShadow.js";
+import { composePadding } from "./builderImpl/composePadding.js";
 
 export const composeContainer = (
-  node: SceneNode & MinimalBlendMixin,
+  node: SceneNode,
   child: string,
 ): string => {
   // Safety check for node dimensions
@@ -22,7 +22,9 @@ export const composeContainer = (
 
   // Determine if we need a specific container type
   if ("fills" in node) {
-    const topFill = retrieveTopFill(node.fills);
+    const topFill = Array.isArray(node.fills)
+      ? (retrieveTopFill(node.fills) as Paint | undefined)
+      : undefined;
     if (topFill) {
       // Background color or gradient
       const backgroundModifier = composeColor(topFill);

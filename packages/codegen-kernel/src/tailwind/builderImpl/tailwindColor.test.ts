@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { tailwindMain } from "../tailwindMain";
+import { tailwindMain } from "../tailwindMain.js";
 import {
   tailwindBackgroundFromFills,
   tailwindBackgroundLayerClassesFromFills,
-} from "./tailwindColor";
+} from "./tailwindColor.js";
 
 describe("tailwindBackgroundLayerClassesFromFills", () => {
   it("returns one Tailwind background class per visible fill when rounding is enabled", async () => {

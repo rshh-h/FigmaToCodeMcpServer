@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildMaskRenderPlan } from "./maskNodes";
-import { annotateRenderSemantics } from "./renderSemantics";
+import { buildMaskRenderPlan } from "./maskNodes.js";
+import { annotateRenderSemantics } from "./renderSemantics.js";
 
 const absoluteParent = {
   type: "FRAME",

@@ -1,5 +1,5 @@
-import { commonIsAbsolutePosition } from "./commonPosition";
-import { getRenderSemantics } from "./renderSemantics";
+import { commonIsAbsolutePosition } from "./commonPosition.js";
+import { getRenderSemantics } from "./renderSemantics.js";
 
 type MaskType = "ALPHA" | "VECTOR" | "LUMINANCE";
 

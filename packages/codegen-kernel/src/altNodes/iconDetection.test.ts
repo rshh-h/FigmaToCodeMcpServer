@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isLikelyIcon } from "./iconDetection";
+import { isLikelyIcon } from "./iconDetection.js";
 
 describe("iconDetection", () => {
   it("treats styled primitive nodes as icons", () => {

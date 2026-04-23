@@ -1,25 +1,25 @@
-import { numberToFixedString } from "./../common/numToAutoFixed";
-import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects";
+import { numberToFixedString } from "./../common/numToAutoFixed.js";
+import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects.js";
 import {
   swiftuiBorder,
   swiftuiCornerRadius,
-} from "./builderImpl/swiftuiBorder";
-import { swiftuiPadding } from "./builderImpl/swiftuiPadding";
-import { swiftuiSize } from "./builderImpl/swiftuiSize";
+} from "./builderImpl/swiftuiBorder.js";
+import { swiftuiPadding } from "./builderImpl/swiftuiPadding.js";
+import { swiftuiSize } from "./builderImpl/swiftuiSize.js";
 
 import {
   swiftuiVisibility,
   swiftuiOpacity,
   swiftuiRotation,
   swiftuiBlendMode,
-} from "./builderImpl/swiftuiBlend";
+} from "./builderImpl/swiftuiBlend.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
-import { SwiftUIElement } from "./builderImpl/swiftuiParser";
-import { SwiftUIModifier } from "../pluginTypes";
-import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
+} from "../common/commonPosition.js";
+import { SwiftUIElement } from "./builderImpl/swiftuiParser.js";
+import { SwiftUIModifier } from "../pluginTypes.js";
+import { swiftuiSolidColor } from "./builderImpl/swiftuiColor.js";
 
 export class SwiftuiDefaultBuilder {
   element: SwiftUIElement;

@@ -1,9 +1,9 @@
-import { nearestColorFrom } from "../nearest-color/nearestColor";
-import { numberToFixedString } from "../common/numToAutoFixed";
-import { localTailwindSettings } from "./tailwindMain";
-import { config } from "./tailwindConfig";
-import { rgbTo6hex } from "../common/color";
-import { figma } from "../runtime/figma";
+import { nearestColorFrom } from "../nearest-color/nearestColor.js";
+import { numberToFixedString } from "../common/numToAutoFixed.js";
+import { localTailwindSettings } from "./tailwindMain.js";
+import { config } from "./tailwindConfig.js";
+import { rgbTo6hex } from "../common/color.js";
+import { figma } from "../runtime/figma.js";
 
 export const nearestValue = (goal: number, array: Array<number>): number => {
   return array.reduce((prev, curr) => {

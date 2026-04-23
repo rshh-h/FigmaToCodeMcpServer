@@ -5,8 +5,8 @@ import {
   ErrorMessage,
   PluginSettings,
   SettingsChangedMessage,
-} from "./pluginTypes";
-import { figma } from "./runtime/figma";
+} from "./pluginTypes.js";
+import { figma } from "./runtime/figma.js";
 
 export const postBackendMessage = (pluginMessage: unknown) =>
   figma.ui.postMessage(pluginMessage);

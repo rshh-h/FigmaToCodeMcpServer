@@ -1,11 +1,11 @@
-import { addWarning } from "../common/commonConversionWarnings";
-import { PluginSettings } from "../pluginTypes";
-import { variableToColorName } from "../tailwind/conversionTables";
-import { HasGeometryTrait, Node, Paint } from "../api_types";
-import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
-import { analyzeRenderSemantics } from "../common/renderSemantics";
-import { isLikelyIcon } from "./iconDetection";
-import { AltNode } from "../alt_api_types";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { PluginSettings } from "../pluginTypes.js";
+import { variableToColorName } from "../tailwind/conversionTables.js";
+import { HasGeometryTrait, Node, Paint } from "../api_types.js";
+import { calculateRectangleFromBoundingBox } from "../common/commonPosition.js";
+import { analyzeRenderSemantics } from "../common/renderSemantics.js";
+import { isLikelyIcon } from "./iconDetection.js";
+import { AltNode } from "../alt_api_types.js";
 
 // Performance tracking counters
 export let getNodeByIdAsyncTime = 0;
@@ -209,19 +209,23 @@ const processEffectVariables = async (
 };
 
 const getColorVariables = async (
-  node: HasGeometryTrait,
+  node: {
+    fills?: readonly unknown[];
+    strokes?: readonly unknown[];
+    effects?: readonly unknown[];
+  },
   settings: PluginSettings,
 ) => {
   // This tries to be as fast as it can, using Promise.all so it can parallelize calls.
   if (settings.useColorVariables) {
     if (node.fills && Array.isArray(node.fills)) {
       await Promise.all(
-        node.fills.map((fill: Paint) => processColorVariables(fill)),
+        node.fills.map((fill) => processColorVariables(fill as Paint)),
       );
     }
     if (node.strokes && Array.isArray(node.strokes)) {
       await Promise.all(
-        node.strokes.map((stroke: Paint) => processColorVariables(stroke)),
+        node.strokes.map((stroke) => processColorVariables(stroke as Paint)),
       );
     }
     if ("effects" in node && node.effects && Array.isArray(node.effects)) {
@@ -278,7 +282,7 @@ const processNodePair = async (
   settings: PluginSettings,
   parentNode?: AltNode,
   parentCumulativeRotation: number = 0,
-): Promise<Node | Node[] | null> => {
+): Promise<AltNode | AltNode[] | null> => {
   if (!jsonNode.id) return null;
   if (jsonNode.visible === false) return null;
 
@@ -301,7 +305,7 @@ const processNodePair = async (
     (!jsonNode.children || jsonNode.children.length === 0)
   ) {
     // Convert to rectangle
-    jsonNode.type = "RECTANGLE";
+    (jsonNode as { type: string }).type = "RECTANGLE";
     return processNodePair(
       jsonNode,
       figmaNode,
@@ -489,7 +493,8 @@ const processNodePair = async (
 
   // Always copy size and position
   if ("absoluteBoundingBox" in jsonNode && jsonNode.absoluteBoundingBox) {
-    if (jsonNode.parent) {
+    const parentBoundingBox = jsonNode.parent?.absoluteBoundingBox;
+    if (parentBoundingBox) {
       // Extract width and height from bounding box and rotation. This is necessary because Figma JSON API doesn't have width and height.
       const rect = calculateRectangleFromBoundingBox(
         {
@@ -497,10 +502,10 @@ const processNodePair = async (
           height: jsonNode.absoluteBoundingBox.height,
           x:
             jsonNode.absoluteBoundingBox.x -
-            (jsonNode.parent?.absoluteBoundingBox.x || 0),
+            parentBoundingBox.x,
           y:
             jsonNode.absoluteBoundingBox.y -
-            (jsonNode.parent?.absoluteBoundingBox.y || 0),
+            parentBoundingBox.y,
         },
         -((jsonNode.rotation || 0) + (jsonNode.cumulativeRotation || 0)),
       );
@@ -535,12 +540,18 @@ const processNodePair = async (
     "individualStrokeWeights" in jsonNode &&
     jsonNode.individualStrokeWeights
   ) {
-    (jsonNode as any).strokeTopWeight = jsonNode.individualStrokeWeights.top;
+    const strokeWeights = jsonNode.individualStrokeWeights as {
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    };
+    (jsonNode as any).strokeTopWeight = strokeWeights.top;
     (jsonNode as any).strokeBottomWeight =
-      jsonNode.individualStrokeWeights.bottom;
-    (jsonNode as any).strokeLeftWeight = jsonNode.individualStrokeWeights.left;
+      strokeWeights.bottom;
+    (jsonNode as any).strokeLeftWeight = strokeWeights.left;
     (jsonNode as any).strokeRightWeight =
-      jsonNode.individualStrokeWeights.right;
+      strokeWeights.right;
   }
 
   await getColorVariables(jsonNode, settings);
@@ -611,7 +622,7 @@ const processNodePair = async (
       (jsonNode.type === "GROUP" ? jsonNode.rotation || 0 : 0);
 
     // Process children and handle potential null returns
-    const processedChildren = [];
+    const processedChildren: AltNode[] = [];
 
     // Process all visible JSON children that have matching Figma nodes
     for (const child of visibleJsonChildren) {
@@ -640,7 +651,7 @@ const processNodePair = async (
 
     if (
       jsonNode.layoutMode === "NONE" ||
-      jsonNode.children.some(
+      (jsonNode.children ?? []).some(
         (d: any) =>
           "layoutPositioning" in d && d.layoutPositioning === "ABSOLUTE",
       )
@@ -704,12 +715,6 @@ export const nodesToJSON = async (
     }),
   );
 
-  console.log("[debug] initial nodeJson", { ...nodes[0] });
-
-  console.log(
-    `[benchmark][inside nodesToJSON] JSON_REST_V1 export: ${Date.now() - exportJsonStart}ms`,
-  );
-
   // Now process each top-level node pair (JSON node + Figma node)
   const processNodesStart = Date.now();
   const result: Node[] = [];
@@ -725,17 +730,13 @@ export const nodesToJSON = async (
     if (processedNode !== null) {
       if (Array.isArray(processedNode)) {
         // If processNodePair returns an array (inlined group), add all nodes
-        result.push(...processedNode);
+        result.push(...(processedNode as unknown as Node[]));
       } else {
         // If it returns a single node, add it directly
-        result.push(processedNode);
+        result.push(processedNode as unknown as Node);
       }
     }
   }
-
-  console.log(
-    `[benchmark][inside nodesToJSON] Process node pairs: ${Date.now() - processNodesStart}ms`,
-  );
 
   return result;
 };

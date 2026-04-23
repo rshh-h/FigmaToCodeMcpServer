@@ -1,4 +1,4 @@
-import { numberToFixedString } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
 
 export const composeSize = (node: SceneNode): string | null => {
   const modifiers: string[] = [];
@@ -10,13 +10,13 @@ export const composeSize = (node: SceneNode): string | null => {
     // Check for special sizing modes
     if ("layoutSizingHorizontal" in node && node.layoutSizingHorizontal === "FILL") {
       modifiers.push("fillMaxWidth()");
-    } else if (width > 0) {
+    } else if (node.width > 0) {
       modifiers.push(`width(${width}.dp)`);
     }
 
     if ("layoutSizingVertical" in node && node.layoutSizingVertical === "FILL") {
       modifiers.push("fillMaxHeight()");
-    } else if (height > 0) {
+    } else if (node.height > 0) {
       modifiers.push(`height(${height}.dp)`);
     }
 

@@ -2,8 +2,8 @@ import {
   generateWidgetCode,
   skipDefaultProperty,
   numberToFixedString,
-} from "../../common/numToAutoFixed";
-import { commonPadding } from "../../common/commonPadding";
+} from "../../common/numToAutoFixed.js";
+import { commonPadding } from "../../common/commonPadding.js";
 
 // This must happen before Stack or after the Positioned, but not before.
 export const flutterPadding = (node: InferredAutoLayoutResult): string => {

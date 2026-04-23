@@ -1,44 +1,44 @@
-import { indentString } from "../common/indentString";
-import { HtmlTextBuilder } from "./htmlTextBuilder";
-import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
-import { formatStyleAttribute } from "../common/commonFormatAttributes";
+import { indentString } from "../common/indentString.js";
+import { HtmlTextBuilder } from "./htmlTextBuilder.js";
+import { HtmlDefaultBuilder } from "./htmlDefaultBuilder.js";
+import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout.js";
+import { formatStyleAttribute } from "../common/commonFormatAttributes.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
-import { formatWithJSX } from "../common/parseJSX";
+} from "../common/commonPosition.js";
+import { formatWithJSX } from "../common/parseJSX.js";
 import {
   PluginSettings,
   HTMLPreview,
   AltNode,
   HTMLSettings,
   ExportableNode,
-} from "../pluginTypes";
+} from "../pluginTypes.js";
 import {
   getLocalImagePath,
   getLocalVectorPath,
   isLocalVectorChildNode,
   renderAndAttachSVG,
-} from "../altNodes/altNodeUtils";
-import { buildMaskRenderPlan } from "../common/maskNodes";
-import { getVisibleNodes } from "../common/nodeVisibility";
+} from "../altNodes/altNodeUtils.js";
+import { buildMaskRenderPlan } from "../common/maskNodes.js";
+import { getVisibleNodes } from "../common/nodeVisibility.js";
 import {
   exportNodeAsBase64PNG,
   getPlaceholderImage,
   nodeHasImageFill,
-} from "../common/images";
-import { retrieveTopFill } from "../common/retrieveFill";
-import { addWarning } from "../common/commonConversionWarnings";
+} from "../common/images.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
 import {
   annotateRenderSemantics,
   shouldAllowNodeFlatten,
   shouldAllowNodeMerge,
   shouldPreserveNodeWrapper,
-} from "../common/renderSemantics";
-import { getImageFillRenderPlan } from "../common/imageFillRender";
-import { ImagePaint } from "../api_types";
-import { isCircularImageFillVectorNode } from "../common/vectorShape";
+} from "../common/renderSemantics.js";
+import { getImageFillRenderPlan } from "../common/imageFillRender.js";
+import { ImagePaint } from "../api_types.js";
+import { isCircularImageFillVectorNode } from "../common/vectorShape.js";
 
 const selfClosingTags = ["img"];
 

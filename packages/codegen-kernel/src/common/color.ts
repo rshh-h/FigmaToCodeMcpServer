@@ -1,5 +1,5 @@
-import { GradientPaint } from "../api_types";
-import { numberToFixedString } from "./numToAutoFixed";
+import { GradientPaint } from "../api_types.js";
+import { numberToFixedString } from "./numToAutoFixed.js";
 
 // ---- Color Format Conversion ----
 export const rgbTo6hex = (color: RGB | RGBA): string => {

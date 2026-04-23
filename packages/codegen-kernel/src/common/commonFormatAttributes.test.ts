@@ -3,7 +3,7 @@ import {
   formatDataAttribute,
   formatTwigAttribute,
   sanitizeAttributeName,
-} from "./commonFormatAttributes";
+} from "./commonFormatAttributes.js";
 
 describe("commonFormatAttributes", () => {
   it("sanitizes component property names into safe attribute names", () => {

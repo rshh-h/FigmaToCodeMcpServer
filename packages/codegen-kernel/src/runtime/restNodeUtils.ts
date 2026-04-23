@@ -1,3 +1,5 @@
+import type { StyledTextSegmentSubset } from "../pluginTypes.js";
+
 function cloneJson<T>(value: T): T {
   return value == null ? value : JSON.parse(JSON.stringify(value));
 }
@@ -34,7 +36,7 @@ export function normalizeLineHeight(
         : 100;
 
   if (!lineHeightUnit) {
-    return { unit: "AUTO", value: fontSize || 0 };
+    return { unit: "AUTO", value: fontSize || 0 } as unknown as LineHeight;
   }
 
   if (lineHeightUnit === "PIXELS") {
@@ -68,7 +70,7 @@ export function normalizeLineHeight(
     };
   }
 
-  return { unit: "AUTO", value: fontSize || 0 };
+  return { unit: "AUTO", value: fontSize || 0 } as unknown as LineHeight;
 }
 
 function getTextStyleOverrideKey(
@@ -165,7 +167,11 @@ function normalizedSegmentShape(
       typeof effectiveStyle.fontWeight === "number"
         ? effectiveStyle.fontWeight
         : 400,
-    hyperlink: effectiveStyle.hyperlink as HyperlinkTarget | null | undefined,
+    fontStyle:
+      (effectiveStyle.fontStyle as FontStyle | undefined) ?? "REGULAR",
+    hyperlink:
+      ((effectiveStyle.hyperlink as HyperlinkTarget | null | undefined) ?? null) as
+        StyledTextSegmentSubset["hyperlink"],
     indentation: getIndentation(node, start),
     letterSpacing: normalizeLetterSpacing(
       typeof effectiveStyle.letterSpacing === "number"
@@ -173,15 +179,22 @@ function normalizedSegmentShape(
         : 0,
     ),
     lineHeight: normalizeLineHeight(effectiveStyle, fontSize),
-    listOptions: getListOptions(node, start),
+    listOptions:
+      (getListOptions(node, start) ?? ({ type: "NONE" } as TextListOptions)) as
+        StyledTextSegmentSubset["listOptions"],
     textCase: (effectiveStyle.textCase as TextCase | undefined) ?? "ORIGINAL",
     textDecoration:
       (effectiveStyle.textDecoration as TextDecoration | undefined) ?? "NONE",
+    textDecorationStyle: null,
+    textDecorationOffset: null,
+    textDecorationThickness: null,
+    textDecorationColor: null,
+    textDecorationSkipInk: null,
     textStyleId: styles.text,
     fillStyleId: styles.fill,
     openTypeFeatures: normalizeOpenTypeFeatures(
       (effectiveStyle.opentypeFlags as Record<string, unknown> | undefined) ?? {},
-    ),
+    ) as StyledTextSegmentSubset["openTypeFeatures"],
   };
 }
 

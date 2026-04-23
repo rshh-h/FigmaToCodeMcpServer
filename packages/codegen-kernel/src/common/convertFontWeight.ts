@@ -1,4 +1,4 @@
-import { FontWeightNumber } from "../pluginTypes";
+import { FontWeightNumber } from "../pluginTypes.js";
 
 // Convert generic named weights to numbers, which is the way tailwind understands
 export const convertFontWeight = (weight: string): FontWeightNumber | null => {

@@ -1,20 +1,20 @@
-import { flutterBorder } from "./builderImpl/flutterBorder";
-import { flutterSize } from "./builderImpl/flutterSize";
-import { flutterPadding } from "./builderImpl/flutterPadding";
-import { flutterShadow } from "./builderImpl/flutterShadow";
+import { flutterBorder } from "./builderImpl/flutterBorder.js";
+import { flutterSize } from "./builderImpl/flutterSize.js";
+import { flutterPadding } from "./builderImpl/flutterPadding.js";
+import { flutterShadow } from "./builderImpl/flutterShadow.js";
 import {
   flutterBoxDecorationColor,
   flutterColorFromFills,
-} from "./builderImpl/flutterColor";
+} from "./builderImpl/flutterColor.js";
 import {
   generateWidgetCode,
   skipDefaultProperty,
-} from "../common/numToAutoFixed";
-import { numberToFixedString } from "../common/numToAutoFixed";
-import { getCommonRadius } from "../common/commonRadius";
-import { commonStroke } from "../common/commonStroke";
-import { generateRotationMatrix } from "./builderImpl/flutterBlend";
-import { figma } from "../runtime/figma";
+} from "../common/numToAutoFixed.js";
+import { numberToFixedString } from "../common/numToAutoFixed.js";
+import { getCommonRadius } from "../common/commonRadius.js";
+import { commonStroke } from "../common/commonStroke.js";
+import { generateRotationMatrix } from "./builderImpl/flutterBlend.js";
+import { figma } from "../runtime/figma.js";
 
 export const flutterContainer = (node: SceneNode, child: string): string => {
   // ignore the view when size is zero or less

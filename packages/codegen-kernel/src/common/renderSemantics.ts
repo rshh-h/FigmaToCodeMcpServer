@@ -1,5 +1,5 @@
-import { commonIsAbsolutePosition } from "./commonPosition";
-import { retrieveTopFill } from "./retrieveFill";
+import { commonIsAbsolutePosition } from "./commonPosition.js";
+import { retrieveTopFill } from "./retrieveFill.js";
 
 export type WrapperReason =
   | "flow-item"
@@ -152,7 +152,10 @@ export const hasMeaningfulRelativeLayout = (node: SceneNode): boolean => {
 };
 
 const isImageLikeNode = (node: SceneNode): boolean => {
-  const topFill = "fills" in node ? retrieveTopFill(node.fills) : undefined;
+  const topFill =
+    "fills" in node && Array.isArray(node.fills)
+      ? (retrieveTopFill(node.fills) as { type?: string } | undefined)
+      : undefined;
   return (
     (node as SceneNode & { localImagePath?: string }).localImagePath !== undefined ||
     topFill?.type === "IMAGE"

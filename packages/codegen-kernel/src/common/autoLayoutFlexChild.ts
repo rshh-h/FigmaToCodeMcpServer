@@ -1,12 +1,22 @@
 const getAutoLayoutParent = (
   node: SceneNode,
-): (BaseNode & LayoutMixin) | null => {
+): (BaseNode &
+  LayoutMixin & {
+    layoutMode: "NONE" | "VERTICAL" | "HORIZONTAL";
+  }) | null => {
   const parent = node.parent;
-  if (!parent || !("layoutMode" in parent) || parent.layoutMode === "NONE") {
+  if (
+    !parent ||
+    !("layoutMode" in parent) ||
+    parent.layoutMode === "NONE"
+  ) {
     return null;
   }
 
-  return parent;
+  return parent as BaseNode &
+    LayoutMixin & {
+      layoutMode: "NONE" | "VERTICAL" | "HORIZONTAL";
+    };
 };
 
 export const getAutoLayoutMainAxisSizing = (

@@ -1,4 +1,4 @@
-import { Warning } from "../pluginTypes";
+import { Warning } from "../pluginTypes.js";
 
 export const warnings = new Set<Warning>();
 export const addWarning = (warning: Warning) => {

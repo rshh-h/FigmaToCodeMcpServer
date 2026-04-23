@@ -1,11 +1,11 @@
-import { StyledTextSegmentSubset, ParentNode, AltNode } from "../pluginTypes";
+import { StyledTextSegmentSubset, ParentNode, AltNode } from "../pluginTypes.js";
 import {
   assignParent,
   isNotEmpty,
   assignRectangleType,
   assignChildren,
-} from "./altNodeUtils";
-import { curry } from "../common/curry";
+} from "./altNodeUtils.js";
+import { curry } from "../common/curry.js";
 
 export const isTypeOrGroupOfTypes = curry(
   (matchTypes: NodeType[], node: SceneNode): boolean => {
@@ -137,13 +137,15 @@ export const cloneNode = <T extends BaseNode>(
     parent: cloned.parent,
     originalNode: node,
     canBeFlattened: canBeFlattened(node),
-  } as AltNode<T>;
+  } as unknown as AltNode<T>;
 
   if (globalTextStyleSegments[node.id]) {
-    altNode.styledTextSegments = globalTextStyleSegments[node.id];
+    (
+      altNode as unknown as {
+        styledTextSegments?: StyledTextSegmentSubset[];
+      }
+    ).styledTextSegments = globalTextStyleSegments[node.id];
   }
-
-  console.log("altnode:", altNode.parent, cloned.parent);
 
   return altNode;
 };
@@ -166,6 +168,7 @@ const extractStyledTextSegments = (node: TextNode) =>
     "fills",
     "fontSize",
     "fontWeight",
+    "fontStyle",
     "hyperlink",
     "indentation",
     "letterSpacing",
@@ -173,7 +176,12 @@ const extractStyledTextSegments = (node: TextNode) =>
     "listOptions",
     "textCase",
     "textDecoration",
+    "textDecorationStyle",
+    "textDecorationOffset",
+    "textDecorationThickness",
+    "textDecorationColor",
+    "textDecorationSkipInk",
     "textStyleId",
     "fillStyleId",
     "openTypeFeatures",
-  ]);
+  ]) as StyledTextSegmentSubset[];

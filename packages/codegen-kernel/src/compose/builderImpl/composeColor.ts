@@ -1,4 +1,4 @@
-import { rgbTo6hex, rgbTo8hex } from "../../common/color";
+import { rgbTo6hex, rgbTo8hex } from "../../common/color.js";
 
 export const composeColor = (fill: Paint): string | null => {
   if (fill.type === "SOLID") {

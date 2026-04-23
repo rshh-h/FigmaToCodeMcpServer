@@ -1,9 +1,9 @@
-import { PluginSettings } from "../../pluginTypes";
-import { composeMain } from "../../compose/composeMain";
-import { flutterMain } from "../../flutter/flutterMain";
-import { htmlMain } from "../../html/htmlMain";
-import { swiftuiMain } from "../../swiftui/swiftuiMain";
-import { tailwindMain } from "../../tailwind/tailwindMain";
+import { PluginSettings } from "../../pluginTypes.js";
+import { composeMain } from "../../compose/composeMain.js";
+import { flutterMain } from "../../flutter/flutterMain.js";
+import { htmlMain } from "../../html/htmlMain.js";
+import { swiftuiMain } from "../../swiftui/swiftuiMain.js";
+import { tailwindMain } from "../../tailwind/tailwindMain.js";
 
 export const convertToCode = async (
   nodes: SceneNode[],

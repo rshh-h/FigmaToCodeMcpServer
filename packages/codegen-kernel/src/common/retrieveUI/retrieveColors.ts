@@ -1,28 +1,33 @@
-import { rgbTo6hex } from "../color";
+import { rgbTo6hex } from "../color.js";
 import {
   swiftuiColor,
   swiftuiGradient,
-} from "../../swiftui/builderImpl/swiftuiColor";
+} from "../../swiftui/builderImpl/swiftuiColor.js";
 import {
   tailwindColor,
   tailwindGradient,
-} from "../../tailwind/builderImpl/tailwindColor";
+} from "../../tailwind/builderImpl/tailwindColor.js";
 import {
   flutterColor,
   flutterGradient,
-} from "../../flutter/builderImpl/flutterColor";
+} from "../../flutter/builderImpl/flutterColor.js";
 import {
   htmlColorFromFill,
   htmlGradientFromFills,
-} from "../../html/builderImpl/htmlColor";
-import { calculateContrastRatio } from "./commonUI";
+} from "../../html/builderImpl/htmlColor.js";
+import { calculateContrastRatio } from "./commonUI.js";
 import {
   LinearGradientConversion,
   SolidColorConversion,
   Framework,
-} from "../../pluginTypes";
-import { figma } from "../../runtime/figma";
-import { processColorVariables } from "../../altNodes/jsonNodeConversion";
+} from "../../pluginTypes.js";
+import { GradientPaint } from "../../api_types.js";
+import { figma } from "../../runtime/figma.js";
+import { processColorVariables } from "../../altNodes/jsonNodeConversion.js";
+
+type GradientPaintWithHandles = GradientPaint & {
+  gradientTransform: Transform;
+};
 
 export const retrieveGenericSolidUIColors = async (
   framework: Framework,
@@ -102,7 +107,7 @@ export const retrieveGenericLinearGradients = async (
     selectionColors.paints.map(async (paint) => {
       if (paint.type === "GRADIENT_LINEAR") {
         try {
-          let fill = { ...paint };
+          const fill = { ...paint } as GradientPaintWithHandles;
           const t = fill.gradientTransform;
           if (
             !Array.isArray(t) ||

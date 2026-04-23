@@ -616,7 +616,10 @@ describe("LocalAssetMaterializer", () => {
     const materializer = new LocalAssetMaterializer(
       createConfig({ ENABLE_VARIABLES: "false" }),
       {
-        async getJson(request: { path?: string }) {
+        async getJson(request: {
+          path?: string;
+          query?: { ids?: string };
+        }) {
           requestedPaths.push(String(request.path));
           if (request.path === "/v1/files/FILE/images") {
             return {
@@ -717,7 +720,10 @@ describe("LocalAssetMaterializer", () => {
     const materializer = new LocalAssetMaterializer(
       createConfig(),
       {
-        async getJson(request: { path?: string }) {
+        async getJson(request: {
+          path?: string;
+          query?: { ids?: string };
+        }) {
           if (request.path === "/v1/files/FILE/variables/local") {
             return {
               meta: {
@@ -896,7 +902,10 @@ describe("LocalAssetMaterializer", () => {
     const materializer = new LocalAssetMaterializer(
       createConfig(),
       {
-        async getJson(request: { path?: string }) {
+        async getJson(request: {
+          path?: string;
+          query?: { ids?: string };
+        }) {
           if (request.path === "/v1/files/FILE/variables/local") {
             return {
               meta: {

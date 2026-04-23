@@ -1,20 +1,18 @@
-import type { ConversionMessage, Message, PluginSettings } from "../pluginTypes";
-import { run } from "../code";
+import type { ConversionMessage, Message, PluginSettings } from "../pluginTypes.js";
+import { run } from "../code.js";
 import {
   type FigmaRuntime,
   clearFigmaRuntime,
   setFigmaRuntime,
-} from "./figma";
-import { defaultPluginSettings } from "./defaultPluginSettings";
+} from "./figma.js";
+import { defaultPluginSettings } from "./defaultPluginSettings.js";
 import {
   createSourceSnapshotPluginApiAdapter,
   type SnapshotPluginApiAdapter,
-} from "./sourceSnapshotAdapter";
-import type { KernelSourceSnapshot } from "../types";
+} from "./sourceSnapshotAdapter.js";
+import type { KernelSourceSnapshot } from "../types.js";
 
-type BackendMessage = Message & {
-  [key: string]: unknown;
-};
+type BackendMessage = Message;
 
 type RunWithSourceSnapshotOptions = {
   snapshot: KernelSourceSnapshot;

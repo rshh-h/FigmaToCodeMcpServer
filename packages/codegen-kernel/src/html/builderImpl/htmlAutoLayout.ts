@@ -1,5 +1,5 @@
-import { HTMLSettings } from "../../pluginTypes";
-import { formatMultipleJSXArray } from "../../common/parseJSX";
+import { HTMLSettings } from "../../pluginTypes.js";
+import { formatMultipleJSXArray } from "../../common/parseJSX.js";
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
   node.layoutMode === "HORIZONTAL" ? "" : "column";

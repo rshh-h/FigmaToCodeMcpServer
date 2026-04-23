@@ -2,7 +2,7 @@
 // It was sligtly modified to support Typescript better.
 // It was also slighly simplified because many parts weren't being used.
 
-import { ColorSpec, RGB } from "../pluginTypes";
+import { ColorSpec, RGB } from "../pluginTypes.js";
 
 /**
  * Gets the nearest color, from the given list of {@link ColorSpec} objects

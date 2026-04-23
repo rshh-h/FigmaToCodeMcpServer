@@ -1,5 +1,5 @@
-import { rgbTo8hex } from "../../common/color";
-import { numberToFixedString } from "../../common/numToAutoFixed";
+import { rgbTo8hex } from "../../common/color.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
 
 /**
  * Converts Figma shadow effects to Jetpack Compose shadow modifiers

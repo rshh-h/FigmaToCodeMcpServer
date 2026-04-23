@@ -1,4 +1,4 @@
-import { lowercaseFirstLetter } from "./lowercaseFirstLetter";
+import { lowercaseFirstLetter } from "./lowercaseFirstLetter.js";
 
 export const getClassLabel = (isJSX: boolean = false) =>
   isJSX ? "className" : "class";

@@ -1,7 +1,7 @@
-import { nodeSize } from "../../common/nodeWidthHeight";
-import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild";
-import { formatWithJSX } from "../../common/parseJSX";
-import { isPreviewGlobal } from "../htmlMain";
+import { nodeSize } from "../../common/nodeWidthHeight.js";
+import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild.js";
+import { formatWithJSX } from "../../common/parseJSX.js";
+import { isPreviewGlobal } from "../htmlMain.js";
 
 export const htmlSizePartial = (
   node: SceneNode,

@@ -1,20 +1,21 @@
 import {
   commonLetterSpacing,
   commonLineHeight,
-} from "../common/commonTextHeightSpacing";
-import { escapeJSXText } from "../common/parseJSX";
-import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
+} from "../common/commonTextHeightSpacing.js";
+import { escapeJSXText } from "../common/parseJSX.js";
+import { tailwindColorFromFills } from "./builderImpl/tailwindColor.js";
 import {
   pxToFontSize,
   pxToLetterSpacing,
   pxToLineHeight,
   pxToBlur,
-} from "./conversionTables";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
-import { config } from "./tailwindConfig";
-import { StyledTextSegmentSubset } from "../pluginTypes";
-import { figma } from "../runtime/figma";
-import { localTailwindSettings } from "./tailwindMain";
+} from "./conversionTables.js";
+import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder.js";
+import { config } from "./tailwindConfig.js";
+import { StyledTextSegmentSubset } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
+import { localTailwindSettings } from "./tailwindMain.js";
+import { isLayerBlurEffect } from "../common/effectGuards.js";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
   getTextSegments(node: TextNode): {
@@ -309,7 +310,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     if (this.node && (this.node as TextNode).effects) {
       const effects = (this.node as TextNode).effects;
       const blurEffect = effects.find(
-        (effect) => effect.type === "LAYER_BLUR" && effect.visible !== false,
+        (effect): effect is BlurEffect & { type: "LAYER_BLUR" } =>
+          isLayerBlurEffect(effect) && effect.visible !== false,
       );
       if (blurEffect && blurEffect.radius && blurEffect.radius > 0) {
         const blurSuffix = pxToBlur(blurEffect.radius);

@@ -1,9 +1,9 @@
-import { commonStroke } from "./../../common/commonStroke";
-import { getCommonRadius } from "../../common/commonRadius";
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { swiftUISolidColor } from "./swiftuiColor";
-import { SwiftUIElement } from "./swiftuiParser";
-import { SwiftUIModifier } from "../../pluginTypes";
+import { commonStroke } from "./../../common/commonStroke.js";
+import { getCommonRadius } from "../../common/commonRadius.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { swiftUISolidColor } from "./swiftuiColor.js";
+import { SwiftUIElement } from "./swiftuiParser.js";
+import { SwiftUIModifier } from "../../pluginTypes.js";
 
 const swiftUIStroke = (node: SceneNode): number => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {

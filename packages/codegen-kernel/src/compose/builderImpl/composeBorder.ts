@@ -1,7 +1,7 @@
-import { commonStroke } from "../../common/commonStroke";
-import { rgbTo6hex } from "../../common/color";
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { retrieveTopFill } from "../../common/retrieveFill";
+import { commonStroke } from "../../common/commonStroke.js";
+import { rgbTo6hex } from "../../common/color.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { retrieveTopFill } from "../../common/retrieveFill.js";
 
 /**
  * Helper function to convert RGBA paint to hex format for Compose

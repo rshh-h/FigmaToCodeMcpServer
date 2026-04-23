@@ -1,4 +1,4 @@
-import { retrieveTopFill } from "./retrieveFill";
+import { retrieveTopFill } from "./retrieveFill.js";
 
 type Point = {
   x: number;
@@ -131,5 +131,6 @@ export const isCircularVectorPath = (node: SceneNode): boolean => {
 export const isCircularImageFillVectorNode = (node: SceneNode): boolean =>
   node.type === "VECTOR" &&
   "fills" in node &&
-  retrieveTopFill(node.fills)?.type === "IMAGE" &&
+  Array.isArray(node.fills) &&
+  (retrieveTopFill(node.fills) as { type?: string } | undefined)?.type === "IMAGE" &&
   isCircularVectorPath(node);

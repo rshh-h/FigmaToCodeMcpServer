@@ -1,5 +1,5 @@
-import { indentString } from "../../common/indentString";
-import { SwiftUIModifier } from "../../pluginTypes";
+import { indentString } from "../../common/indentString.js";
+import { SwiftUIModifier } from "../../pluginTypes.js";
 
 export class SwiftUIElement {
   private readonly element: string;

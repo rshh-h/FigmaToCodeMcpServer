@@ -2,13 +2,13 @@ import {
   composeVisibility,
   composeOpacity,
   composeRotation,
-} from "./builderImpl/composeBlend";
+} from "./builderImpl/composeBlend.js";
 
-import { composeContainer } from "./composeContainer";
+import { composeContainer } from "./composeContainer.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
+} from "../common/commonPosition.js";
 
 export class ComposeDefaultBuilder {
   child: string;

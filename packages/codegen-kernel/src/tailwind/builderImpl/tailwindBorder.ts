@@ -1,12 +1,12 @@
-import { getCommonRadius } from "../../common/commonRadius";
-import { commonStroke } from "../../common/commonStroke";
+import { getCommonRadius } from "../../common/commonRadius.js";
+import { commonStroke } from "../../common/commonStroke.js";
 import {
   pxToBorderRadius,
   pxToBorderWidth,
   pxToOutline,
-} from "../conversionTables";
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { addWarning } from "../../common/commonConversionWarnings";
+} from "../conversionTables.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { addWarning } from "../../common/commonConversionWarnings.js";
 
 const getBorder = (
   weight: number,

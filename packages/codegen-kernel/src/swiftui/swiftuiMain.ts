@@ -1,18 +1,18 @@
-import { indentString } from "../common/indentString";
+import { indentString } from "../common/indentString.js";
 import {
   stringToClassName,
   numberToFixedString,
-} from "../common/numToAutoFixed";
-import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
-import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { PluginSettings } from "../pluginTypes";
-import { addWarning } from "../common/commonConversionWarnings";
-import { getVisibleNodes } from "../common/nodeVisibility";
+} from "../common/numToAutoFixed.js";
+import { SwiftuiTextBuilder } from "./swiftuiTextBuilder.js";
+import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder.js";
+import { PluginSettings } from "../pluginTypes.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { getVisibleNodes } from "../common/nodeVisibility.js";
 import {
   getLocalImagePath,
   getLocalVectorPath,
   isLocalVectorChildNode,
-} from "../altNodes/altNodeUtils";
+} from "../altNodes/altNodeUtils.js";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];

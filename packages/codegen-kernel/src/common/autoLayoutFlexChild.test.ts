@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAutoLayoutMainAxisSizing,
   shouldPreventAutoLayoutFlexShrink,
-} from "./autoLayoutFlexChild";
+} from "./autoLayoutFlexChild.js";
 
 describe("autoLayoutFlexChild", () => {
   it("prevents shrink for fixed-size children on the parent's main axis", () => {

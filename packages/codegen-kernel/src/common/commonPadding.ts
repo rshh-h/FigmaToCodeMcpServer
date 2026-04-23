@@ -1,10 +1,12 @@
-import { PaddingType } from "../pluginTypes";
+import { PaddingType } from "../pluginTypes.js";
 
 export const commonPadding = (
   node: InferredAutoLayoutResult,
 ): PaddingType | null => {
   if ("layoutMode" in node && node.layoutMode !== "NONE") {
-    if ("children" in node && node.children.length === 0) {
+    const children =
+      "children" in node && Array.isArray(node.children) ? node.children : undefined;
+    if (children && children.length === 0) {
       return null;
     }
 

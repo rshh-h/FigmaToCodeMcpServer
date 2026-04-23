@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { tailwindMain } from "../tailwind/tailwindMain";
-import { PluginSettings } from "../pluginTypes";
-import { deriveTextSegmentsFromRestNode, normalizeLineHeight } from "./restNodeUtils";
+import { tailwindMain } from "../tailwind/tailwindMain.js";
+import { PluginSettings } from "../pluginTypes.js";
+import { deriveTextSegmentsFromRestNode, normalizeLineHeight } from "./restNodeUtils.js";
 
 const createSettings = (): PluginSettings =>
   ({

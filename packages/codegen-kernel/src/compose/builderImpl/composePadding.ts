@@ -1,5 +1,5 @@
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { commonPadding } from "../../common/commonPadding";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { commonPadding } from "../../common/commonPadding.js";
 
 /**
  * Generates Jetpack Compose padding modifiers based on node padding properties.

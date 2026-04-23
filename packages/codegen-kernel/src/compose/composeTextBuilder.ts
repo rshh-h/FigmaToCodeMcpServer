@@ -1,10 +1,10 @@
-import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
-import { numberToFixedString } from "../common/numToAutoFixed";
-import { ComposeDefaultBuilder } from "./composeDefaultBuilder";
-import { rgbTo6hex } from "../common/color";
-import { getCommonRadius } from "../common/commonRadius";
-import { retrieveTopFill } from "../common/retrieveFill";
-import { figma } from "../runtime/figma";
+import { commonLetterSpacing } from "../common/commonTextHeightSpacing.js";
+import { numberToFixedString } from "../common/numToAutoFixed.js";
+import { ComposeDefaultBuilder } from "./composeDefaultBuilder.js";
+import { rgbTo6hex } from "../common/color.js";
+import { getCommonRadius } from "../common/commonRadius.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { figma } from "../runtime/figma.js";
 
 // Cache static mappings for performance
 const FONT_WEIGHT_MAP: Record<number, string> = {
@@ -84,14 +84,16 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
     }
 
     // Text color
-    const fill = retrieveTopFill(node.fills);
+    const fill = Array.isArray(node.fills)
+      ? (retrieveTopFill(node.fills) as Paint | undefined)
+      : undefined;
     if (fill?.type === "SOLID") {
       const color = rgbTo6hex(fill.color);
       styles.push(`color = Color(0xFF${color.toUpperCase()})`);
     }
 
     // Letter spacing
-    if (node.letterSpacing !== figma.mixed && node.letterSpacing !== 0) {
+    if (node.letterSpacing !== figma.mixed && typeof node.letterSpacing === "object") {
       const spacing = commonLetterSpacing(node.letterSpacing, node.fontSize as number);
       styles.push(`letterSpacing = ${spacing}.sp`);
     }

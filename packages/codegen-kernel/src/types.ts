@@ -1,4 +1,4 @@
-import type { Framework, PluginSettings } from "./pluginTypes";
+import type { Framework, PluginSettings } from "./pluginTypes.js";
 
 export interface KernelSourceSnapshot {
   fileKey: string;

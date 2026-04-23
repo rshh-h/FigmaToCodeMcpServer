@@ -1,5 +1,5 @@
-import { BorderSide } from "../pluginTypes";
-import { figma } from "../runtime/figma";
+import { BorderSide } from "../pluginTypes.js";
+import { figma } from "../runtime/figma.js";
 
 export const commonStroke = (
   node: SceneNode,

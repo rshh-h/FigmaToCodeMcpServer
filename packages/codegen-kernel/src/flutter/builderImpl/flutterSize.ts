@@ -1,5 +1,5 @@
-import { nodeSize } from "../../common/nodeWidthHeight";
-import { numberToFixedString } from "../../common/numToAutoFixed";
+import { nodeSize } from "../../common/nodeWidthHeight.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
 
 // Used in tests.
 export const flutterSizeWH = (node: SceneNode): string => {

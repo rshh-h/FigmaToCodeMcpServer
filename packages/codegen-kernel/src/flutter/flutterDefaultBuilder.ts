@@ -2,14 +2,14 @@ import {
   flutterVisibility,
   flutterOpacity,
   flutterRotation,
-} from "./builderImpl/flutterBlend";
+} from "./builderImpl/flutterBlend.js";
 
-import { flutterContainer } from "./flutterContainer";
+import { flutterContainer } from "./flutterContainer.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
-import { generateWidgetCode } from "../common/numToAutoFixed";
+} from "../common/commonPosition.js";
+import { generateWidgetCode } from "../common/numToAutoFixed.js";
 
 export class FlutterDefaultBuilder {
   child: string;

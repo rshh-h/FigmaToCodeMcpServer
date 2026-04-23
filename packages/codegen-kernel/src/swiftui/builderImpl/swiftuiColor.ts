@@ -1,7 +1,8 @@
-import { retrieveTopFill } from "../../common/retrieveFill";
-import { gradientAngle } from "../../common/color";
-import { nearestValue } from "../../tailwind/conversionTables";
-import { numberToFixedString } from "../../common/numToAutoFixed";
+import { retrieveTopFill } from "../../common/retrieveFill.js";
+import { gradientAngle } from "../../common/color.js";
+import { nearestValue } from "../../tailwind/conversionTables.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import type { GradientPaint as ApiGradientPaint } from "../../api_types.js";
 
 /**
  * Retrieve the SwiftUI color for a Paint object
@@ -50,7 +51,9 @@ export const swiftuiSolidColor = (
 export const swiftuiSolidColorFromDirectFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
-  const fill = retrieveTopFill(fills);
+  const fill = Array.isArray(fills)
+    ? (retrieveTopFill(fills) as Paint | undefined)
+    : undefined;
 
   if (fill && fill.type === "SOLID") {
     // opacity should only be null on set, not on get. But better be prevented.
@@ -77,7 +80,7 @@ export const swiftuiSolidColorFromDirectFills = (
  * @param fill The gradient fill object from Figma
  * @returns SwiftUI gradient code as a string
  */
-export const swiftuiGradient = (fill: GradientPaint): string => {
+export const swiftuiGradient = (fill: ApiGradientPaint): string => {
   if (fill.type !== "GRADIENT_LINEAR") {
     return ""; // Only handling linear gradients here for simplicity
   }

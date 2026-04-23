@@ -1,15 +1,16 @@
-import { numberToFixedString } from "../common/numToAutoFixed";
+import { numberToFixedString } from "../common/numToAutoFixed.js";
 import {
   commonLetterSpacing,
   commonLineHeight,
-} from "../common/commonTextHeightSpacing";
-import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { swiftuiWeightMatcher } from "./builderImpl/swiftuiTextWeight";
-import { swiftuiSize } from "./builderImpl/swiftuiSize";
-import { SwiftUIElement } from "./builderImpl/swiftuiParser";
-import { parseTextAsCode } from "../flutter/flutterTextBuilder";
-import { swiftuiSolidColorFromDirectFills } from "./builderImpl/swiftuiColor";
-import { StyledTextSegmentSubset } from "../pluginTypes";
+} from "../common/commonTextHeightSpacing.js";
+import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder.js";
+import { swiftuiWeightMatcher } from "./builderImpl/swiftuiTextWeight.js";
+import { swiftuiSize } from "./builderImpl/swiftuiSize.js";
+import { SwiftUIElement } from "./builderImpl/swiftuiParser.js";
+import { parseTextAsCode } from "../flutter/flutterTextBuilder.js";
+import { swiftuiSolidColorFromDirectFills } from "./builderImpl/swiftuiColor.js";
+import { StyledTextSegmentSubset } from "../pluginTypes.js";
+import { isLayerBlurEffect } from "../common/effectGuards.js";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   node?: TextNode;
@@ -240,8 +241,8 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   textBlur = (): string => {
     if (this.node && this.node.effects) {
       const blurEffect = this.node.effects.find(
-        (effect) =>
-          effect.type === "LAYER_BLUR" &&
+        (effect): effect is BlurEffect & { type: "LAYER_BLUR" } =>
+          isLayerBlurEffect(effect) &&
           effect.visible !== false &&
           effect.radius > 0,
       );

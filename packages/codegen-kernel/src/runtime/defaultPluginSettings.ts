@@ -1,4 +1,4 @@
-import { PluginSettings } from "../pluginTypes";
+import type { PluginSettings } from "../pluginTypes.js";
 
 export const defaultPluginSettings: PluginSettings = {
   framework: "HTML",

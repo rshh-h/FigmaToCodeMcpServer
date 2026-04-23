@@ -1,9 +1,9 @@
-import { pxToLayoutSize } from "../conversionTables";
-import { nodeSize } from "../../common/nodeWidthHeight";
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild";
-import { TailwindSettings } from "../../pluginTypes";
-import { localTailwindSettings } from "../tailwindMain";
+import { pxToLayoutSize } from "../conversionTables.js";
+import { nodeSize } from "../../common/nodeWidthHeight.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { shouldPreventAutoLayoutFlexShrink } from "../../common/autoLayoutFlexChild.js";
+import { TailwindSettings } from "../../pluginTypes.js";
+import { localTailwindSettings } from "../tailwindMain.js";
 
 /**
  * Formats a size value into a Tailwind class

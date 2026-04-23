@@ -1,10 +1,10 @@
-import { commonStroke } from "../../common/commonStroke";
-import { getStrokeAlign } from "../flutterContainer";
+import { commonStroke } from "../../common/commonStroke.js";
+import { getStrokeAlign } from "../flutterContainer.js";
 import {
   generateWidgetCode,
   skipDefaultProperty,
-} from "./../../common/numToAutoFixed";
-import { flutterColorFromFills } from "./flutterColor";
+} from "./../../common/numToAutoFixed.js";
+import { flutterColorFromFills } from "./flutterColor.js";
 
 export const flutterBorder = (node: SceneNode): string => {
   if (!("strokes" in node)) {

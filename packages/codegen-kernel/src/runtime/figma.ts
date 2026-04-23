@@ -20,19 +20,23 @@ const runtimeNotReadyError = () =>
 const defaultRuntime: FigmaRuntime = {
   currentPage: {
     selection: [],
-  } as PluginAPI["currentPage"],
+  } as unknown as PluginAPI["currentPage"],
   async getNodeByIdAsync() {
     throw runtimeNotReadyError();
   },
   getSelectionColors() {
-    return { paints: [] };
+    return { paints: [], styles: [] };
   },
   getImageByHash() {
     return {
+      hash: "uninitialized",
+      async getSizeAsync() {
+        throw runtimeNotReadyError();
+      },
       async getBytesAsync() {
         throw runtimeNotReadyError();
       },
-    };
+    } as unknown as NonNullable<ReturnType<PluginAPI["getImageByHash"]>>;
   },
   variables: {
     getVariableById() {
@@ -41,7 +45,7 @@ const defaultRuntime: FigmaRuntime = {
     async getVariableByIdAsync() {
       return null;
     },
-  } as PluginAPI["variables"],
+  } as unknown as PluginAPI["variables"],
   mixed: Symbol.for("figma-runtime.uninitialized-mixed") as PluginAPI["mixed"],
   ui: {
     postMessage() {},

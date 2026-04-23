@@ -1,5 +1,9 @@
-import { AltNode } from "../../alt_api_types";
-import { numberToFixedString } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+
+type RotatableNode = {
+  rotation?: number;
+  cumulativeRotation?: number;
+};
 
 /**
  * Handles opacity transformations for Jetpack Compose
@@ -43,7 +47,7 @@ export const composeVisibility = (node: SceneNode, child: string): string => {
  * Maps to Modifier.rotate() in Compose
  * Converts angles from degrees to the format expected by Compose
  */
-export const composeRotation = (node: AltNode, child: string): string => {
+export const composeRotation = (node: RotatableNode, child: string): string => {
   if (
     node.rotation !== undefined &&
     child !== "" &&
@@ -69,7 +73,10 @@ export const composeRotation = (node: AltNode, child: string): string => {
  * Combines multiple blend transformations into a single modifier chain
  * This is more efficient than nesting multiple Box composables
  */
-export const composeBlendModifiers = (node: AltNode, child: string): string => {
+export const composeBlendModifiers = (
+  node: SceneNodeMixin & Partial<MinimalBlendMixin> & RotatableNode,
+  child: string,
+): string => {
   const modifiers: string[] = [];
   
   // Add opacity modifier

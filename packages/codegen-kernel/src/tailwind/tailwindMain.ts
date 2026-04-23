@@ -1,38 +1,38 @@
-import { retrieveTopFill } from "../common/retrieveFill";
-import { indentString } from "../common/indentString";
-import { addWarning } from "../common/commonConversionWarnings";
-import { formatStyleAttribute } from "../common/commonFormatAttributes";
-import { getVisibleNodes } from "../common/nodeVisibility";
-import { getPlaceholderImage } from "../common/images";
-import { buildMaskRenderPlan } from "../common/maskNodes";
-import { getImageFillRenderPlan } from "../common/imageFillRender";
-import { isCircularImageFillVectorNode } from "../common/vectorShape";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { indentString } from "../common/indentString.js";
+import { addWarning } from "../common/commonConversionWarnings.js";
+import { formatStyleAttribute } from "../common/commonFormatAttributes.js";
+import { getVisibleNodes } from "../common/nodeVisibility.js";
+import { getPlaceholderImage } from "../common/images.js";
+import { buildMaskRenderPlan } from "../common/maskNodes.js";
+import { getImageFillRenderPlan } from "../common/imageFillRender.js";
+import { isCircularImageFillVectorNode } from "../common/vectorShape.js";
 import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
-} from "../common/commonPosition";
-import { TailwindTextBuilder } from "./tailwindTextBuilder";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
-import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
+} from "../common/commonPosition.js";
+import { TailwindTextBuilder } from "./tailwindTextBuilder.js";
+import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder.js";
+import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout.js";
 import {
   getLocalImagePath,
   getLocalVectorPath,
   isLocalVectorChildNode,
   renderAndAttachSVG,
-} from "../altNodes/altNodeUtils";
-import { numberToFixedString } from "../common/numToAutoFixed";
-import { formatWithJSX } from "../common/parseJSX";
+} from "../altNodes/altNodeUtils.js";
+import { numberToFixedString } from "../common/numToAutoFixed.js";
+import { formatWithJSX } from "../common/parseJSX.js";
 import {
   annotateRenderSemantics,
   shouldAllowNodeFlatten,
   shouldAllowNodeMerge,
   shouldPreserveNodeWrapper,
-} from "../common/renderSemantics";
-import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes";
-import { ImagePaint } from "../api_types";
-import { pxToLayoutSize } from "./conversionTables";
-import { tailwindBorderRadius } from "./builderImpl/tailwindBorder";
-import { tailwindBackgroundLayerClassesFromFills } from "./builderImpl/tailwindColor";
+} from "../common/renderSemantics.js";
+import { AltNode, PluginSettings, TailwindSettings } from "../pluginTypes.js";
+import { ImagePaint } from "../api_types.js";
+import { pxToLayoutSize } from "./conversionTables.js";
+import { tailwindBorderRadius } from "./builderImpl/tailwindBorder.js";
+import { tailwindBackgroundLayerClassesFromFills } from "./builderImpl/tailwindColor.js";
 
 export let localTailwindSettings: PluginSettings;
 let previousExecutionCache: {
@@ -45,7 +45,10 @@ const SELF_CLOSING_TAGS = ["img"];
 const hasNestedImageFillChild = (node: SceneNode): boolean =>
   "children" in node &&
   node.children.some((child) => {
-    const childTopFill = "fills" in child ? retrieveTopFill(child.fills) : undefined;
+    const childTopFill =
+      "fills" in child && Array.isArray(child.fills)
+        ? (retrieveTopFill(child.fills) as { type?: string } | undefined)
+        : undefined;
     const childHasImageFill =
       getLocalImagePath(child) !== undefined || childTopFill?.type === "IMAGE";
 
@@ -442,7 +445,9 @@ export const tailwindContainer = (
   const builder = new TailwindDefaultBuilder(node, settings)
     .commonPositionStyles()
     .commonShapeStyles();
-  const topFill = retrieveTopFill(node.fills);
+  const topFill = Array.isArray(node.fills)
+    ? (retrieveTopFill(node.fills) as { type?: string } | undefined)
+    : undefined;
   const hasImageFill = topFill?.type === "IMAGE";
   const needsLayerWrapper =
     backgroundLayers.length > 0 && !commonIsAbsolutePosition(node);

@@ -2,18 +2,19 @@ import {
   generateWidgetCode,
   skipDefaultProperty,
   numberToFixedString,
-} from "./../common/numToAutoFixed";
-import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
+} from "./../common/numToAutoFixed.js";
+import { FlutterDefaultBuilder } from "./flutterDefaultBuilder.js";
 import {
   flutterColorFromDirectFills,
   flutterColorFromFills,
-} from "./builderImpl/flutterColor";
-import { flutterSize } from "./builderImpl/flutterSize";
+} from "./builderImpl/flutterColor.js";
+import { flutterSize } from "./builderImpl/flutterSize.js";
 import {
   commonLetterSpacing,
   commonLineHeight,
-} from "../common/commonTextHeightSpacing";
-import { StyledTextSegmentSubset } from "../pluginTypes";
+} from "../common/commonTextHeightSpacing.js";
+import { StyledTextSegmentSubset } from "../pluginTypes.js";
+import { isLayerBlurEffect } from "../common/effectGuards.js";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   node?: TextNode;
@@ -266,8 +267,8 @@ export const wrapTextWithLayerBlur = (
 ): string => {
   if (node.effects) {
     const blurEffect = node.effects.find(
-      (effect) =>
-        effect.type === "LAYER_BLUR" &&
+      (effect): effect is BlurEffect & { type: "LAYER_BLUR" } =>
+        isLayerBlurEffect(effect) &&
         effect.visible !== false &&
         effect.radius > 0,
     );

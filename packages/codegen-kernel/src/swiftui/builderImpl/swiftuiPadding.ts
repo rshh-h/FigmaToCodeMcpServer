@@ -1,6 +1,6 @@
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { commonPadding } from "../../common/commonPadding";
-import { SwiftUIModifier } from "../../pluginTypes";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { commonPadding } from "../../common/commonPadding.js";
+import { SwiftUIModifier } from "../../pluginTypes.js";
 
 export const swiftuiPadding = (
   node: InferredAutoLayoutResult,

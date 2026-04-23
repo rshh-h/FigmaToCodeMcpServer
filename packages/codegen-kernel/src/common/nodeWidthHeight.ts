@@ -1,4 +1,4 @@
-import { Size } from "../pluginTypes";
+import { Size } from "../pluginTypes.js";
 
 export const nodeSize = (node: SceneNode): Size => {
   if ("layoutSizingHorizontal" in node && "layoutSizingVertical" in node) {

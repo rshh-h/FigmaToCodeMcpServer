@@ -1,4 +1,4 @@
-import { figma } from "../../runtime/figma";
+import { figma } from "../../runtime/figma.js";
 
 /**
  * Large (Default)

@@ -1,4 +1,4 @@
-import type { ImagePaint } from "../api_types";
+import type { ImagePaint } from "../api_types.js";
 
 export type ImageFillRenderPlan = {
   renderMode: "img" | "background";

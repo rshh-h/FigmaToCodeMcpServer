@@ -1,4 +1,4 @@
-import { pxToLayoutSize } from "../conversionTables";
+import { pxToLayoutSize } from "../conversionTables.js";
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
   node.layoutMode === "HORIZONTAL" ? "" : "flex-col";

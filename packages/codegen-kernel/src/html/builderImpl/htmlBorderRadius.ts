@@ -1,5 +1,5 @@
-import { getCommonRadius } from "../../common/commonRadius";
-import { formatWithJSX } from "../../common/parseJSX";
+import { getCommonRadius } from "../../common/commonRadius.js";
+import { formatWithJSX } from "../../common/parseJSX.js";
 
 export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
   let comp: string[] = [];

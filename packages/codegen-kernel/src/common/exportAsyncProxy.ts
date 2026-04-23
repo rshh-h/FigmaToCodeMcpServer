@@ -1,5 +1,5 @@
-import { postConversionStart } from "../messaging";
-import { figma } from "../runtime/figma";
+import { postConversionStart } from "../messaging.js";
+import { figma } from "../runtime/figma.js";
 
 let isRunning = false;
 

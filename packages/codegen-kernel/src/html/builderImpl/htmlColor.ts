@@ -1,7 +1,7 @@
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { retrieveTopFill } from "../../common/retrieveFill";
-import { GradientPaint, Paint } from "../../api_types";
-import { figma } from "../../runtime/figma";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+import { retrieveTopFill } from "../../common/retrieveFill.js";
+import { GradientPaint } from "../../api_types.js";
+import { figma } from "../../runtime/figma.js";
 
 /**
  * Helper to process a color with variable binding if present
@@ -60,7 +60,7 @@ const getColorAndVariable = (
 export const htmlColorFromFills = (
   fills: ReadonlyArray<Paint> | undefined,
 ): string => {
-  const fill = retrieveTopFill(fills);
+  const fill = retrieveTopFill(fills) as Paint | undefined;
   if (fill) {
     const colorInfo = getColorAndVariable(fill);
     return processColorWithVariable(colorInfo);
@@ -143,13 +143,13 @@ export const htmlGradientFromFills = (fill: Paint): string => {
   if (!fill) return "";
   switch (fill.type) {
     case "GRADIENT_LINEAR":
-      return htmlLinearGradient(fill);
+      return htmlLinearGradient(fill as unknown as GradientPaint);
     case "GRADIENT_ANGULAR":
-      return htmlAngularGradient(fill);
+      return htmlAngularGradient(fill as unknown as GradientPaint);
     case "GRADIENT_RADIAL":
-      return htmlRadialGradient(fill);
+      return htmlRadialGradient(fill as unknown as GradientPaint);
     case "GRADIENT_DIAMOND":
-      return htmlDiamondGradient(fill);
+      return htmlDiamondGradient(fill as unknown as GradientPaint);
     default:
       return "";
   }

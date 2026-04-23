@@ -1,6 +1,10 @@
-import { SwiftUIModifier } from "../../pluginTypes";
-import { numberToFixedString } from "../../common/numToAutoFixed";
-import { AltNode } from "../../alt_api_types";
+import { SwiftUIModifier } from "../../pluginTypes.js";
+import { numberToFixedString } from "../../common/numToAutoFixed.js";
+
+type RotatableNode = {
+  rotation?: number;
+  cumulativeRotation?: number;
+};
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
@@ -30,7 +34,7 @@ export const swiftuiVisibility = (
 /**
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const swiftuiRotation = (node: AltNode): SwiftUIModifier | null => {
+export const swiftuiRotation = (node: RotatableNode): SwiftUIModifier | null => {
   const rotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
   if (Math.round(rotation) !== 0) {
     return ["rotationEffect", `.degrees(${numberToFixedString(rotation)})`];

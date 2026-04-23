@@ -100,10 +100,18 @@ function getAbsoluteBoundingBox(
     return null;
   }
 
-  const x = typeof box.x === "number" ? box.x : null;
-  const y = typeof box.y === "number" ? box.y : null;
-  const width = typeof box.width === "number" ? box.width : null;
-  const height = typeof box.height === "number" ? box.height : null;
+  const boundingBox = box as {
+    x?: unknown;
+    y?: unknown;
+    width?: unknown;
+    height?: unknown;
+  };
+
+  const x = typeof boundingBox.x === "number" ? boundingBox.x : null;
+  const y = typeof boundingBox.y === "number" ? boundingBox.y : null;
+  const width = typeof boundingBox.width === "number" ? boundingBox.width : null;
+  const height =
+    typeof boundingBox.height === "number" ? boundingBox.height : null;
 
   if (
     x === null ||
@@ -197,7 +205,7 @@ function shouldKeepChildrenSeparate(
         analysis: VectorAnalysis;
         box: BoundingBox;
       } =>
-        Boolean(entry.box) &&
+        entry.box !== null &&
         typeof entry.child.type === "string" &&
         CONTAINER_NODE_TYPES.has(entry.child.type) &&
         entry.analysis.containsVectorContent &&

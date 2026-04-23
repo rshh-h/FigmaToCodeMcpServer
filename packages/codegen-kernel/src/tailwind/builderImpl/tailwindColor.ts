@@ -1,16 +1,16 @@
-import { gradientAngle } from "../../common/color";
+import { gradientAngle } from "../../common/color.js";
 import {
   getColorInfo,
   nearestOpacity,
   nearestValue,
-} from "../conversionTables";
-import { TailwindColorType } from "../../pluginTypes";
-import { retrieveTopFill } from "../../common/retrieveFill";
+} from "../conversionTables.js";
+import { TailwindColorType } from "../../pluginTypes.js";
+import { retrieveTopFill } from "../../common/retrieveFill.js";
 
 // Import the HTML gradient functions
-import { htmlAngularGradient, htmlRadialGradient } from "../../html/builderImpl/htmlColor";
-import { GradientPaint, Paint } from "../../api_types";
-import { localTailwindSettings } from "../tailwindMain";
+import { htmlAngularGradient, htmlRadialGradient } from "../../html/builderImpl/htmlColor.js";
+import { GradientPaint } from "../../api_types.js";
+import { localTailwindSettings } from "../tailwindMain.js";
 
 /**
  * Get a tailwind color value object
@@ -123,12 +123,14 @@ export const tailwindGradientStop = (
 
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
-  fills: ReadonlyArray<Paint>,
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   kind: TailwindColorType,
 ): string => {
   // [when testing] fills can be undefined
 
-  const fill = retrieveTopFill(fills);
+  const fill = Array.isArray(fills)
+    ? (retrieveTopFill(fills) as Paint | undefined)
+    : undefined;
   if (fill && fill.type === "SOLID") {
     return tailwindSolidColor(fill, kind);
   } else if (
@@ -146,9 +148,11 @@ export const tailwindColorFromFills = (
 };
 
 export const tailwindGradientFromFills = (
-  fills: ReadonlyArray<Paint>,
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
-  const fill = retrieveTopFill(fills);
+  const fill = Array.isArray(fills)
+    ? (retrieveTopFill(fills) as Paint | undefined)
+    : undefined;
 
   // Return early if no fill exists
   if (!fill) {
@@ -156,16 +160,16 @@ export const tailwindGradientFromFills = (
   }
 
   if (fill.type === "GRADIENT_LINEAR") {
-    return tailwindGradient(fill);
+    return tailwindGradient(fill as unknown as GradientPaint);
   }
 
   // Tailwind 4 has built-in support for radial and conic gradients
   if (localTailwindSettings.useTailwind4) {
     if (fill.type === "GRADIENT_RADIAL") {
-      return tailwindRadialGradient(fill);
+      return tailwindRadialGradient(fill as unknown as GradientPaint);
     }
     if (fill.type === "GRADIENT_ANGULAR") {
-      return tailwindConicGradient(fill);
+      return tailwindConicGradient(fill as unknown as GradientPaint);
     }
     // Diamond is still too complex for direct Tailwind support
     if (fill.type === "GRADIENT_DIAMOND") {
@@ -174,11 +178,15 @@ export const tailwindGradientFromFills = (
   } else {
     // Use arbitrary values with HTML-based gradient syntax for other gradient types
     if (fill.type === "GRADIENT_ANGULAR") {
-      return tailwindArbitraryGradient(htmlAngularGradient(fill));
+      return tailwindArbitraryGradient(
+        htmlAngularGradient(fill as unknown as GradientPaint),
+      );
     }
 
     if (fill.type === "GRADIENT_RADIAL") {
-      return tailwindArbitraryGradient(htmlRadialGradient(fill));
+      return tailwindArbitraryGradient(
+        htmlRadialGradient(fill as unknown as GradientPaint),
+      );
     }
 
     if (fill.type === "GRADIENT_DIAMOND") {
@@ -191,7 +199,7 @@ export const tailwindGradientFromFills = (
 };
 
 export const tailwindBackgroundFromFills = (
-  fills: ReadonlyArray<Paint>,
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const layers = tailwindBackgroundLayerClassesFromFills(fills);
   return layers.length > 1 ? "" : layers[0] ?? "";
@@ -202,7 +210,7 @@ export const tailwindBackgroundFromFills = (
  * bottom-to-top order so callers can render them as stacked DOM layers.
  */
 export const tailwindBackgroundLayerClassesFromFills = (
-  fills: ReadonlyArray<Paint> | undefined,
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"] | undefined,
 ): string[] => {
   if (!Array.isArray(fills)) {
     return [];
