@@ -1,6 +1,7 @@
 import type { Server as HttpServer } from "node:http";
 import express, { type Express } from "express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { isDirectEntrypoint } from "./entrypoint.js";
 import { createMcpApplication } from "./mcp/server.js";
 import { PACKAGE_NAME } from "./product.js";
 
@@ -58,6 +59,6 @@ async function main() {
   await startHttpServer(process.env);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isDirectEntrypoint(import.meta.url)) {
   void main();
 }

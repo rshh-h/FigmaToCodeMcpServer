@@ -1,4 +1,5 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { isDirectEntrypoint } from "./entrypoint.js";
 import { createMcpApplication } from "./mcp/server.js";
 
 export async function startStdioServer(env: NodeJS.ProcessEnv = process.env) {
@@ -8,6 +9,6 @@ export async function startStdioServer(env: NodeJS.ProcessEnv = process.env) {
   await server.connect(transport);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isDirectEntrypoint(import.meta.url)) {
   void startStdioServer(process.env);
 }

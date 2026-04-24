@@ -71,3 +71,36 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Fix Windows CLI entrypoint
+
+**Date**: 2026-04-24
+**Task**: Fix Windows CLI entrypoint
+**Branch**: `main`
+
+### Summary
+
+Fixed anchor-d2c-mcp no-op on Windows by replacing hand-built file URL entrypoint checks with normalized cross-platform path comparison, added regression coverage, and updated backend quality guidance.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b4658ec` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

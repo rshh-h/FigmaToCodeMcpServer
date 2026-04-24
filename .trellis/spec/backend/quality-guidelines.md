@@ -54,6 +54,7 @@ When a change affects generated output, update or add the corresponding fixture/
 - Add package-appropriate tests for new behavior, especially schema, error, cache, and output changes.
 - Preserve deterministic fixtures and golden outputs.
 - Keep NodeNext-compatible `.js` import specifiers in TypeScript source.
+- For ESM executable entrypoints, detect direct execution by comparing normalized filesystem paths derived from `import.meta.url` and `process.argv[1]`; do not hand-build `file://` URLs because Windows drive paths will not match standard file URL formatting.
 - When adding or changing a public MCP tool in `apps/figma-rest-mcp-server`, update the npm-facing `apps/figma-rest-mcp-server/README.md` with user-facing usage documentation.
 - Public tool usage docs in the npm-facing README should stay concise and focus on how to use the tool, not parameter-by-parameter breakdowns or implementation details.
 - Prefer a short purpose statement plus one example prompt or invocation shape.
