@@ -564,7 +564,7 @@ describe("FetchFigmaNodeScreenshotUseCase", () => {
       },
       {
         async readCached() {
-          return ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png";
+          return ".figma-to-code/cache/screenshot/FILE/1_2/preview.png";
         },
         async write() {
           throw new Error("write should be skipped");
@@ -580,7 +580,7 @@ describe("FetchFigmaNodeScreenshotUseCase", () => {
     });
 
     expect(result).toEqual({
-      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1_2/preview.png",
       fileKey: "FILE",
       nodeId: "1:2",
     });

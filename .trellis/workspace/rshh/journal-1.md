@@ -104,3 +104,36 @@ Fixed anchor-d2c-mcp no-op on Windows by replacing hand-built file URL entrypoin
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: 图片资源命名改为小写下划线
+
+**Date**: 2026-04-28
+**Task**: 图片资源命名改为小写下划线
+**Branch**: `main`
+
+### Summary
+
+将本地图片、向量、截图及相关 manifest 产物命名统一为小写 snake_case，并更新测试和后端 spec。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e13c9ab` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

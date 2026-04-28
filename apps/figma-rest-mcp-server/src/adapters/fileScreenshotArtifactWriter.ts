@@ -15,7 +15,7 @@ function resolveScreenshotOutputPath(
     resolveScreenshotCacheDir(workspace.workspaceRoot),
     target.fileKey,
     nodeIdToSlug(nodeId),
-    "Preview.png",
+    "preview.png",
   );
 }
 
@@ -63,7 +63,7 @@ export class FileScreenshotArtifactWriter implements ScreenshotArtifactWriter {
     }
 
     const outputPath = resolveScreenshotOutputPath(input.target, input.workspace);
-    await saveBuffer("Preview.png", input.buffer, {
+    await saveBuffer("preview.png", input.buffer, {
       baseDir: dirname(outputPath),
     });
     return toWorkspaceRelativePath(input.workspace.workspaceRoot, outputPath);

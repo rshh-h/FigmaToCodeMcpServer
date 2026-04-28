@@ -10,6 +10,7 @@ import {
   saveBuffer,
   saveJson,
   saveText,
+  toSnakeCaseSlug,
   toRepoRelativePath,
 } from "./figmaScriptCommon.js";
 import {
@@ -129,11 +130,12 @@ async function saveSourceNodeJsons(
   baseDir: string,
   fileKey: string,
 ): Promise<string[]> {
+  const fileKeySlug = toSnakeCaseSlug(fileKey);
   const paths: string[] = [];
   for (const entry of documents) {
     paths.push(
       await saveJson(
-        `figma-node-${fileKey}-${nodeIdToSlug(entry.nodeId)}.json`,
+        `figma_node_${fileKeySlug}_${nodeIdToSlug(entry.nodeId)}.json`,
         buildSyntheticNodeJson(entry.nodeId, entry.document),
         { baseDir },
       ),
@@ -152,6 +154,7 @@ export async function fetchNodeImagesForDocuments(
   missingCount: number;
   localImagePaths: Record<string, string>;
 }> {
+  const fileKeySlug = toSnakeCaseSlug(options.fileKey);
   const outputSlug =
     options.outputSlug ??
     options.documents.map((entry) => nodeIdToSlug(entry.nodeId)).join("__");
@@ -169,7 +172,7 @@ export async function fetchNodeImagesForDocuments(
   ).sort();
 
   const imageRefsPath = await saveJson(
-    `figma-image-refs-${options.fileKey}-${outputSlug}.json`,
+    `figma_image_refs_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),
@@ -192,11 +195,11 @@ export async function fetchNodeImagesForDocuments(
 
   const cachedImagesResponsePath = cachedPath(
     options.baseDir,
-    `figma-file-images-${options.fileKey}.json`,
+    `figma_file_images_${fileKeySlug}.json`,
   );
   const cachedManifestPath = cachedPath(
     options.baseDir,
-    `figma-downloaded-images-${options.fileKey}-${outputSlug}.json`,
+    `figma_downloaded_images_${fileKeySlug}_${outputSlug}.json`,
   );
   if (options.useCache) {
     const manifest = await readJsonIfExists<{
@@ -242,7 +245,7 @@ export async function fetchNodeImagesForDocuments(
     },
   });
   const imagesResponsePath = await saveJson(
-    `figma-file-images-${options.fileKey}.json`,
+    `figma_file_images_${fileKeySlug}.json`,
     imagesResponse,
     { baseDir: options.baseDir },
   );
@@ -270,7 +273,7 @@ export async function fetchNodeImagesForDocuments(
       });
       const extension = extensionFromContentType(contentType);
       const outputPath = await saveBuffer(
-        `figma-image-${imageRef}.${extension}`,
+        `figma_image_${toSnakeCaseSlug(imageRef)}.${extension}`,
         buffer,
         { baseDir: options.baseDir },
       );
@@ -295,7 +298,7 @@ export async function fetchNodeImagesForDocuments(
   }
 
   const manifestPath = await saveJson(
-    `figma-downloaded-images-${options.fileKey}-${outputSlug}.json`,
+    `figma_downloaded_images_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),
@@ -333,6 +336,7 @@ export async function fetchNodeSvgForDocuments(
     path: string;
   }>;
 }> {
+  const fileKeySlug = toSnakeCaseSlug(options.fileKey);
   const outputSlug =
     options.outputSlug ??
     options.documents.map((entry) => nodeIdToSlug(entry.nodeId)).join("__");
@@ -354,7 +358,7 @@ export async function fetchNodeSvgForDocuments(
 
   const candidates = roots.map(({ node }) => toVectorCandidate(node));
   const candidatesPath = await saveJson(
-    `figma-vector-node-candidates-${options.fileKey}-${outputSlug}.json`,
+    `figma_vector_node_candidates_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),
@@ -368,11 +372,11 @@ export async function fetchNodeSvgForDocuments(
   let svgUrlsResponse: { err: null; images: Record<string, string> } | { images?: Record<string, string> };
   const cachedSvgUrlsPath = cachedPath(
     options.baseDir,
-    `figma-vector-svg-urls-${options.fileKey}-${outputSlug}.json`,
+    `figma_vector_svg_urls_${fileKeySlug}_${outputSlug}.json`,
   );
   const cachedManifestPath = cachedPath(
     options.baseDir,
-    `figma-downloaded-vector-svgs-${options.fileKey}-${outputSlug}.json`,
+    `figma_downloaded_vector_svgs_${fileKeySlug}_${outputSlug}.json`,
   );
   if (options.useCache) {
     const manifest = await readJsonIfExists<{
@@ -452,7 +456,7 @@ export async function fetchNodeSvgForDocuments(
   }
 
   const svgUrlsPath = await saveJson(
-    `figma-vector-svg-urls-${options.fileKey}-${outputSlug}.json`,
+    `figma_vector_svg_urls_${fileKeySlug}_${outputSlug}.json`,
     svgUrlsResponse,
     { baseDir: options.baseDir },
   );
@@ -489,7 +493,7 @@ export async function fetchNodeSvgForDocuments(
     const outputPath =
       svgPathByHash.get(svgHash) ??
       (await saveText(
-        `figma-vector-root-${nodeIdToSlug(root.id)}.svg`,
+        `figma_vector_root_${nodeIdToSlug(root.id)}.svg`,
         svgContent,
         { baseDir: options.baseDir },
       ));
@@ -513,7 +517,7 @@ export async function fetchNodeSvgForDocuments(
   }
 
   const manifestPath = await saveJson(
-    `figma-downloaded-vector-svgs-${options.fileKey}-${outputSlug}.json`,
+    `figma_downloaded_vector_svgs_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),
@@ -547,6 +551,7 @@ export async function fetchNodeVariablesForDocuments(
   missingVariableIds: string[];
   variablesRaw: Record<string, unknown>;
 }> {
+  const fileKeySlug = toSnakeCaseSlug(options.fileKey);
   const outputSlug =
     options.outputSlug ??
     options.documents.map((entry) => nodeIdToSlug(entry.nodeId)).join("__");
@@ -564,7 +569,7 @@ export async function fetchNodeVariablesForDocuments(
   ).sort();
 
   const variableRefsPath = await saveJson(
-    `figma-node-variable-refs-${options.fileKey}-${outputSlug}.json`,
+    `figma_node_variable_refs_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),
@@ -576,11 +581,11 @@ export async function fetchNodeVariablesForDocuments(
 
   const cachedVariablesResponsePath = cachedPath(
     options.baseDir,
-    `figma-file-variables-${options.fileKey}.json`,
+    `figma_file_variables_${fileKeySlug}.json`,
   );
   const cachedManifestPath = cachedPath(
     options.baseDir,
-    `figma-node-variables-${options.fileKey}-${outputSlug}.json`,
+    `figma_node_variables_${fileKeySlug}_${outputSlug}.json`,
   );
   if (options.useCache) {
     const variablesRaw = await readJsonIfExists<Record<string, unknown>>(cachedVariablesResponsePath);
@@ -608,7 +613,7 @@ export async function fetchNodeVariablesForDocuments(
     },
   });
   const variablesResponsePath = await saveJson(
-    `figma-file-variables-${options.fileKey}.json`,
+    `figma_file_variables_${fileKeySlug}.json`,
     variablesResponse,
     { baseDir: options.baseDir },
   );
@@ -649,7 +654,7 @@ export async function fetchNodeVariablesForDocuments(
     .map((entry) => entry.variableId);
 
   const manifestPath = await saveJson(
-    `figma-node-variables-${options.fileKey}-${outputSlug}.json`,
+    `figma_node_variables_${fileKeySlug}_${outputSlug}.json`,
     {
       fileKey: options.fileKey,
       nodeIds: options.documents.map((entry) => entry.nodeId),

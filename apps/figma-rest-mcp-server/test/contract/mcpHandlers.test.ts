@@ -5,7 +5,7 @@ import { ServiceError } from "../../src/core/errors.js";
 const screenshotUseCase = {
   async execute() {
     return {
-      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+      screenshotPath: ".figma-to-code/cache/screenshot/FILE/1_2/preview.png",
       fileKey: "FILE",
       nodeId: "1:2",
     };
@@ -311,7 +311,7 @@ describe("MCP tool handlers", () => {
 
     expect(result.content[0].text).toContain("Fetched Figma node screenshot");
     expect((result.structuredContent as any).screenshotPath).toBe(
-      ".figma-to-code/cache/screenshot/FILE/1-2/Preview.png",
+      ".figma-to-code/cache/screenshot/FILE/1_2/preview.png",
     );
   });
 });

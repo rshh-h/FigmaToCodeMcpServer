@@ -23,7 +23,7 @@ describe("FileScreenshotArtifactWriter", () => {
       contentType: "image/png",
     });
 
-    expect(result).toBe(".figma-to-code/cache/screenshot/FILE/1-2/Preview.png");
+    expect(result).toBe(".figma-to-code/cache/screenshot/FILE/1_2/preview.png");
     expect(await readFile(resolve(workspaceRoot, result))).toEqual(Buffer.from("png-binary"));
   });
 });

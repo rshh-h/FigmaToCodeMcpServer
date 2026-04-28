@@ -74,7 +74,7 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
     {
       title: "Figma To Code Fetch Screenshot",
       description:
-        "Fetch a screenshot image for a single Figma node and cache it as Preview.png under the workspace cache directory.",
+        "Fetch a screenshot image for a single Figma node and cache it as preview.png under the workspace cache directory.",
       inputSchema: fetchScreenshotRequestSchema,
       outputSchema: fetchScreenshotResponseSchema,
       annotations: readOnlyAnnotations,

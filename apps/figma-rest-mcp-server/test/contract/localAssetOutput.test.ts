@@ -70,18 +70,18 @@ function createSnapshot(): SourceSnapshot {
     imageRefs: ["hero-ref"],
     imageUrls: {},
     localImagePaths: {
-      "hero-ref": ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
+      "hero-ref": ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
     },
     vectorCandidates: [],
     vectorUrls: {},
     localVectorPaths: {
-      "2:1": ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+      "2:1": ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
     },
     localVectorRootMappings: [
       {
         rootNodeId: "2:1",
         childNodeIds: ["2:2", "2:3"],
-        path: ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+        path: ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
       },
     ],
     metadata: {
@@ -130,36 +130,36 @@ describe("local asset code output", () => {
       {
         framework: "HTML",
         expected: [
-          ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
-          ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
         ],
       },
       {
         framework: "Tailwind",
         expected: [
-          ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
-          ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
         ],
       },
       {
         framework: "Flutter",
         expected: [
-          "Image.asset('.figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png'",
-          "SvgPicture.asset('.figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg'",
+          "Image.asset('.figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png'",
+          "SvgPicture.asset('.figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg'",
         ],
       },
       {
         framework: "Compose",
         expected: [
-          ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
-          ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
         ],
       },
       {
         framework: "SwiftUI",
         expected: [
-          ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
-          ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
+          ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
         ],
       },
     ];
@@ -224,18 +224,18 @@ describe("local asset code output", () => {
       imageRefs: ["photo-ref"],
       imageUrls: {},
       localImagePaths: {
-        "photo-ref": ".figma-to-code/cache/assets/FILE/1-1/figma-image-photo-ref.png",
+        "photo-ref": ".figma-to-code/cache/assets/FILE/1_1/figma_image_photo_ref.png",
       },
       vectorCandidates: [],
       vectorUrls: {},
       localVectorPaths: {
-        "1:2:1": ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-1-2-1.svg",
+        "1:2:1": ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_1_2_1.svg",
       },
       localVectorRootMappings: [
         {
           rootNodeId: "1:2:1",
           childNodeIds: [],
-          path: ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-1-2-1.svg",
+          path: ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_1_2_1.svg",
         },
       ],
       metadata: {
@@ -254,10 +254,10 @@ describe("local asset code output", () => {
     const artifact = await generator.generate(tree, context);
 
     expect(artifact.code).toContain(
-      `backgroundImage: 'url(".figma-to-code/cache/assets/FILE/1-1/figma-image-photo-ref.png")'`,
+      `backgroundImage: 'url(".figma-to-code/cache/assets/FILE/1_1/figma_image_photo_ref.png")'`,
     );
     expect(artifact.code).toContain(
-      'src=".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-1-2-1.svg"',
+      'src=".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_1_2_1.svg"',
     );
   });
 });

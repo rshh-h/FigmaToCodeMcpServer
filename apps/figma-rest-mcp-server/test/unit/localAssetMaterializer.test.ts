@@ -257,10 +257,10 @@ describe("LocalAssetMaterializer", () => {
     });
 
     expect(result.localImagePaths?.["hero-ref"]).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-image-hero-ref\.png$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_image_hero_ref\.png$/,
     );
     expect(result.localVectorPaths?.["2:1"]).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-vector-root-2-1\.svg$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_vector_root_2_1\.svg$/,
     );
     expect(result.localVectorRootMappings).toContainEqual({
       rootNodeId: "2:1",
@@ -275,19 +275,19 @@ describe("LocalAssetMaterializer", () => {
       ).meta?.variables?.["VariableID:brand/primary"]?.name,
     ).toBe("color.brand.primary");
     expect(result.localAssetManifestPaths?.variableRefsPath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-node-variable-refs-FILE-1-1\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_node_variable_refs_file_1_1\.json$/,
     );
     expect(result.localAssetManifestPaths?.variablesResponsePath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-file-variables-FILE\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_file_variables_file\.json$/,
     );
     expect(result.localAssetManifestPaths?.variableManifestPath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-node-variables-FILE-1-1\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_node_variables_file_1_1\.json$/,
     );
     expect(result.localAssetManifestPaths?.imageManifestPath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-downloaded-images-FILE-1-1\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_downloaded_images_file_1_1\.json$/,
     );
     expect(result.localAssetManifestPaths?.vectorManifestPath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-downloaded-vector-svgs-FILE-1-1\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_downloaded_vector_svgs_file_1_1\.json$/,
     );
 
     await access(resolve(workspaceRoot, result.localImagePaths?.["hero-ref"] ?? ""));
@@ -606,8 +606,8 @@ describe("LocalAssetMaterializer", () => {
       context,
     });
 
-    expect(result.localImagePaths?.["hero-ref"]).toMatch(/figma-image-hero-ref\.png$/);
-    expect(result.localVectorPaths?.["2:1"]).toMatch(/figma-vector-root-2-1\.svg$/);
+    expect(result.localImagePaths?.["hero-ref"]).toMatch(/figma_image_hero_ref\.png$/);
+    expect(result.localVectorPaths?.["2:1"]).toMatch(/figma_vector_root_2_1\.svg$/);
   });
 
   it("skips variable materialization when color variables are disabled", async () => {
@@ -818,11 +818,11 @@ describe("LocalAssetMaterializer", () => {
     });
 
     expect(result.localImagePaths).toEqual({
-      "hero-ref": ".figma-to-code/cache/assets/FILE/1-1/figma-image-hero-ref.png",
+      "hero-ref": ".figma-to-code/cache/assets/FILE/1_1/figma_image_hero_ref.png",
     });
     expect(context.warningCollector.list()).not.toContain("local_image_download_failed");
     expect(result.localAssetManifestPaths?.imageManifestPath).toMatch(
-      /^\.figma-to-code\/cache\/assets\/FILE\/1-1\/figma-downloaded-images-FILE-1-1\.json$/,
+      /^\.figma-to-code\/cache\/assets\/FILE\/1_1\/figma_downloaded_images_file_1_1\.json$/,
     );
     await access(resolve(workspaceRoot, result.localImagePaths?.["hero-ref"] ?? ""));
   });
@@ -992,24 +992,24 @@ describe("LocalAssetMaterializer", () => {
     });
 
     expect(result.localVectorPaths?.["2:1"]).toBe(
-      ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+      ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
     );
     expect(result.localVectorPaths?.["3:1"]).toBe(
-      ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+      ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
     );
     expect(result.localVectorRootMappings).toContainEqual({
       rootNodeId: "2:1",
       childNodeIds: ["2:2"],
-      path: ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+      path: ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
     });
     expect(result.localVectorRootMappings).toContainEqual({
       rootNodeId: "3:1",
       childNodeIds: ["3:2"],
-      path: ".figma-to-code/cache/assets/FILE/1-1/figma-vector-root-2-1.svg",
+      path: ".figma-to-code/cache/assets/FILE/1_1/figma_vector_root_2_1.svg",
     });
 
-    const assetDir = resolve(workspaceRoot, ".figma-to-code/cache/assets/FILE/1-1");
+    const assetDir = resolve(workspaceRoot, ".figma-to-code/cache/assets/FILE/1_1");
     const svgFiles = (await readdir(assetDir)).filter((name) => name.endsWith(".svg"));
-    expect(svgFiles).toEqual(["figma-vector-root-2-1.svg"]);
+    expect(svgFiles).toEqual(["figma_vector_root_2_1.svg"]);
   });
 });

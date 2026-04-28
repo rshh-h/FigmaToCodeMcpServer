@@ -77,6 +77,20 @@ When changing behavior, account for configuration and parameter effects end to e
 - Request parameters should be traced through schemas, use case options, adapters, and generated artifacts.
 - Do not fix a symptom by hardcoding or ignoring existing parameters such as environment flags, generation modes, cache options, or embed/download toggles.
 
+### Convention: Workspace Artifact Naming
+
+**What**: Generated workspace artifact filenames should use lowercase snake_case. Convert generated name segments through the shared local-asset slug helper instead of hand-building mixed-case or dash-separated names.
+
+**Why**: Local image/vector/screenshot paths are returned to callers and embedded into generated code. A single naming convention prevents drift between disk artifacts, manifests, cache reads, and generated framework output.
+
+**Examples**:
+
+- Local image: `.figma-to-code/cache/assets/<fileKey>/1_2/figma_image_hero_ref.png`
+- Local vector: `.figma-to-code/cache/assets/<fileKey>/1_2/figma_vector_root_2_1.svg`
+- Screenshot: `.figma-to-code/cache/screenshot/<fileKey>/1_2/preview.png`
+
+Keep source identifiers such as the `fileKey` directory and manifest payload fields unchanged unless the source contract itself changes.
+
 ---
 
 ## Generator Package Rules
@@ -146,7 +160,7 @@ Examples:
 - `workspaceRoot` 是截图缓存根目录；输出文件写入该目录下的 workspace cache
 - `useCache=true` 时，优先复用现有截图文件
 - 返回的 `screenshotPath` 必须是相对 `workspaceRoot` 的路径
-- 截图文件固定落在 `.figma-to-code/cache/screenshot/<fileKey>/<nodeId>/Preview.png`
+- 截图文件固定落在 `.figma-to-code/cache/screenshot/<fileKey>/<node_slug>/preview.png`
 - 该 tool 只表示 Figma REST 导出的截图文件，不能复用 HTML preview artifact 语义
 
 ### 4. Validation & Error Matrix
@@ -159,7 +173,7 @@ Examples:
 
 ### 5. Good/Base/Bad Cases
 
-- Good: 合法单节点 URL，首次请求下载 PNG，并返回 `.figma-to-code/cache/screenshot/FILE/1-2/Preview.png`
+- Good: 合法单节点 URL，首次请求下载 PNG，并返回 `.figma-to-code/cache/screenshot/FILE/1_2/preview.png`
 - Base: `useCache=true` 且目标文件已存在，直接返回已有路径，不再次请求 Figma
 - Bad: 把该工具的输出挂到 `ConvertResponse.preview` 或复用 `PreviewArtifact`
 
@@ -173,7 +187,7 @@ Examples:
   - 调用 `/v1/images/<fileKey>` 且 `format=png`
   - 使用 signed URL 下载二进制 PNG
 - Writer unit test:
-  - 文件写入 `.figma-to-code/cache/screenshot/<fileKey>/<nodeId>/Preview.png`
+  - 文件写入 `.figma-to-code/cache/screenshot/<fileKey>/<node_slug>/preview.png`
   - 返回相对 `workspaceRoot` 路径
 - MCP handler contract test:
   - 返回 `screenshotPath/fileKey/nodeId`

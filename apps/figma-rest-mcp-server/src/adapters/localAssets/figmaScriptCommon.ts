@@ -3,7 +3,20 @@ import { join, resolve } from "node:path";
 import { toWorkspaceRelativePath } from "../../infrastructure/workspacePaths.js";
 
 export function nodeIdToSlug(nodeId: string): string {
-  return nodeId.replace(/:/g, "-");
+  return toSnakeCaseSlug(nodeId);
+}
+
+export function toSnakeCaseSlug(value: string): string {
+  const normalized = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return normalized || "asset";
 }
 
 export function resolveOutputDir(baseDir: string): string {
