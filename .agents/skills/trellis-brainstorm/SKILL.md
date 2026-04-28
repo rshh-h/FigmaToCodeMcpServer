@@ -92,10 +92,16 @@ Create/seed `prd.md` immediately with what you know:
 
 * [ ] <testable criterion>
 
+## Version Plan
+
+* Version impact: <major | minor | patch | none> because <scope/risk reason>
+* If version changes, update both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts`
+
 ## Definition of Done (team quality bar)
 
 * Tests added/updated (unit/integration where appropriate)
 * Lint / typecheck / CI green
+* Version bump applied to both version declarations when the change scope requires it
 * Docs/notes updated if behavior changes
 * Rollout/rollback considered if risky
 
@@ -415,6 +421,11 @@ Here's my understanding of the complete requirements:
 * [ ] ...
 * [ ] ...
 
+**Version Plan**:
+
+* Version impact: <major | minor | patch | none> because <scope/risk reason>
+* If version changes, update both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts`
+
 **Definition of Done**:
 
 * ...
@@ -468,6 +479,11 @@ python3 ./.trellis/scripts/task.py add-subtask "$TASK_DIR" "$CHILD_DIR"
 ## Acceptance Criteria
 
 * [ ] ...
+
+## Version Plan
+
+* Version impact: <major | minor | patch | none> because <scope/risk reason>
+* If version changes, update both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts`
 
 ## Definition of Done
 

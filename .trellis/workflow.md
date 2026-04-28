@@ -183,6 +183,7 @@ The brainstorm skill will guide you to:
 - Prefer researching over asking the user
 - Prefer offering options over open-ended questions
 - Update `prd.md` immediately after each user answer
+- Add a `Version Plan` to every `prd.md`: choose `major`, `minor`, `patch`, or `none` based on the change scope, and state whether both version declarations must be updated
 
 Return to this step whenever requirements change and revise `prd.md`.
 
@@ -253,6 +254,7 @@ Skip this step. Context is loaded directly by the `trellis-before-dev` skill in 
 | Condition | Required |
 |------|:---:|
 | `prd.md` exists | ✅ |
+| `prd.md` includes `Version Plan` | ✅ |
 | User confirms requirements | ✅ |
 | `research/` has artifacts (complex tasks) | recommended |
 | `info.md` technical design (complex tasks) | optional |
@@ -290,7 +292,8 @@ The platform hook auto-handles:
 2. Read `{TASK_DIR}/prd.md` for requirements
 3. Consult materials under `{TASK_DIR}/research/`
 4. Implement the code per requirements
-5. Run project type-check, test, and build
+5. If the PRD `Version Plan` says `major`, `minor`, or `patch`, update both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts` consistently
+6. Run project type-check, test, and build
 
 [/Kilo, Antigravity, Windsurf]
 
@@ -316,6 +319,7 @@ Load the `trellis-check` skill and verify the code per its guidance:
 - Spec compliance
 - type-check / tests / build
 - Cross-layer consistency (when changes span layers)
+- Version plan compliance: if the task requires a version bump, both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts` must contain the same new version
 
 If issues are found → fix → re-check, until green.
 
@@ -339,6 +343,7 @@ Load the `trellis-check` skill and do a final verification:
 - Spec compliance
 - type-check / tests / build
 - Cross-layer consistency (when changes span layers)
+- Version plan compliance: confirm the PRD version impact was applied or explicitly marked `none`
 
 If issues are found → fix → re-check, until green.
 

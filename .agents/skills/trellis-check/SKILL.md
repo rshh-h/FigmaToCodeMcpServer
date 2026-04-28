@@ -56,6 +56,13 @@ Run the project's type-check, test, and build commands. Fix any failures before 
 
 > "If I fixed a bug or discovered something non-obvious, should I document it so future me won't hit the same issue?" → If YES, update the relevant spec doc.
 
+### Versioning
+
+- [ ] Does the task `prd.md` include a `Version Plan`?
+- [ ] Is the selected version impact (`major`, `minor`, `patch`, or `none`) consistent with the actual change scope?
+- [ ] If version impact is not `none`, did both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts` change to the same version?
+- [ ] If version impact is `none`, is that justified by the PRD and the actual diff?
+
 ## Step 5: Cross-Layer Dimensions (if applicable)
 
 Skip this step if your change is confined to a single layer.

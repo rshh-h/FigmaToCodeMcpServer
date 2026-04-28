@@ -137,3 +137,36 @@ Fixed anchor-d2c-mcp no-op on Windows by replacing hand-built file URL entrypoin
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: PRD 增加版本号计划要求
+
+**Date**: 2026-04-28
+**Task**: PRD 增加版本号计划要求
+**Branch**: `main`
+
+### Summary
+
+将 Trellis PRD 模板、workflow 和 check 清单更新为每个任务都记录 Version Plan，并要求按改动范围同步 package.json 与 PRODUCT_VERSION。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6af9471` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
