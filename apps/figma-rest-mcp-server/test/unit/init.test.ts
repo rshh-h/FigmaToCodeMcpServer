@@ -19,6 +19,7 @@ describe("init", () => {
     expect(block).toContain('command = "anchor-d2c-mcp"');
     expect(block).toContain('FIGMA_ACCESS_TOKEN = ""');
     expect(block).toContain('INCLUDE_DIAGNOSTICS = "true"');
+    expect(block).toContain('MCP_TEXT_FALLBACK = "false"');
   });
 
   it("replaces an existing codex server section without touching other content", () => {
@@ -82,6 +83,8 @@ describe("init", () => {
       "ENABLE_IMAGE_EMBED=true",
       "-e",
       "ENABLE_VECTOR_EMBED=true",
+      "-e",
+      "MCP_TEXT_FALLBACK=false",
       "-e",
       "ROUND_TAILWIND_VALUES=false",
       "-e",

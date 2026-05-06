@@ -170,3 +170,36 @@ Fixed anchor-d2c-mcp no-op on Windows by replacing hand-built file URL entrypoin
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: MCP Trae compatibility fallback
+
+**Date**: 2026-05-06
+**Task**: MCP Trae compatibility fallback
+**Branch**: `main`
+
+### Summary
+
+Added MCP_TEXT_FALLBACK text compatibility output, fixed tool input schema visibility for Trae by separating public input schemas from refined validation, kept help optional, updated docs and tests.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `70f891f` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

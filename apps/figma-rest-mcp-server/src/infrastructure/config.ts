@@ -44,6 +44,7 @@ export const configSchema = z.object({
   ENABLE_IMAGE_EMBED: booleanFromEnv.default(true),
   ENABLE_VECTOR_EMBED: booleanFromEnv.default(true),
   ENABLE_METRICS_LOGGING: booleanFromEnv.default(false),
+  MCP_TEXT_FALLBACK: booleanFromEnv.default(false),
   SHOW_LAYER_NAMES: booleanFromEnv.default(false),
   ROUND_TAILWIND_VALUES: booleanFromEnv.default(true),
   ROUND_TAILWIND_COLORS: booleanFromEnv.default(true),

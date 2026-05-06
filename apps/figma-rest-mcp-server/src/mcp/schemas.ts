@@ -25,24 +25,25 @@ function parseFigmaSourceUrl(urlString: string): { fileKey?: string; nodeId?: st
   }
 }
 
-export const convertRequestSchema = z
-  .object({
-    figmaUrl: z.string().url().describe(figmaUrlDescription),
-    workspaceRoot: z
-      .string()
-      .min(1)
-      .describe(
-        "Absolute or project-relative workspace root for this conversion. Generated code, intermediate files, and REST caches are stored under this directory.",
-      ),
-    useCache: z
-      .boolean()
-      .default(false)
-      .describe(
-        "Whether to reuse cached Figma REST data and previously materialized workspace intermediates. Defaults to false.",
-      ),
-    framework: frameworkSchema,
-    generationMode: generationModeSchema.optional(),
-  })
+export const convertToolInputSchema = z.object({
+  figmaUrl: z.string().url().describe(figmaUrlDescription),
+  workspaceRoot: z
+    .string()
+    .min(1)
+    .describe(
+      "Absolute or project-relative workspace root for this conversion. Generated code, intermediate files, and REST caches are stored under this directory.",
+    ),
+  useCache: z
+    .boolean()
+    .default(false)
+    .describe(
+      "Whether to reuse cached Figma REST data and previously materialized workspace intermediates. Defaults to false.",
+    ),
+  framework: frameworkSchema,
+  generationMode: generationModeSchema.optional(),
+});
+
+export const convertRequestSchema = convertToolInputSchema
   .superRefine((value, ctx) => {
     const parsed = parseFigmaSourceUrl(value.figmaUrl);
 
@@ -168,22 +169,23 @@ export const convertResponseSchema = z.object({
     .optional(),
 });
 
-export const fetchScreenshotRequestSchema = z
-  .object({
-    figmaUrl: z.string().url().describe(figmaUrlDescription),
-    workspaceRoot: z
-      .string()
-      .min(1)
-      .describe(
-        "Absolute or project-relative workspace root for this request. Screenshot caches are stored under this directory.",
-      ),
-    useCache: z
-      .boolean()
-      .default(false)
-      .describe(
-        "Whether to reuse a previously cached screenshot file for the same file key and node id. Defaults to false.",
-      ),
-  })
+export const fetchScreenshotToolInputSchema = z.object({
+  figmaUrl: z.string().url().describe(figmaUrlDescription),
+  workspaceRoot: z
+    .string()
+    .min(1)
+    .describe(
+      "Absolute or project-relative workspace root for this request. Screenshot caches are stored under this directory.",
+    ),
+  useCache: z
+    .boolean()
+    .default(false)
+    .describe(
+      "Whether to reuse a previously cached screenshot file for the same file key and node id. Defaults to false.",
+    ),
+});
+
+export const fetchScreenshotRequestSchema = fetchScreenshotToolInputSchema
   .superRefine((value, ctx) => {
     const parsed = parseFigmaSourceUrl(value.figmaUrl);
 

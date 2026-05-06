@@ -2,7 +2,7 @@
 
 [中文](#chinese) | [English](#english)
 
-当前 CLI 版本 / Current CLI Version: `1.0.2`
+当前 CLI 版本 / Current CLI Version: `1.0.5`
 
 <a id="chinese"></a>
 
@@ -35,7 +35,7 @@ Anchor D2C MCP 的目标是让 Figma to Code 能以更产品化的方式接入 M
 - 提供统一 CLI 入口，支持 `init`、`stdio`、`http`、`help` 和 `version` 命令
 - 支持为 `Codex`、`Claude`、`OpenCode` 生成或安装 MCP 配置
 - 基于 Figma REST API，将单个节点链接转换为目标代码
-- 支持通过环境变量控制 diagnostics、图片嵌入、矢量嵌入和 Tailwind rounding 行为
+- 支持通过环境变量控制 diagnostics、图片嵌入、矢量嵌入、MCP 文本 fallback 和 Tailwind rounding 行为
 - 同时支持适配 MCP 客户端的本地 `stdio` 模式和服务化部署的 HTTP 模式
 
 ### 安装
@@ -99,8 +99,21 @@ https://www.figma.com/design/ANONFILEKEY1234567890AB/anonymized-case?node-id=1-1
 - `INCLUDE_DIAGNOSTICS=false`
 - `ENABLE_IMAGE_EMBED=true`
 - `ENABLE_VECTOR_EMBED=true`
+- `MCP_TEXT_FALLBACK=false`
 - `ROUND_TAILWIND_VALUES=false`
 - `ROUND_TAILWIND_COLORS=false`
+
+如果 MCP 客户端不展示 `structuredContent`（例如部分 Trae 配置），可以设置 `MCP_TEXT_FALLBACK=true`，让工具把关键结构化结果同时写入 `content[0].text`。
+
+#### `MCP_TEXT_FALLBACK`
+
+默认情况下，工具会把完整结构化结果放在 MCP 的 `structuredContent` 字段里，`content[0].text` 只返回简短摘要。部分 MCP 客户端（例如某些 Trae 配置）不会把 `structuredContent` 暴露给模型或用户，这时可以开启：
+
+```bash
+MCP_TEXT_FALLBACK=true
+```
+
+开启后，工具仍会保留原始 `structuredContent`，同时把关键结构化结果追加到 `content[0].text`。支持 `true` / `false` 或 `1` / `0`。默认值为 `false`，避免在支持 `structuredContent` 的客户端里产生过长文本。
 
 ### MCP 配置示例
 
@@ -115,6 +128,7 @@ tool_timeout_sec = 600
 FIGMA_ACCESS_TOKEN = "your figma token"
 ENABLE_IMAGE_EMBED = "true"
 ENABLE_VECTOR_EMBED = "true"
+MCP_TEXT_FALLBACK = "false"
 ROUND_TAILWIND_VALUES = "false"
 ROUND_TAILWIND_COLORS = "false"
 ```
@@ -154,7 +168,7 @@ The server currently supports the following output targets. At the moment, only 
 - Unified CLI entrypoint with `init`, `stdio`, `http`, `help`, and `version` commands
 - Bootstrap support for `Codex`, `Claude`, and `OpenCode`
 - Converts a single Figma node URL into target code through the Figma REST API
-- Supports environment-variable based control over diagnostics, image embedding, vector embedding, and Tailwind rounding behavior
+- Supports environment-variable based control over diagnostics, image embedding, vector embedding, MCP text fallback, and Tailwind rounding behavior
 - Supports both local `stdio` mode for MCP clients and HTTP mode for service-style deployment
 
 ### Installation
@@ -218,8 +232,21 @@ Common optional settings:
 - `INCLUDE_DIAGNOSTICS=false`
 - `ENABLE_IMAGE_EMBED=true`
 - `ENABLE_VECTOR_EMBED=true`
+- `MCP_TEXT_FALLBACK=false`
 - `ROUND_TAILWIND_VALUES=false`
 - `ROUND_TAILWIND_COLORS=false`
+
+If an MCP client does not surface `structuredContent` (for example, some Trae setups), set `MCP_TEXT_FALLBACK=true` so tools also include key structured result data in `content[0].text`.
+
+#### `MCP_TEXT_FALLBACK`
+
+By default, tools return full structured data in MCP `structuredContent`, while `content[0].text` only contains a short summary. Some MCP clients, including some Trae setups, do not expose `structuredContent` to the model or user. In that case, enable:
+
+```bash
+MCP_TEXT_FALLBACK=true
+```
+
+When enabled, tools still return the original `structuredContent` and also append key structured result data to `content[0].text`. Supported values are `true` / `false` or `1` / `0`. The default is `false` to avoid overly long text on clients that already support `structuredContent`.
 
 ### Example MCP Configuration
 
@@ -234,6 +261,7 @@ tool_timeout_sec = 600
 FIGMA_ACCESS_TOKEN = "your figma token"
 ENABLE_IMAGE_EMBED = "true"
 ENABLE_VECTOR_EMBED = "true"
+MCP_TEXT_FALLBACK = "false"
 ROUND_TAILWIND_VALUES = "false"
 ROUND_TAILWIND_COLORS = "false"
 ```

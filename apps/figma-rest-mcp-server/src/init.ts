@@ -16,6 +16,7 @@ export interface InitEnvironment {
   INCLUDE_DIAGNOSTICS: string;
   ENABLE_IMAGE_EMBED: string;
   ENABLE_VECTOR_EMBED: string;
+  MCP_TEXT_FALLBACK: string;
   ROUND_TAILWIND_VALUES: string;
   ROUND_TAILWIND_COLORS: string;
 }
@@ -39,6 +40,7 @@ export function createInitEnvironment(
     INCLUDE_DIAGNOSTICS: defaultFlag(env.INCLUDE_DIAGNOSTICS, "false"),
     ENABLE_IMAGE_EMBED: defaultFlag(env.ENABLE_IMAGE_EMBED, "true"),
     ENABLE_VECTOR_EMBED: defaultFlag(env.ENABLE_VECTOR_EMBED, "true"),
+    MCP_TEXT_FALLBACK: defaultFlag(env.MCP_TEXT_FALLBACK, "false"),
     ROUND_TAILWIND_VALUES: defaultFlag(env.ROUND_TAILWIND_VALUES, "false"),
     ROUND_TAILWIND_COLORS: defaultFlag(env.ROUND_TAILWIND_COLORS, "false"),
   };
@@ -113,6 +115,7 @@ export function renderCodexConfigBlock(config: InitEnvironment): string {
     `INCLUDE_DIAGNOSTICS = ${toTomlString(config.INCLUDE_DIAGNOSTICS)}`,
     `ENABLE_IMAGE_EMBED = ${toTomlString(config.ENABLE_IMAGE_EMBED)}`,
     `ENABLE_VECTOR_EMBED = ${toTomlString(config.ENABLE_VECTOR_EMBED)}`,
+    `MCP_TEXT_FALLBACK = ${toTomlString(config.MCP_TEXT_FALLBACK)}`,
     `ROUND_TAILWIND_VALUES = ${toTomlString(config.ROUND_TAILWIND_VALUES)}`,
     `ROUND_TAILWIND_COLORS = ${toTomlString(config.ROUND_TAILWIND_COLORS)}`,
   ].join("\n");

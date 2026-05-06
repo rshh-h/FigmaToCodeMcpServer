@@ -115,7 +115,7 @@ curl http://127.0.0.1:3101/health
 
 ## `figma_to_code_convert`
 
-调用前建议先使用 `figma_to_code_convert_help` 获取请求模板和字段说明。
+需要请求示例、字段说明或 `generationMode` 选择说明时，可以使用 `figma_to_code_convert_help`。
 
 入参表：
 
@@ -206,6 +206,7 @@ curl http://127.0.0.1:3101/health
 | `ENABLE_IMAGE_EMBED` | `boolean` | 否 | `true` | 是否启用图片嵌入能力，同时也是图片嵌入输出的默认来源 |
 | `ENABLE_VECTOR_EMBED` | `boolean` | 否 | `true` | 是否启用向量嵌入能力，同时也是向量嵌入输出的默认来源 |
 | `ENABLE_METRICS_LOGGING` | `boolean` | 否 | `false` | 是否输出 metrics 日志 |
+| `MCP_TEXT_FALLBACK` | `boolean` | 否 | `false` | 是否把关键 structuredContent 数据同步写入 MCP 文本响应，适用于不展示 structuredContent 的客户端 |
 | `SHOW_LAYER_NAMES` | `boolean` | 否 | `false` | 是否在输出中显示 layer 名称 |
 | `ROUND_TAILWIND_VALUES` | `boolean` | 否 | `true` | Tailwind 数值是否按阈值近似映射 |
 | `ROUND_TAILWIND_COLORS` | `boolean` | 否 | `true` | Tailwind 颜色是否按阈值近似映射 |
@@ -226,7 +227,20 @@ export ENABLE_VARIABLES=false
 export INCLUDE_DIAGNOSTICS=false
 export ENABLE_IMAGE_EMBED=true
 export ENABLE_VECTOR_EMBED=true
+export MCP_TEXT_FALLBACK=false
 ```
+
+### `MCP_TEXT_FALLBACK`
+
+默认情况下，工具会把完整结构化结果放在 MCP 的 `structuredContent` 字段里，`content[0].text` 只返回一段简短摘要。部分 MCP 客户端（例如某些 Trae 配置）不会把 `structuredContent` 暴露给模型或用户，这时会出现 help 只看到摘要、convert 只看到生成路径、详细字段丢失的情况。
+
+遇到这类客户端兼容问题时，可以设置：
+
+```bash
+export MCP_TEXT_FALLBACK=true
+```
+
+开启后，工具仍会保留原始 `structuredContent`，同时把关键结构化结果追加到 `content[0].text`。支持 `true` / `false` 或 `1` / `0`。默认值为 `false`，避免在支持 `structuredContent` 的客户端里产生过长文本。
 
 ### 开发者运行
 

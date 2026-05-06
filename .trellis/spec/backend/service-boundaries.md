@@ -125,6 +125,113 @@ Examples:
 
 ---
 
+## Scenario: MCP Text Fallback for Structured Results
+
+### 1. Scope / Trigger
+
+- Trigger: Changing MCP tool response formatting or adding a public MCP tool that returns `structuredContent`.
+- Reason: Some MCP clients only surface `content[].text`; relying only on `structuredContent` can hide key output from the model/user.
+
+### 2. Signatures
+
+- Environment key: `MCP_TEXT_FALLBACK?: boolean`
+- MCP result shape remains:
+  - `content: [{ type: "text", text: string }]`
+  - `structuredContent: <tool response or StandardErrorShape>`
+
+### 3. Contracts
+
+- Default behavior: `MCP_TEXT_FALLBACK=false`, keep concise text summaries.
+- Compatibility behavior: `MCP_TEXT_FALLBACK=true`, append a deterministic text rendering of the structured result to `content[0].text`.
+- `structuredContent` must still be returned unchanged for clients that support it.
+- Environment parsing belongs in `infrastructure/config.ts`; transport formatting belongs in `mcp/server.ts`.
+
+### 4. Validation & Error Matrix
+
+- Invalid boolean env value -> config schema rejects startup.
+- Tool success with fallback disabled -> concise text only plus unchanged `structuredContent`.
+- Tool success with fallback enabled -> concise text plus structured fallback text.
+- Tool error with fallback enabled -> standard error summary plus structured error fallback text.
+
+### 5. Good/Base/Bad Cases
+
+- Good: `figma_to_code_convert_help` exposes request example, fields, generation modes, and notes through text when fallback is enabled.
+- Base: Existing clients continue using `structuredContent` with no text expansion when fallback is disabled.
+- Bad: Removing `structuredContent`, changing response schemas, or detecting one client by name instead of using the explicit env flag.
+
+### 6. Tests Required
+
+- Config unit test:
+  - default is `false`
+  - `"true"` / `"1"` parse as enabled
+- MCP handler contract tests:
+  - fallback disabled preserves concise text
+  - fallback enabled includes key structured fields for convert/help/screenshot outputs
+  - error results include structured error fields in text when enabled
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+Only returning a short text summary while putting required follow-up data exclusively in `structuredContent`.
+
+#### Correct
+
+Keep `structuredContent` as the primary structured contract, and gate text fallback with `MCP_TEXT_FALLBACK=true` for clients that do not expose structured tool results.
+
+---
+
+## Scenario: MCP Tool Input Schema Visibility
+
+### 1. Scope / Trigger
+
+- Trigger: Adding or changing a public MCP tool whose request schema needs cross-field validation.
+- Reason: Zod v3 `z.object(...).superRefine(...)` produces `ZodEffects`; the MCP SDK cannot extract JSON Schema properties from that wrapper for `tools/list`.
+
+### 2. Signatures
+
+- Tool registration should use a plain object schema for `inputSchema`.
+- Handler execution should parse the full refined schema before calling application use cases.
+
+### 3. Contracts
+
+- `tools/list` must expose usable parameter properties for client UIs and agents.
+- Full validation, including `node-id`, file key, and framework-specific `generationMode`, must still run before application logic.
+- Refined validation failures should return a `ToolValidationError`, not an internal service error.
+
+### 4. Validation & Error Matrix
+
+- Plain type/required-field mismatch -> MCP SDK input validation error.
+- Refined validation failure -> structured `ToolValidationError` from the handler.
+- Valid input -> parsed request is passed to the use case.
+
+### 5. Good/Base/Bad Cases
+
+- Good: `figma_to_code_convert` lists `figmaUrl`, `workspaceRoot`, `useCache`, `framework`, and `generationMode` while still rejecting mismatched generation modes.
+- Base: zero-argument tools may use `z.object({})` directly.
+- Bad: Registering a `ZodEffects` schema as the public `inputSchema`, which makes clients see an empty parameter object.
+
+### 6. Tests Required
+
+- MCP contract test using a real client/server `tools/list` call:
+  - assert input schema properties are present
+  - assert required fields match the public contract
+- Handler contract test:
+  - invalid refined inputs do not reach the use case
+  - response is a structured validation error
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+Registering `inputSchema: convertRequestSchema` when `convertRequestSchema` is built with `superRefine`.
+
+#### Correct
+
+Register `inputSchema: convertToolInputSchema` for field visibility, then call `convertRequestSchema.safeParse(...)` inside the handler before invoking the use case.
+
+---
+
 ## Anti-Patterns
 
 - Calling external APIs directly from `mcp/server.ts`

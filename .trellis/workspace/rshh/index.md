@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
-- **Last Active**: 2026-04-28
+- **Total Sessions**: 6
+- **Last Active**: 2026-05-06
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~172 | Active |
+| `journal-1.md` | ~205 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-05-06 | MCP Trae compatibility fallback | `70f891f` | `main` |
 | 5 | 2026-04-28 | PRD 增加版本号计划要求 | `6af9471` | `main` |
 | 4 | 2026-04-28 | 图片资源命名改为小写下划线 | `e13c9ab` | `main` |
 | 3 | 2026-04-24 | Fix Windows CLI entrypoint | `b4658ec` | `main` |

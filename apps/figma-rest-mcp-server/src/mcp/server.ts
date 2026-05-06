@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
+import type { z } from "zod";
 import { createApplication } from "../application/factory.js";
 import { ServiceError, toServiceError } from "../core/errors.js";
 import type { ConvertExecutionHooks, ConvertProgressUpdate } from "../core/interfaces.js";
@@ -13,8 +14,10 @@ import {
   convertHelpResponseSchema,
   convertRequestSchema,
   convertResponseSchema,
+  convertToolInputSchema,
   fetchScreenshotRequestSchema,
   fetchScreenshotResponseSchema,
+  fetchScreenshotToolInputSchema,
 } from "./schemas.js";
 import { createConvertHelpResponse } from "./convertToolMetadata.js";
 import { MCP_SERVER_NAME, PRODUCT_VERSION } from "../product.js";
@@ -43,6 +46,10 @@ type ToolCallExtra = {
   }) => Promise<void>;
 };
 
+type ToolHandlerOptions = {
+  textFallback?: boolean;
+};
+
 export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
   const app = createApplication(env);
   const server = new McpServer({
@@ -54,6 +61,9 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
     app.convertUseCase,
     app.capabilitiesUseCase,
     app.screenshotUseCase,
+    {
+      textFallback: app.config.MCP_TEXT_FALLBACK,
+    },
   );
 
   server.registerTool(
@@ -61,8 +71,8 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
     {
       title: "Figma To Code Convert",
       description:
-        "Convert a single Figma node into HTML, Tailwind, Flutter, SwiftUI, or Compose code. Call figma_to_code_convert_help to get a valid request template and field notes before invoking this tool.",
-      inputSchema: convertRequestSchema,
+        "Convert a single Figma node into HTML, Tailwind, Flutter, SwiftUI, or Compose code. If you need examples, field notes, or generation mode guidance, call figma_to_code_convert_help.",
+      inputSchema: convertToolInputSchema,
       outputSchema: convertResponseSchema,
       annotations: readOnlyAnnotations,
     },
@@ -75,7 +85,7 @@ export function createMcpApplication(env: NodeJS.ProcessEnv = process.env) {
       title: "Figma To Code Fetch Screenshot",
       description:
         "Fetch a screenshot image for a single Figma node and cache it as preview.png under the workspace cache directory.",
-      inputSchema: fetchScreenshotRequestSchema,
+      inputSchema: fetchScreenshotToolInputSchema,
       outputSchema: fetchScreenshotResponseSchema,
       annotations: readOnlyAnnotations,
     },
@@ -102,6 +112,7 @@ export function createToolHandlers(
   convertUseCase: Pick<ConvertFigmaNodeUseCase, "execute">,
   capabilitiesUseCase: Pick<GetCapabilitiesUseCase, "execute">,
   screenshotUseCase: Pick<FetchFigmaNodeScreenshotUseCase, "execute">,
+  options: ToolHandlerOptions = {},
 ) {
   return {
     convert: async (
@@ -109,15 +120,24 @@ export function createToolHandlers(
       extra?: ToolCallExtra,
     ) => {
       try {
-        const response = await convertUseCase.execute(
+        const parsedRequest = parseToolInput(
+          convertRequestSchema,
           request,
+          "figma_to_code_convert",
+        );
+        const response = await convertUseCase.execute(
+          parsedRequest,
           createProgressHooks(extra),
         );
         return {
           content: [
             {
               type: "text" as const,
-              text: `Generated ${response.framework} code at ${response.code} with ${response.warnings.length} warnings.`,
+              text: formatToolResultText(
+                `Generated ${response.framework} code at ${response.code} with ${response.warnings.length} warnings.`,
+                response,
+                options,
+              ),
             },
           ],
           structuredContent: response,
@@ -131,7 +151,7 @@ export function createToolHandlers(
           suggestion: "Inspect the server logs and retry the request.",
           retryable: false,
         });
-        return toToolErrorResult(serviceError);
+        return toToolErrorResult(serviceError, options);
       }
     },
     capabilities: async (
@@ -143,7 +163,11 @@ export function createToolHandlers(
           content: [
             {
               type: "text" as const,
-              text: `Capabilities loaded for ${response.frameworks.length} frameworks.`,
+              text: formatToolResultText(
+                `Capabilities loaded for ${response.frameworks.length} frameworks.`,
+                response,
+                options,
+              ),
             },
           ],
           structuredContent: response,
@@ -157,19 +181,28 @@ export function createToolHandlers(
           suggestion: "Inspect the server logs and retry the request.",
           retryable: false,
         });
-        return toToolErrorResult(serviceError);
+        return toToolErrorResult(serviceError, options);
       }
     },
     fetchScreenshot: async (
       request: Parameters<FetchFigmaNodeScreenshotUseCase["execute"]>[0],
     ) => {
       try {
-        const response = await screenshotUseCase.execute(request);
+        const parsedRequest = parseToolInput(
+          fetchScreenshotRequestSchema,
+          request,
+          "figma_to_code_fetch_screenshot",
+        );
+        const response = await screenshotUseCase.execute(parsedRequest);
         return {
           content: [
             {
               type: "text" as const,
-              text: `Fetched Figma node screenshot at ${response.screenshotPath}.`,
+              text: formatToolResultText(
+                `Fetched Figma node screenshot at ${response.screenshotPath}.`,
+                response,
+                options,
+              ),
             },
           ],
           structuredContent: response,
@@ -183,7 +216,7 @@ export function createToolHandlers(
           suggestion: "Inspect the server logs and retry the request.",
           retryable: false,
         });
-        return toToolErrorResult(serviceError);
+        return toToolErrorResult(serviceError, options);
       }
     },
     convertHelp: async () => {
@@ -192,7 +225,11 @@ export function createToolHandlers(
         content: [
           {
             type: "text" as const,
-            text: "Loaded figma_to_code_convert request template and field notes.",
+            text: formatToolResultText(
+              "Loaded figma_to_code_convert request template and field notes.",
+              response,
+              options,
+            ),
           },
         ],
         structuredContent: response,
@@ -201,17 +238,64 @@ export function createToolHandlers(
   };
 }
 
-function toToolErrorResult(error: ServiceError) {
+function toToolErrorResult(error: ServiceError, options: ToolHandlerOptions = {}) {
+  const structuredContent = error.toJSON();
   return {
     isError: true,
     content: [
       {
         type: "text" as const,
-        text: `${error.category} at ${error.stage}: ${error.message}. ${error.suggestion}`,
+        text: formatToolResultText(
+          `${error.category} at ${error.stage}: ${error.message}. ${error.suggestion}`,
+          structuredContent,
+          options,
+        ),
       },
     ],
-    structuredContent: error.toJSON(),
+    structuredContent,
   };
+}
+
+function formatToolResultText(
+  summary: string,
+  structuredContent: unknown,
+  options: ToolHandlerOptions,
+): string {
+  if (!options.textFallback) {
+    return summary;
+  }
+
+  return `${summary}\n\nStructured content fallback:\n${stringifyStructuredContent(structuredContent)}`;
+}
+
+function stringifyStructuredContent(structuredContent: unknown): string {
+  try {
+    return JSON.stringify(structuredContent, null, 2) ?? String(structuredContent);
+  } catch {
+    return String(structuredContent);
+  }
+}
+
+function parseToolInput<T>(
+  schema: z.ZodType<T>,
+  input: unknown,
+  toolName: string,
+): T {
+  const result = schema.safeParse(input);
+  if (result.success) {
+    return result.data;
+  }
+
+  throw new ServiceError({
+    category: "ToolValidationError",
+    code: "invalid_tool_arguments",
+    stage: "resolve_source",
+    message: `Invalid arguments for ${toolName}: ${result.error.issues
+      .map((issue) => issue.message)
+      .join("; ")}`,
+    suggestion: "Check the tool input fields and retry with a single Figma node URL.",
+    retryable: false,
+  });
 }
 
 function createProgressHooks(extra?: ToolCallExtra): ConvertExecutionHooks | undefined {

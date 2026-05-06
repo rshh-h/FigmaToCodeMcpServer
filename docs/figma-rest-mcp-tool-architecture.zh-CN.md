@@ -149,4 +149,4 @@ flowchart LR
 - [渲染语义预处理方案](render-semantics-preprocess-plan.zh-CN.md)
 - [本地资源能力说明](local-asset-download-plan.md)
 
-调用 `figma_to_code_convert` 前，建议先通过 `figma_to_code_convert_help` 获取请求模板和字段说明。
+需要请求示例、字段说明或 `generationMode` 选择说明时，可以通过 `figma_to_code_convert_help` 获取补充信息。

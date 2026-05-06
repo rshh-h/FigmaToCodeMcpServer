@@ -19,10 +19,17 @@ describe("infrastructure", () => {
     expect(config.CACHE_MAX_ENTRIES).toBe(500);
     expect(config.ENABLE_METRICS_LOGGING).toBe(false);
     expect(config.INCLUDE_DIAGNOSTICS).toBe(false);
+    expect(config.MCP_TEXT_FALLBACK).toBe(false);
     expect(config.SHOW_LAYER_NAMES).toBe(false);
     expect(config.USE_TAILWIND4).toBe(false);
     expect(config.DOWNLOAD_IMAGES_TO_LOCAL).toBe(true);
     expect(config.DOWNLOAD_VECTORS_TO_LOCAL).toBe(true);
+  });
+
+  it("reads MCP text fallback from config", () => {
+    expect(readConfig({ MCP_TEXT_FALLBACK: "true" }).MCP_TEXT_FALLBACK).toBe(true);
+    expect(readConfig({ MCP_TEXT_FALLBACK: "1" }).MCP_TEXT_FALLBACK).toBe(true);
+    expect(readConfig({ MCP_TEXT_FALLBACK: "false" }).MCP_TEXT_FALLBACK).toBe(false);
   });
 
   it("retries retryable http failures", async () => {

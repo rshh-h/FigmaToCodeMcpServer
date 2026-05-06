@@ -76,9 +76,10 @@ export const convertHelpFields = [
 ] as const;
 
 export const convertHelpNotes = [
-  "Call this tool first when you need a valid figma_to_code_convert request template.",
+  "Use this tool when you need examples, field notes, or generation mode guidance for figma_to_code_convert.",
   "figmaUrl must include both a valid Figma file key and node-id.",
   "Diagnostics are controlled by the INCLUDE_DIAGNOSTICS server environment variable.",
+  "If your MCP client does not surface structuredContent, set MCP_TEXT_FALLBACK=true.",
   "figma_to_code_convert returns code as a generated file path relative to workspaceRoot.",
   "preview is defined in the schema but is currently disabled by the implementation.",
 ] as const;
