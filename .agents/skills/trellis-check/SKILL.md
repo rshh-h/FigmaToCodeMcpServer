@@ -1,6 +1,6 @@
 ---
 name: trellis-check
-description: "Comprehensive quality verification: spec compliance, type-check, tests, build, cross-layer data flow, code reuse, and consistency checks. Use when code is written and needs quality verification, before committing changes, or to catch context drift during long sessions."
+description: "Comprehensive quality verification: spec compliance, lint, type-check, tests, cross-layer data flow, code reuse, and consistency checks. Use when code is written and needs quality verification, before committing changes, or to catch context drift during long sessions."
 ---
 
 # Code Quality Check
@@ -32,15 +32,15 @@ Read the specific guideline files referenced — the index is a pointer, not the
 
 ## Step 3: Run Project Checks
 
-Run the project's type-check, test, and build commands. Fix any failures before proceeding.
+Run the project's lint, type-check, and test commands. Fix any failures before proceeding.
 
 ## Step 4: Review Against Checklist
 
 ### Code Quality
 
+- [ ] Linter passes?
 - [ ] Type checker passes (if applicable)?
 - [ ] Tests pass?
-- [ ] Build passes?
 - [ ] No debug logging left in?
 - [ ] No suppressed warnings or type-safety bypasses?
 
@@ -55,13 +55,6 @@ Run the project's type-check, test, and build commands. Fix any failures before 
 - [ ] Does `.trellis/spec/` need updates? (new patterns, conventions, lessons learned)
 
 > "If I fixed a bug or discovered something non-obvious, should I document it so future me won't hit the same issue?" → If YES, update the relevant spec doc.
-
-### Versioning
-
-- [ ] Does the task `prd.md` include a `Version Plan`?
-- [ ] Is the selected version impact (`major`, `minor`, `patch`, or `none`) consistent with the actual change scope?
-- [ ] If version impact is not `none`, did both `apps/figma-rest-mcp-server/package.json` and `apps/figma-rest-mcp-server/src/product.ts` change to the same version?
-- [ ] If version impact is `none`, is that justified by the PRD and the actual diff?
 
 ## Step 5: Cross-Layer Dimensions (if applicable)
 
