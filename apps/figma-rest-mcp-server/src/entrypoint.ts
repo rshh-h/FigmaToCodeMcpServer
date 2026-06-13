@@ -1,5 +1,6 @@
 import { posix, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
 
 function fileUrlToWindowsPath(metaUrl: string): string {
   const url = new URL(metaUrl);
@@ -16,12 +17,20 @@ function fileUrlToWindowsPath(metaUrl: string): string {
   return url.hostname ? `\\\\${url.hostname}${localPath}` : localPath;
 }
 
+function realpathSafe(value: string): string {
+  try {
+    return realpathSync(value);
+  } catch {
+    return value;
+  }
+}
+
 function resolveEntrypointPath(
   value: string,
   platform: NodeJS.Platform,
 ): string {
   const pathApi = platform === "win32" ? win32 : posix;
-  const resolved = pathApi.resolve(value);
+  const resolved = realpathSafe(pathApi.resolve(value));
   return platform === "win32" ? resolved.toLowerCase() : resolved;
 }
 

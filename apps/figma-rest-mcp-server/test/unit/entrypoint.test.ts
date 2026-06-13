@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { tmpdir } from "node:os";
+import { mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { isDirectEntrypoint } from "../../src/entrypoint.js";
 
 describe("entrypoint", () => {
@@ -30,5 +34,17 @@ describe("entrypoint", () => {
         "darwin",
       ),
     ).toBe(false);
+  });
+
+  it("resolves symlinks so .bin wrapper paths match the real module", () => {
+    const dir = mkdtempSync(join(tmpdir(), "entrypoint-"));
+    const realFile = join(dir, "index.js");
+    writeFileSync(realFile, "");
+    const symlinkPath = join(dir, "anchor-d2c-mcp");
+    symlinkSync(realFile, symlinkPath);
+
+    const metaUrl = pathToFileURL(realFile).href;
+
+    expect(isDirectEntrypoint(metaUrl, symlinkPath, "darwin")).toBe(true);
   });
 });
