@@ -15,6 +15,13 @@
 - 修改后只对Tailwind，jsx 类型进行了测试，其他输出格式未验证。
 
 ## 安装与启动
+
+### 前置条件
+配置figma access token 环境变量，把以下内容添加到 ~/.zshrc 中
+```bash
+export FIGMA_ACCESS_TOKEN=figd_xxxx
+```
+
 1. 通过 npx 直接运行，无需全局安装：
 
 对应的 MCP 配置：

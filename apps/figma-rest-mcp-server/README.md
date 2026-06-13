@@ -39,6 +39,13 @@ Anchor D2C MCP 的目标是让 Figma to Code 能以更产品化的方式接入 M
 - 同时支持适配 MCP 客户端的本地 `stdio` 模式和服务化部署的 HTTP 模式
 
 ### 安装
+
+### 前置条件
+配置figma access token 环境变量，把以下内容添加到 ~/.zshrc 中
+```bash
+export FIGMA_ACCESS_TOKEN=figd_xxxx
+```
+
 1. 通过 npx 直接运行，无需全局安装：
 
 对应的 MCP 配置：
