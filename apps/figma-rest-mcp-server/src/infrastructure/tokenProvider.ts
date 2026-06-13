@@ -14,9 +14,10 @@ export class TokenProvider {
         category: "AuthenticationError",
         code: "missing_figma_access_token",
         stage: "fetch_snapshot",
-        message: "The service is not configured with FIGMA_ACCESS_TOKEN.",
-        suggestion: "Set FIGMA_ACCESS_TOKEN in the server environment before starting the MCP server.",
-        retryable: false,
+        message: "FIGMA_ACCESS_TOKEN is not configured. Cannot call Figma API without a token.",
+        suggestion:
+          "Add FIGMA_ACCESS_TOKEN to the MCP server env configuration, then retry the request.",
+        retryable: true,
       });
     }
 
