@@ -15,8 +15,24 @@
 - 修改后只对Tailwind，jsx 类型进行了测试，其他输出格式未验证。
 
 ## 安装与启动
+1. 通过 npx 直接运行，无需全局安装：
 
-推荐通过 pnpm 包安装后，使用统一命令 `anchor-d2c-mcp`：
+对应的 MCP 配置：
+
+```json
+{
+  "mcpServers": {
+    "anchor-d2c-mcp": {
+      "command": "npx",
+      "args": ["-y", "anchor-d2c-mcp@latest", "stdio"],
+      "timeout": 600000
+    }
+  }
+}
+```
+
+
+2. 通过 pnpm 包全局安装，使用统一命令 `anchor-d2c-mcp`：
 
 ```bash
 pnpm install -g anchor-d2c-mcp
@@ -124,18 +140,18 @@ curl http://127.0.0.1:3101/health
 | `figmaUrl` | `string` | 是 | 无 | 单节点 Figma URL，必须包含 `node-id` |
 | `workspaceRoot` | `string` | 是 | 无 | 工作区根目录，用于保存缓存、中间产物与生成结果 |
 | `useCache` | `boolean` | 否 | `false` | 是否复用当前工作区下的 REST 缓存和本地资产中间产物 |
-| `framework` | `"HTML" \| "Tailwind" \| "Flutter" \| "SwiftUI" \| "Compose"` | 是 | 无 | 目标代码框架 |
-| `generationMode` | `string` | 否 | 无 | 对应框架的生成模式，取值受 `framework` 限制 |
+| `framework` | `"HTML" \| "Tailwind" \| "Flutter" \| "SwiftUI" \| "Compose"` | 否 | `"Tailwind"` | 目标代码框架，不填时默认为 `Tailwind` |
+| `generationMode` | `string` | 否 | 无 | 对应框架的生成模式，取值受 `framework` 限制。使用 `Tailwind` 时若不填则默认为 `jsx` |
 
 `generationMode` 可选值：
 
-| `framework` | 合法 `generationMode` |
-|---|---|
-| `HTML` | `html`, `jsx`, `styled-components`, `svelte` |
-| `Tailwind` | `html`, `jsx`, `twig` |
-| `Flutter` | `fullApp`, `stateless`, `snippet` |
-| `SwiftUI` | `preview`, `struct`, `snippet` |
-| `Compose` | `snippet`, `composable`, `screen` |
+| `framework` | 合法 `generationMode` | 默认值 |
+|---|---|---|
+| `HTML` | `html`, `jsx`, `styled-components`, `svelte` | 无 |
+| `Tailwind` | `html`, `jsx`, `twig` | `jsx` |
+| `Flutter` | `fullApp`, `stateless`, `snippet` | 无 |
+| `SwiftUI` | `preview`, `struct`, `snippet` | 无 |
+| `Compose` | `snippet`, `composable`, `screen` | 无 |
 
 说明：
 

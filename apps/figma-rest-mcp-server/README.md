@@ -17,18 +17,18 @@ Anchor D2C MCP 的目标是让 Figma to Code 能以更产品化的方式接入 M
 当前支持生成以下目标代码，目前仅 `Tailwind` 经过验证，其他目标尚未经过完整测试验证，使用时请谨慎评估：
 
 - `HTML`
-- `Tailwind`
+- `Tailwind`（默认）
 - `Flutter`
 - `SwiftUI`
 - `Compose`
 
-| `framework` | 合法 `generationMode` |
-|---|---|
-| `HTML` | `html`, `jsx`, `styled-components`, `svelte` |
-| `Tailwind` | `html`, `jsx`, `twig` |
-| `Flutter` | `fullApp`, `stateless`, `snippet` |
-| `SwiftUI` | `preview`, `struct`, `snippet` |
-| `Compose` | `snippet`, `composable`, `screen` |
+| `framework` | 合法 `generationMode` | 默认值 |
+|---|---|---|
+| `HTML` | `html`, `jsx`, `styled-components`, `svelte` | 无 |
+| `Tailwind` | `html`, `jsx`, `twig` | `jsx` |
+| `Flutter` | `fullApp`, `stateless`, `snippet` | 无 |
+| `SwiftUI` | `preview`, `struct`, `snippet` | 无 |
+| `Compose` | `snippet`, `composable`, `screen` | 无 |
 
 ### 特性
 
@@ -39,8 +39,24 @@ Anchor D2C MCP 的目标是让 Figma to Code 能以更产品化的方式接入 M
 - 同时支持适配 MCP 客户端的本地 `stdio` 模式和服务化部署的 HTTP 模式
 
 ### 安装
+1. 通过 npx 直接运行，无需全局安装：
 
-使用 `pnpm` 全局安装：
+对应的 MCP 配置：
+
+```json
+{
+  "mcpServers": {
+    "anchor-d2c-mcp": {
+      "command": "npx",
+      "args": ["-y", "anchor-d2c-mcp@latest", "stdio"],
+      "timeout": 600000
+    }
+  }
+}
+```
+
+
+2. 通过 pnpm 包全局安装，使用统一命令 `anchor-d2c-mcp`：
 
 ```bash
 pnpm install -g anchor-d2c-mcp
@@ -150,18 +166,18 @@ Anchor D2C MCP is designed to make Figma-to-code adoption more productized for M
 The server currently supports the following output targets. At the moment, only `Tailwind` has been verified. The other targets have not been fully validated yet, so use them with care:
 
 - `HTML`
-- `Tailwind`
+- `Tailwind` (default)
 - `Flutter`
 - `SwiftUI`
 - `Compose`
 
-| `framework` | Supported `generationMode` values |
-|---|---|
-| `HTML` | `html`, `jsx`, `styled-components`, `svelte` |
-| `Tailwind` | `html`, `jsx`, `twig` |
-| `Flutter` | `fullApp`, `stateless`, `snippet` |
-| `SwiftUI` | `preview`, `struct`, `snippet` |
-| `Compose` | `snippet`, `composable`, `screen` |
+| `framework` | Supported `generationMode` values | Default |
+|---|---|---|
+| `HTML` | `html`, `jsx`, `styled-components`, `svelte` | — |
+| `Tailwind` | `html`, `jsx`, `twig` | `jsx` |
+| `Flutter` | `fullApp`, `stateless`, `snippet` | — |
+| `SwiftUI` | `preview`, `struct`, `snippet` | — |
+| `Compose` | `snippet`, `composable`, `screen` | — |
 
 ### Features
 
@@ -172,8 +188,23 @@ The server currently supports the following output targets. At the moment, only 
 - Supports both local `stdio` mode for MCP clients and HTTP mode for service-style deployment
 
 ### Installation
+1. You can also run it directly via `npx` without a global install:
 
-Install globally with `pnpm`:
+Corresponding MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "anchor-d2c-mcp": {
+      "command": "npx",
+      "args": ["-y", "anchor-d2c-mcp@latest", "stdio"],
+      "timeout": 600000
+    }
+  }
+}
+```
+
+2. Install globally with `pnpm`:
 
 ```bash
 pnpm install -g anchor-d2c-mcp
