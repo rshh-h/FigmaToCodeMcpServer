@@ -64,7 +64,7 @@ OpenCode：
 anchor-d2c-mcp init opencode
 ```
 
-如果需要像素级一致，建议关闭 `ROUND_TAILWIND_VALUES` 和 `ROUND_TAILWIND_COLORS`。
+`ROUND_TAILWIND_VALUES` 和 `ROUND_TAILWIND_COLORS` 默认关闭，Tailwind 输出使用精确像素值。如需启用近似映射（按 `THRESHOLD_PERCENT` 阈值匹配最接近的 Tailwind 预设值），可在环境变量中设为 `true`。
 通过 Figma REST API 拉取数据可能受网络影响和频率限制，推荐适当增大工具超时时间。
 
 #### 转码方法
@@ -190,7 +190,7 @@ curl http://127.0.0.1:3101/health
 
 | 变量名 | 类型 | 必填 | 默认值 | 说明 |
 |---|---|---|---|---|
-| `FIGMA_ACCESS_TOKEN` | `string` | 是 | 无 | Figma API token，服务启动必需 |
+| `FIGMA_ACCESS_TOKEN` | `string` | 是 | 无 | Figma API token，调用 Figma API 必备参数 |
 | `FIGMA_API_BASE_URL` | `string` | 否 | `https://api.figma.com` | Figma API 基地址 |
 | `HTTP_TIMEOUT_MS` | `number` | 否 | `60000` | HTTP 请求超时毫秒数 |
 | `HTTP_RETRY_MAX` | `number` | 否 | `2` | HTTP 最大重试次数 |
@@ -208,8 +208,8 @@ curl http://127.0.0.1:3101/health
 | `ENABLE_METRICS_LOGGING` | `boolean` | 否 | `false` | 是否输出 metrics 日志 |
 | `MCP_TEXT_FALLBACK` | `boolean` | 否 | `false` | 是否把关键 structuredContent 数据同步写入 MCP 文本响应，适用于不展示 structuredContent 的客户端 |
 | `SHOW_LAYER_NAMES` | `boolean` | 否 | `false` | 是否在输出中显示 layer 名称 |
-| `ROUND_TAILWIND_VALUES` | `boolean` | 否 | `true` | Tailwind 数值是否按阈值近似映射 |
-| `ROUND_TAILWIND_COLORS` | `boolean` | 否 | `true` | Tailwind 颜色是否按阈值近似映射 |
+| `ROUND_TAILWIND_VALUES` | `boolean` | 否 | `false` | Tailwind 数值是否按阈值近似映射 |
+| `ROUND_TAILWIND_COLORS` | `boolean` | 否 | `false` | Tailwind 颜色是否按阈值近似映射 |
 | `USE_TAILWIND4` | `boolean` | 否 | `false` | 是否启用 Tailwind 4 相关生成逻辑 |
 | `CUSTOM_TAILWIND_PREFIX` | `string` | 否 | `""` | Tailwind 类名前缀 |
 | `BASE_FONT_SIZE` | `number` | 否 | `16` | 基础字体大小，用于部分 Tailwind/排版换算 |
@@ -223,11 +223,6 @@ curl http://127.0.0.1:3101/health
 
 ```bash
 export FIGMA_ACCESS_TOKEN=xxxxx
-export ENABLE_VARIABLES=false
-export INCLUDE_DIAGNOSTICS=false
-export ENABLE_IMAGE_EMBED=true
-export ENABLE_VECTOR_EMBED=true
-export MCP_TEXT_FALLBACK=false
 ```
 
 ### `MCP_TEXT_FALLBACK`
@@ -304,7 +299,7 @@ pnpm --filter anchor-d2c-mcp verify:real
 
 ## 常见错误
 
-- `missing_figma_access_token`：启动或调用前设置 `FIGMA_ACCESS_TOKEN`
+- `missing_figma_access_token`：调用接口时未配置 `FIGMA_ACCESS_TOKEN`，在 MCP server env 配置中添加后重试
 - `figma_http_401`：检查 token 是否有效、是否过期或被撤销
 - `figma_http_403`：确认 token 所属账号能访问目标 Figma 文件
 - `figma_http_404`：检查 `figmaUrl` 中的文件和 `node-id` 是否正确

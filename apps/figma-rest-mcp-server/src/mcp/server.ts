@@ -120,11 +120,14 @@ export function createToolHandlers(
       extra?: ToolCallExtra,
     ) => {
       try {
-        const parsedRequest = parseToolInput(
+        let parsedRequest = parseToolInput(
           convertRequestSchema,
           request,
           "figma_to_code_convert",
         );
+        if (parsedRequest.framework === "Tailwind" && parsedRequest.generationMode === undefined) {
+          parsedRequest = { ...parsedRequest, generationMode: "jsx" as const };
+        }
         const response = await convertUseCase.execute(
           parsedRequest,
           createProgressHooks(extra),
@@ -276,11 +279,11 @@ function stringifyStructuredContent(structuredContent: unknown): string {
   }
 }
 
-function parseToolInput<T>(
-  schema: z.ZodType<T>,
+function parseToolInput<T extends z.ZodTypeAny>(
+  schema: T,
   input: unknown,
   toolName: string,
-): T {
+): z.output<T> {
   const result = schema.safeParse(input);
   if (result.success) {
     return result.data;

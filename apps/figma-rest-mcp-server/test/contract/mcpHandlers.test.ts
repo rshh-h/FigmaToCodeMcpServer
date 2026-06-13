@@ -47,7 +47,6 @@ describe("MCP tool handlers", () => {
       expect(convertTool?.inputSchema.required).toEqual([
         "figmaUrl",
         "workspaceRoot",
-        "framework",
       ]);
       expect(screenshotTool?.inputSchema.properties).toMatchObject({
         figmaUrl: expect.any(Object),

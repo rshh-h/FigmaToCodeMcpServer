@@ -63,15 +63,17 @@ export const convertHelpFields = [
   {
     name: "framework",
     type: "enum",
-    required: true,
+    required: false,
+    default: "Tailwind",
     enum: [...supportedFrameworks],
-    description: "Target code framework.",
+    description: "Target code framework. Defaults to Tailwind.",
   },
   {
     name: "generationMode",
     type: "enum",
     required: false,
-    description: "Optional generation mode. Valid values depend on framework.",
+    description:
+      "Optional generation mode. Valid values depend on framework. Defaults to 'jsx' when framework is Tailwind.",
   },
 ] as const;
 

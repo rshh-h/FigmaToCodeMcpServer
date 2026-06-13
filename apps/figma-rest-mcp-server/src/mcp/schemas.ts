@@ -39,7 +39,9 @@ export const convertToolInputSchema = z.object({
     .describe(
       "Whether to reuse cached Figma REST data and previously materialized workspace intermediates. Defaults to false.",
     ),
-  framework: frameworkSchema,
+  framework: frameworkSchema
+    .default("Tailwind")
+    .describe("Target code framework. Defaults to Tailwind."),
   generationMode: generationModeSchema.optional(),
 });
 
