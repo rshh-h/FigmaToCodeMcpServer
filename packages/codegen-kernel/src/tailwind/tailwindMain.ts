@@ -97,6 +97,10 @@ const tailwindWidgetGenerator = async (
       );
     }
 
+    if (item.kind === "skip") {
+      return "";
+    }
+
     return await convert(item.node);
   });
   const code = (await Promise.all(promiseOfConvertedCode)).join("");

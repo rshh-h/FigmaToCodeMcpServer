@@ -34,7 +34,7 @@ describe("maskNodes", () => {
     ]);
   });
 
-  it("warns for luminance masks", () => {
+  it("skips luminance masks instead of rendering their fill", () => {
     const maskNode = {
       id: "mask",
       name: "Luminance Mask",
@@ -53,12 +53,12 @@ describe("maskNodes", () => {
 
     expect(plan).toHaveLength(2);
     expect(plan[0]).toMatchObject({
-      kind: "node",
-      node: maskNode,
+      kind: "skip",
     });
     expect((plan[0] as { warning?: string }).warning).toContain(
       'unsupported maskType "LUMINANCE"',
     );
+    expect(plan[1]).toEqual({ kind: "node", node: maskedNode });
   });
 
   it("routes vector masks through the structural mask path with an approximation warning", () => {
@@ -91,7 +91,7 @@ describe("maskNodes", () => {
     ]);
   });
 
-  it("warns when masked siblings are not absolutely positioned", () => {
+  it("skips masks whose siblings are not absolutely positioned instead of rendering the mask fill", () => {
     const maskNode = {
       id: "mask",
       name: "Mask",
@@ -112,9 +112,11 @@ describe("maskNodes", () => {
     const plan = buildMaskRenderPlan([maskNode, maskedNode]);
 
     expect(plan).toHaveLength(2);
+    expect(plan[0]).toMatchObject({ kind: "skip" });
     expect((plan[0] as { warning?: string }).warning).toContain(
       "not absolutely positioned",
     );
+    expect(plan[1]).toEqual({ kind: "node", node: maskedNode });
   });
 
   it("stops masking at the next mask boundary and supports multiple mask groups", () => {
@@ -209,6 +211,26 @@ describe("maskNodes", () => {
       {
         kind: "node",
         node: boundaryGroup,
+      },
+    ]);
+  });
+
+  it("skips a mask with no subsequent siblings instead of rendering its fill", () => {
+    const maskNode = {
+      id: "mask",
+      name: "Subtract",
+      type: "VECTOR",
+      isMask: true,
+      maskType: "ALPHA",
+      fills: [{ type: "SOLID", color: { r: 0.58, g: 0, b: 0, a: 1 } }],
+    } as unknown as SceneNode;
+
+    const plan = buildMaskRenderPlan([maskNode]);
+
+    expect(plan).toEqual([
+      {
+        kind: "skip",
+        warning: expect.stringContaining("no subsequent siblings to mask"),
       },
     ]);
   });

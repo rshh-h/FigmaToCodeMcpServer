@@ -412,6 +412,10 @@ const htmlWidgetGenerator = async (
       return await htmlStructuralMaskGroup(item.maskNode, item.maskedNodes, settings);
     }
 
+    if (item.kind === "skip") {
+      return "";
+    }
+
     return await convert(item.node);
   });
   const code = (await Promise.all(promiseOfConvertedCode)).join("");

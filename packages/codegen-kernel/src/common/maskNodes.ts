@@ -14,6 +14,10 @@ export type MaskRenderPlanItem =
       maskNode: SceneNode;
       maskedNodes: readonly SceneNode[];
       warning?: string;
+    }
+  | {
+      kind: "skip";
+      warning?: string;
     };
 
 const STRUCTURABLE_MASK_NODE_TYPES = new Set<SceneNode["type"]>([
@@ -101,10 +105,14 @@ export const buildMaskRenderPlan = (
     const unsupportedReason = getUnsupportedMaskReason(node, maskedNodes);
 
     if (unsupportedReason) {
+      // A mask node's fill is structural (defines the clipping shape), not a
+      // visible rendering property.  When the mask cannot be structurally
+      // applied (no masked siblings, unsupported type, etc.), the mask node
+      // must NOT be rendered as a regular node — doing so would leak its
+      // placeholder fill (e.g. a red crescent) as a visible background.
       plan.push({
-        kind: "node",
-        node,
-        warning: `${unsupportedReason} Rendering without mask semantics.`,
+        kind: "skip",
+        warning: `${unsupportedReason} Mask node will not be rendered.`,
       });
       index += 1;
       continue;

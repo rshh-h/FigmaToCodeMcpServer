@@ -2,7 +2,7 @@
 
 [中文](#chinese) | [English](#english)
 
-当前 CLI 版本 / Current CLI Version: `1.0.7`
+当前 CLI 版本 / Current CLI Version: `1.0.8`
 
 <a id="chinese"></a>
 

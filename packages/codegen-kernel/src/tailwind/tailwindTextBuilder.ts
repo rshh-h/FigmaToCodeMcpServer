@@ -3,12 +3,14 @@ import {
   commonLineHeight,
 } from "../common/commonTextHeightSpacing.js";
 import { escapeJSXText } from "../common/parseJSX.js";
+import { parseFontStyle } from "../common/fontStyleParser.js";
 import { tailwindColorFromFills } from "./builderImpl/tailwindColor.js";
 import {
   pxToFontSize,
   pxToLetterSpacing,
   pxToLineHeight,
   pxToBlur,
+  nearestValue,
 } from "./conversionTables.js";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder.js";
 import { config } from "./tailwindConfig.js";
@@ -49,7 +51,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       const styleClasses = [
         color,
         this.fontSize(segment.fontSize),
-        this.fontWeight(segment.fontWeight),
+        this.resolveFontWeight(segment.fontName, segment.fontWeight),
         this.fontFamily(segment.fontName),
         textDecoration,
         textTransform,
@@ -103,8 +105,45 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontWeight = (fontWeight: number): string => {
-    const weight = config.fontWeight[fontWeight];
-    return weight ? `font-${weight}` : "";
+    const exact = config.fontWeight[fontWeight];
+    if (exact) {
+      return `font-${exact}`;
+    }
+    // Fall back to nearest standard weight for non-standard values (e.g. 550).
+    const keys = Object.keys(config.fontWeight).map(Number);
+    if (keys.length === 0) {
+      return "";
+    }
+    const nearest = nearestValue(fontWeight, keys);
+    return `font-${config.fontWeight[nearest]}`;
+  };
+
+  /**
+   * Resolve the Tailwind font-weight (and italic) classes for a text segment.
+   *
+   * Figma's `fontName.style` string (e.g. "Heavy", "Bold Italic") is the
+   * authoritative source for the visual weight — it directly names the font
+   * face Figma loads.  The numeric `fontWeight` (e.g. 400) is an approximation
+   * that can be wrong for CJK fonts where "Heavy" reports `fontWeight: 400`.
+   *
+   * Decision order:
+   *  1. Parse `fontName.style` for a known weight keyword (not "Regular").
+   *     If found → map to the Tailwind class, ignore `fontWeight`.
+   *  2. If style is "Regular"/"Normal" or unknown → fall back to `fontWeight`.
+   *  3. Italic is extracted from the style string independently.
+   */
+  resolveFontWeight = (fontName: FontName, fontWeight: number): string => {
+    const { weightKeyword, isItalic } = parseFontStyle(fontName.style);
+
+    let weightClass: string;
+    if (weightKeyword) {
+      weightClass = `font-${weightKeyword}`;
+    } else {
+      weightClass = this.fontWeight(fontWeight);
+    }
+
+    const italicClass = isItalic ? "italic" : "";
+    return [weightClass, italicClass].filter(Boolean).join(" ");
   };
 
   indentStyle = (indentation: number) => {
